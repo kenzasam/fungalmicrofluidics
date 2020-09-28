@@ -64,14 +64,15 @@ if __name__ == "__main__":
     ########################################################################################
     #edit 24/11/18
     user= 'Kenza Samlali'
-    lib = 'protocol_KS_clr_sort_nem5' #<--CHANGE PROTOCOL file name
+    lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
     port = 'COM20' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
     PID1 = False #<-- True / False to build a PID controller.
-    PUMPS= False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = True #<-- True when user wants to use FLAME spectrometer through python.
+    PUMPS= True #<-- True when user wants to use Nemesys pump through python.
+    SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
+    SPEC= False #<-- True when user wants to use a spectrometer thread.
     GUI=False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
@@ -109,6 +110,7 @@ if __name__ == "__main__":
     '''
     Set up PID
     '''
+    print 'PID status: %s' %(PID1)
     if PID1 == True:
         PID = threadPID.ArduPidThread(bridge=ardu,
                                       nameID='PID', #proces name
@@ -124,12 +126,14 @@ if __name__ == "__main__":
         PID.enIO(True) #PID.enOut = True
         ardu.gpio.pinMode(9,0)
         print 'type PID.start() to start the PID thread\n'
+
     '''
     Start spectrometer thread
     '''
-    threadFLAME = __import__('threadFLAME') #delete when you place in ArduBridge. For now place thread in folder
+    print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
-        SPEC = threadFLAME.ArduFlameThread(bridge=ardu,
+        threadSpec = __import__('threadFLAME') #delete when you place in ArduBridge. For now place thread in folder
+        Spec = threadSpec.ArduFlameThread(bridge=ardu,
                                       nameID='FLAME', #proces name
                                       Period=0.5,   #Period-time of the control-loop.
                                       device= '', # spectrometer serial number FLMS04421. If empty, first available.
@@ -143,41 +147,73 @@ if __name__ == "__main__":
                                       scan_frames=1,
                                       scan_time=100000 #integration time in microseconds
                                       )
-        SPEC.root.mainloop()
+        Spec.root.mainloop()
+        print 'type Spec.start() to start the FLAME thread\n'
+    else:
+        Spec=None
 
-        print 'type SPEC.start() to start the FLAME thread\n'
+    print 'Spectrometer GUI status: %s' %(SPECGUI)
+    if SPEC == True:
+        SpecGUI = __import__('Spec_Bridge') #delete when you place in ArduBridge. For now place thread in folder
+        SpecGui = SpecGUI.ArduFlameThread(bridge=ardu,
+                                      nameID='FLAME', #proces name
+                                      Period=0.5,   #Period-time of the control-loop.
+                                      device= '', # spectrometer serial number FLMS04421. If empty, first available.
+                                      inttime=100000, #integration time
+                                      autoexposure=False,
+                                      autorepeat=False,
+                                      autosave=True,
+                                      dark_frames=1,
+                                      enable_plot=True,
+                                      output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
+                                      scan_frames=1,
+                                      scan_time=100000 #integration time in microseconds
+                                      )
+        SpecGui.root.mainloop()
+        print 'Spectrometer started'
+    else:
+        Spec=None
 
-    #######NEMESYS##################
-    #if NEMESYS==True:
-    #    nemesysprot = __import__("Nemesys_Bridge")  #--> change protocol file if needed
-    #    nem=nemesysprot.nemesys(cfg=deviceconfig)
-    #    print 'Nemesys ready...'
-    ################################
+    print 'Pumps status: %s' %(PUMPS)
+    if PUMPS==True:
+        Pumpsbridge= __import__('Nemesys_Bridge')  #--> change protocol file if needed
+        Pumps=Pumpsbridge.Nem(
+                deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308", #change path to device configuration folder
+                syringe_diam=[7.29,3.26,3.26,3.26,3.26], #syringe diameter, in mm
+                syringe_stroke=[59,40,40,40,40] #syringe stroke length, in mm
+                )
+        #nem=nemesysprot.nemesys(cfg=deviceconfig)
+        print 'Syringe pumps ready...'
+    else:
+        Pumps=None
 
     print("/\  "*10)
     print("  \/"*10)
     print 'Now: %s'%(time.strftime("%Y-%m-%d %H:%M"))
     print ''
     print 'USER: %s'%(user)
-    print 'LOADED PROTOCOL: using %s'%(lib)
+    print 'ASSIGNED PROTOCOL: using %s'%(lib)
     print ''
 
-    if (lib =='protocol_KS_clr_sort_nem5') :
+    if (lib =='protocol_KS_clr_sort_nem5_v2') :
       print 'The protocol you are using, requires the NeMESYS syringe pump add-on'
       print 'Change the device config file if needed'
       print 'Change the NeMESYS to True or False to go online'
       print 'status: %s' %(PUMPS)
       print 'Change the SPEC spectrometer to True or False to go online'
       print 'status: %s' %(SPEC)
-      setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Nemesys=PUMPS, Flame=SPEC)
-      print ''
-      if GUI == True:
+
+    print 'Loading protocol: %s' %(lib)
+    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec)
+      #setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps)
+    print ''
+    if GUI == True:
           gui=__import__('GUI_KS_Nemesys.GUI_KS_SC_nemesys')
           print 'Start ChipViewer to control droplet movement.'
-
+    '''
     else:
-      setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Nemesys=PUMPS)
-
+      setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send)
+    '''
     print("/\  "*10)
     print("  \/"*10)
     #########################
