@@ -29,10 +29,9 @@ if sys.version_info[:2] < (3, 3):
 """
 """
 Class to view spectrum from Ocean Optics spectrometer as a thread.
+Based on and adapted from SpectrOMat, copyright Tobias Dusa.
 """
-"""
-TO DO: Tk root
-"""
+
 
 __version__ = "1.0.0"
 
@@ -46,10 +45,7 @@ __status__ = "Production"
 
 import math, time
 import numpy
-#import threadBasic as BT
-from GSOF_ArduBridge import threadBasic as BT
-#from GSOF_ArduBridge import PidAlgorithm
-#from GSOF_ArduBridge import movAvg
+
 '''
 #import seabreeze
 #seabreeze.use('pyseabreeze')
@@ -75,15 +71,44 @@ except ImportError:
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-SpectrOMat_animation = None
+SBGUI_animation = None
 
-class ArduFlameThread(BT.BasicThread):
+# SeaBreeze spectrograph simulator
+class SBSimulator:
+    """SeaBreeze specrograph simulator class"""
+    def __init__(self,
+                 integration_time_micros=100000,
+                 minimum_integration_time_micros = 8000,
+                 wavelengths=list(range(2048)),
+                 generator=numpy.random.normal,
+                 histogram=True):
+        self._integration_time_micros = integration_time_micros
+        self.minimum_integration_time_micros = minimum_integration_time_micros
+        self._wavelengths = wavelengths
+        self.samplesize = len(wavelengths)
+        self.generator = generator
+        self.histogram = histogram
+
+    def integration_time_micros(self, newValue):
+        if (newValue >= self.minimum_integration_time_micros):
+            self._integration_time_micros = newValue
+
+    def intensities(self):
+        time.sleep(self._integration_time_micros / 1000000)
+        if self.histogram:
+            return(numpy.histogram(self.generator(size=self.samplesize), bins=self.samplesize)[0])
+        else:
+            return(self.generator(size=self.samplesize))
+
+    def wavelengths(self):
+        return(self._wavelengths)
+
+
+
+class SBGUI:
     """
     """
     def __init__(self,
-                bridge,
-                nameID,
-                Period,
                 device,
                 inttime,
                 autoexposure,
@@ -95,14 +120,8 @@ class ArduFlameThread(BT.BasicThread):
                 scan_frames,
                 scan_time,
                 root= None,
-                viewer={}
                  ):
 
-        BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
-        self.ardu = bridge   #The Arduino-Bridge object
-        #self.spectrometer = Spectrometer.from_serial_number(device)
-        #self.spec = Spectrometer.from_first_available()
-        print(device)
         self.init_device(device=device)
         self.init_tk(root=root)
         self.init_variables(
@@ -121,7 +140,9 @@ class ArduFlameThread(BT.BasicThread):
     def init_device(self, device='#0'):
         #Initialize spectrometer device
         try:
-            if (device == ''):
+            if ('SIMULATOR'.startswith(device.upper())):
+                self.spectrometer = SBSimulator()
+            elseif (device == ''):
             #    print('allo')
             #    self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
                 print('No spec serial number listed. Picking first spec found.')
@@ -145,12 +166,14 @@ class ArduFlameThread(BT.BasicThread):
         print(self.spec)
         self.wavelengths = self.spec.wavelengths()
         self.samplesize = len(self.wavelengths)
+
     def init_tk(self, root=None):
         """Initialize TK subsystem"""
         if root is None:
             root = Tk()
         self.root = root
-        self.root.title('SpectrometerBridge')
+        self.root.title('Spectrometer Bridge')
+
     def init_variables(self,
                        autoexposure=False,
                        autorepeat=False,
@@ -162,7 +185,6 @@ class ArduFlameThread(BT.BasicThread):
                        scan_frames=1,
                        scan_time=100000):
         """Initialize instance variables"""
-        self.T0 = time.time() #wehre should this go????
         self.run_measurement = False
         self.have_darkness_correction = False
         self.button_startpause_texts = { True: 'Pause Measurement', False: 'Start Measurement' }
@@ -178,7 +200,6 @@ class ArduFlameThread(BT.BasicThread):
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
         self.message = StringVar()
         self.total_exposure = int(scan_frames) * int(scan_time)
-
         # Initialize variables
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
@@ -267,7 +288,6 @@ class ArduFlameThread(BT.BasicThread):
 	# Start the infinite measurement loop
         self.root.after(1, self.measure)
 
-    #@staticmethod
     def update_scan_frames(self,newValue):
         newValue = int(newValue)
         if self.autoexposure.get() > 0:
@@ -289,7 +309,6 @@ class ArduFlameThread(BT.BasicThread):
         self.scale_dark_frames.set(newValue)
         self.total_exposure = int(self.scan_frames.get()) * int(self.scan_time.get())
 
-    #@staticmethod
     def validate_scan_frames(self):
         newValue = self.scan_frames.get()
         if StringIsInt(newValue) and \
@@ -303,8 +322,6 @@ class ArduFlameThread(BT.BasicThread):
             self.entry_scan_frames.after_idle(self.entry_scan_frames.config, {'validate': 'focusout', 'validatecommand': self.validate_scan_frames})
         return True
 
-
-    #@staticmethod
     def update_scan_time(self,newValue):
         newValue = int(newValue)
         if self.autoexposure.get() > 0 and \
@@ -322,7 +339,6 @@ class ArduFlameThread(BT.BasicThread):
         self.spectrometer.integration_time_micros(newValue)
         self.total_exposure = int(self.scan_frames.get()) * int(self.scan_time.get())
 
-    #@staticmethod
     def validate_scan_time(self):
         newValue = self.scan_time.get()
         if StringIsInt(newValue) and \
@@ -335,11 +351,9 @@ class ArduFlameThread(BT.BasicThread):
         return True
 
 
-    #@staticmethod
     def update_dark_frames(self,newValue):
         self.dark_frames.set(newValue)
 
-    #@staticmethod
     def validate_dark_frames(self):
         newValue = self.dark_frames.get()
         if StringIsInt(newValue) and \
@@ -351,14 +365,11 @@ class ArduFlameThread(BT.BasicThread):
             self.entry_dark_frames.after_idle(self.entry_dark_frames.config, {'validate': 'focusout', 'validatecommand': self.validate_dark_frames})
         return True
 
-
-    #@staticmethod
     def startpause(self):
         self.run_measurement = not self.run_measurement
         self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
         self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
 
-    #@staticmethod
     def stopdarkness(self):
         if self.run_measurement:
             self.run_measurement = False
@@ -388,7 +399,6 @@ class ArduFlameThread(BT.BasicThread):
             self.message.set(str(self.dark_frames.get()) + ' dark frames scanned. Ready.')
             print(str(self.dark_frames.get()) + ' dark frames scanned.')
 
-    #@staticmethod
     def save(self):
         try:
             with open(time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()), 'w') as f:
@@ -413,7 +423,6 @@ class ArduFlameThread(BT.BasicThread):
         self.root.update()
 
 
-    #@staticmethod
     def reset(self):
         self.run_measurement = False
         self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
@@ -426,12 +435,9 @@ class ArduFlameThread(BT.BasicThread):
         self.measurement = 0
         self.message.set('All parameters reset. Ready.')
 
-    #@staticmethod
     def exit(self):
         sys.exit(0)
 
-
-    #@staticmethod
     def update_plot(i):
         scan_frames = int(self.scan_frames.get())
         if (self.measurement == scan_frames) or \
@@ -440,8 +446,6 @@ class ArduFlameThread(BT.BasicThread):
             self.axes.relim()
             self.axes.autoscale_view(True, True, True)
 
-
-    #@staticmethod
     def measure(self):
         if self.run_measurement:
             scan_frames = int(self.scan_frames.get())
@@ -480,18 +484,3 @@ class ArduFlameThread(BT.BasicThread):
                         self.message.set('Ready.')
 
         self.root.after(1, self.measure)
-
-
-def start(self):
-
-        self.T0 = time.time()
-        BT.BasicThread.start(self)
-        if self.enOut:
-            print('%s: Started ON line'%(self.name))
-        else:
-            print('%s: Started OFF line'%(self.name))
-        self.root.mainloop()
-
-def stop(self):
-    self.setOutput(0)
-    BT.BasicThread.stop(self)

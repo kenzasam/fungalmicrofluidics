@@ -62,7 +62,6 @@ def tempTC1047(pin=0, vcc=5.0):
 if __name__ == "__main__":
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
     ########################################################################################
-    #edit 24/11/18
     user= 'Kenza Samlali'
     lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
     port = 'COM20' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
@@ -132,8 +131,8 @@ if __name__ == "__main__":
     '''
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
-        threadSpec = __import__('threadFLAME') #delete when you place in ArduBridge. For now place thread in folder
-        Spec = threadSpec.ArduFlameThread(bridge=ardu,
+        threadSpec = __import__('spectroThread') #delete when you place in ArduBridge. For now place thread in folder
+        Spec = threadSpec.spectroThread(bridge=ardu,
                                       nameID='FLAME', #proces name
                                       Period=0.5,   #Period-time of the control-loop.
                                       device= '', # spectrometer serial number FLMS04421. If empty, first available.
@@ -151,14 +150,13 @@ if __name__ == "__main__":
         print 'type Spec.start() to start the FLAME thread\n'
     else:
         Spec=None
-
+    '''
+    Start spectrometer bridge
+    '''
     print 'Spectrometer GUI status: %s' %(SPECGUI)
-    if SPEC == True:
-        SpecGUI = __import__('Spec_Bridge') #delete when you place in ArduBridge. For now place thread in folder
-        SpecGui = SpecGUI.ArduFlameThread(bridge=ardu,
-                                      nameID='FLAME', #proces name
-                                      Period=0.5,   #Period-time of the control-loop.
-                                      device= '', # spectrometer serial number FLMS04421. If empty, first available.
+    if SPECGUI == True:
+        SpecBridge = __import__('FLAME_bridge') #delete when you place in ArduBridge. For now place thread in folder
+        specGui = SpecBridge.SBGUI(device= 'FLMS04421', # spectrometer serial number FLMS04421. If empty, first available.
                                       inttime=100000, #integration time
                                       autoexposure=False,
                                       autorepeat=False,
@@ -169,11 +167,14 @@ if __name__ == "__main__":
                                       scan_frames=1,
                                       scan_time=100000 #integration time in microseconds
                                       )
-        SpecGui.root.mainloop()
+        SBGUI_animation = animation.FuncAnimation(specGUI.figure, specGUI.update_plot)
+        specGui.root.mainloop()
         print 'Spectrometer started'
     else:
         Spec=None
-
+    '''
+    Start Nemesys syringe pump bridge
+    '''
     print 'Pumps status: %s' %(PUMPS)
     if PUMPS==True:
         Pumpsbridge= __import__('Nemesys_Bridge')  #--> change protocol file if needed
@@ -186,6 +187,7 @@ if __name__ == "__main__":
         print 'Syringe pumps ready...'
     else:
         Pumps=None
+
 
     print("/\  "*10)
     print("  \/"*10)
