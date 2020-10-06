@@ -115,9 +115,9 @@ class Setup():
         seqCategory = 'Sorting'  #<-- EDIT THIS
         seqName = 'S1'  #<-- EDIT THIS
         seqDesc = ''  #<-- EDIT THIS
-        b=[[42,78,41,100,40,75,39,97,38,72,94,37]]
+        b=[[37,38]]
         seqList = b # <-- Electrodes 1 and 2 actuated at same time. 3 actuated after 1 and 2.
-        seqOnTime= 0.7 # <-- How long is the electrode actuated [Sec]
+        seqOnTime= 0.9 # <-- How long is the electrode actuated [Sec]
         seqPeriod= 1 # <-- Keep this at least 0.2 seconds above onTime [Sec]
 
         self.seqAdd(seqCategory, seqName, seqDesc, seqList, seqPeriod, seqOnTime, ExtGpio, chipViewer) #DON'T EDIT
@@ -261,8 +261,8 @@ class Setup():
         print "....................."
         '''
     ####### droplet operations ##############
-    def Sort(self,nr):
-        self.seq['E%d'%(nr)].start(1)
+    def sort(self,nr):
+        self.seq['S%d'%(nr)].start(1)
         print "....................."
 
 ######################################################################################################################
