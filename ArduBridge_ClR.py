@@ -146,7 +146,6 @@ if __name__ == "__main__":
                                       scan_frames=1,
                                       scan_time=100000 #integration time in microseconds
                                       )
-        Spec.root.mainloop()
         print 'type Spec.start() to start the FLAME thread\n'
     else:
         Spec=None
@@ -167,8 +166,8 @@ if __name__ == "__main__":
                                       scan_frames=1,
                                       scan_time=100000 #integration time in microseconds
                                       )
-        SBGUI_animation = animation.FuncAnimation(specGUI.figure, specGUI.update_plot)
-        specGui.root.mainloop()
+        specGui.start()
+
         print 'Spectrometer started'
     else:
         Spec=None
@@ -188,6 +187,9 @@ if __name__ == "__main__":
     else:
         Pumps=None
 
+    '''
+    Start printouts
+    '''
 
     print("/\  "*10)
     print("  \/"*10)
