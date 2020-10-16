@@ -37,6 +37,7 @@ import time, copy
 import sys
 import os
 import numpy
+'''
 qmixsdk_dir =  "C:/QmixSDK" #path to Qmix SDK
 sys.path.append(qmixsdk_dir + "/lib/python")
 os.environ['PATH'] += os.pathsep + qmixsdk_dir
@@ -44,7 +45,7 @@ from qmixsdk import qmixbus
 from qmixsdk import qmixpump
 from qmixsdk import qmixvalve
 from qmixsdk.qmixbus import UnitPrefix, TimeUnit
-
+'''
 
 #####################
 
