@@ -64,11 +64,11 @@ if __name__ == "__main__":
     ########################################################################################
     user= 'Kenza Samlali'
     lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
-    port = 'COM20' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
+    port = 'COM4' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = True #<-- False for simulation
-    PID1 = False #<-- True / False to build a PID controller.
+    ELEC_EN = False #<-- False for simulation
+    PID = True #<-- True / False to build a PID controller.
     PUMPS= False #<-- True when user wants to use Nemesys pump through python.
     SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
     SPEC= False #<-- True when user wants to use a spectrometer thread.
@@ -109,13 +109,14 @@ if __name__ == "__main__":
     '''
     Set up PID
     '''
-    print 'PID status: %s' %(PID1)
-    if PID1 == True:
+    print 'PID status: %s' %(PID)
+    if PID == True:
+        threadPID = __import__('threadPID_KS') #delete when you place in ArduBridge. For now place thread in folder
         PID = threadPID.ArduPidThread(bridge=ardu,
                                       nameID='PID', #proces name
-                                      Period=0.5,   #Period-time of the control-loop. PID calculation cycle time.
+                                      Period=0.5,   #Period-time of the control-loop. PID calculation cycle time in sec.
                                       fbPin=1,      #The analog pin of the temp sensor.
-                                      outPin=10,     #The output pin  of the driver.
+                                      outPin=10,    #The output pin  of the driver.
                                       dirPin=7      #The direction pin for the driver.
                                       )
         PID.PID.Kp = 30 # proportional control of PID
@@ -124,10 +125,13 @@ if __name__ == "__main__":
         PID.addViewer('UDP',udpSendPid.Send) #'UDP',udpSendPid1.Send)
         PID.enIO(True) #PID.enOut = True
         ardu.gpio.pinMode(9,0)
-        print 'type PID.start() to start the PID thread\n'
+        #print 'type PID.start() to start the PID thread\n'
+
+        #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
+
 
     '''
-    Start spectrometer thread
+    Set up spectrometer
     '''
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:

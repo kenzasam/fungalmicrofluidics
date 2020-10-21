@@ -18,7 +18,7 @@ This file is part of GSOF_ArduBridge.
     along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
 """
 """
-## Protocol by Kenza Smalali
+## Protocol by Kenza Samlali
 ## June 2020: V1.0
 """
 
@@ -101,16 +101,14 @@ class Setup():
             #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.spec=Spec
-        ##############################################################
-        ####\/\/\/ EXTRA USER FUNCTIONS \/\/\/#########################
-        ###############################################################
-        self.DropGenLSeq = [[61,84],[84,66],[66,90],[90,67],[61]]
-        ##############################################################
+        #self.init_pumps()
+        #self.init_spec()
+        #self.init_incubation()
+        self.init_elecs()
 
-        ##############################################################################
-        ####\/\/\/ SEQUENCES \/\/\/###################################################
+    def init_elecs(self):
         """
-        The Sorting function allows you to sort droplets to the bottom channel.
+        Initializing electrode sequences.
         """
         # \/ ** START OF SEQUENCE ** \/
         seqCategory = 'Sorting'  #<-- EDIT THIS
@@ -144,9 +142,6 @@ class Setup():
         seqPeriod= 1 # <-- Keep this at least 0.2 seconds above onTime [Sec]
 
         self.seqAdd(seqCategory, seqName, seqDesc, seqList, seqPeriod, seqOnTime, ExtGpio, chipViewer) #DON'T EDIT
-        # /\ **  END OF SEQUENCE  ** /\
-        ######################################################################################################################
-        ######################################################################################################################
 
     def catAdd(self, catName):
         if not catName in self.categoryDict.keys():
@@ -266,6 +261,16 @@ class Setup():
         self.seq['S%d'%(nr)].start(1)
         print "....................."
 
+    def hs(RC=0.5,T=37,t=30):
+
+    	PID.RC_div_DT=RC
+    	PID.ctrl(T)
+    	time.sleep(t)
+    	PID.RC_div_DT=0.5
+    	PID.ctrl(0)
+    	time.sleep(3*60)
+    	PID.RC_div_DT=22
+    	PID.ctrl(24)
 ######################################################################################################################
 ######################################################################################################################
 """
