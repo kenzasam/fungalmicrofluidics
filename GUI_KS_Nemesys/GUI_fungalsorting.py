@@ -3,10 +3,10 @@
 ###
 ### On-Demand Channel operations, Single-Cell GUI, with Cetoni Nemesys low-pressure syringe pump integration
 ### by Kenza Samlali
-### Sequence selector channel by Laura Lecrerc's LLGUI
+### Sequence selector class by Laura Lecrerc's LLGUI
 #-------------------------------------------------------------------
 ## >>> VERSIONS <<< ##
-# v0.1.0 - copy from Laura, adding extra function buildButtons
+# v 0.1.0 - copy from Laura, adding extra function buildButtons
 # v 1.0.0 - Droplet Generation buttons and functions, Droplet operations buttons and FUNCTIONS
 # v 1.1.0 - Bug Fixes (error window popups when buttons pressed, integrating KeepAll in KeepAllBut)
 # v 2.0.0 - Nemesys integration
@@ -18,6 +18,7 @@
 #-------------------------------------------------------------------
 
 
+
 import wx
 import os, sys
 import pyperclip
@@ -25,31 +26,46 @@ import Tkinter, tkFileDialog
 from optparse import OptionParser
 from GSOF_ArduBridge import UDP_Send
 
+'''
+CODE STRUCTURE
+------------------
+------------------
+MainFrame - MainFrame class; gathers all other panels, toolbars etc.
+Menubar - Menubar class
+Pumppanel - Panel class to operate syringe pumps
+Operationspanel - Panel class with functions
+Incubationpanel - Panel class for incubation (time input, temperature input to run PID thread)
+Specpanel - Panel class to start sorting procedure
+'''
+
 class MainFrame(wx.Frame):
     '''Create MainFrame class.'''
     def __init__(self, setup, port=-1, ip='127.0.0.1', columns=2):
         super(MainFrame, self).__init__(None, wx.ID_ANY) #, size=(400,400)
         #panel=wx.Panel(self, wx.ID_ANY)
-        ###sending stuff to ArduBridge Shell
+        '''PARAMETERS'''
+        pumpnrs=5
+        self.Title = 'Fungal Sorting hybrid microfluidics GUI'
+
+        '''setup sending protocol for ArduBridge Shell.'''
         self.udpSend = False
         if port > 1:
             self.udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
-        #
-        #
-        '''setting up wx Main Frame window'''
+
+        '''setting up wx Main Frame window.'''
         self.setup=setup
-        pumpnrs=5
-        self.Title = 'Channel microfluidics GUI'
         ico=wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.SetMenuBar(MenuBar(self,pumpnrs))
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
+
         '''Populate main frame.'''
         #mainpanel = MainPanel(self)
         pumppanel = PumpPanel(self,pumpnrs)
-        dropletpanel=DropletPanel(self)
+        #dropletpanel=DropletPanel(self)
         operationspanel=OperationsPanel(self)
         #seqpanel=SequencePanel(self,self.setup)
+        incpanel=Incubationpanel(self)
         MAINbox = wx.BoxSizer(wx.VERTICAL)
         line1 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         MAINbox.Add( line1, 0, wx.ALL|wx.EXPAND, 2 )
@@ -61,16 +77,6 @@ class MainFrame(wx.Frame):
         MAINbox.Add(titleboxnem, 0, wx.ALIGN_CENTER_VERTICAL)
         #
         MAINbox.Add(pumppanel, 0, wx.ALL)
-        #
-        line2 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        MAINbox.Add(line2, 0, wx.ALL|wx.EXPAND, 2)
-        titlebox0  = wx.BoxSizer(wx.HORIZONTAL)
-        title = wx.StaticText(self, label='Droplet Generation')
-        title.SetFont(font)
-        titlebox0.Add(title, flag=wx.ALIGN_LEFT, border=8)
-        MAINbox.Add(titlebox0, 0, wx.ALIGN_CENTER_VERTICAL )
-        #
-        MAINbox.Add(dropletpanel, 0, wx.ALL, 2)
         #
         line3 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         MAINbox.Add( line3, 0, wx.ALL|wx.EXPAND, 2 )
@@ -86,12 +92,12 @@ class MainFrame(wx.Frame):
         line4 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         MAINbox.Add( line4, 0, wx.ALL|wx.EXPAND, 2 )
         titlebox2  = wx.BoxSizer(wx.HORIZONTAL)
-        title2 = wx.StaticText(self, label='Sequences')
+        title2 = wx.StaticText(self, label='Incubation')
         title2.SetFont(font)
         titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
         MAINbox.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
         #
-        #MAINbox.Add(seqpanel)
+        MAINbox.Add(incpanel)
         #
         self.SetSizerAndFit(MAINbox)
         self.Fit()
@@ -118,17 +124,7 @@ class MainPanel(wx.Panel):
         self.SetSizer(sizer)
 """
 
-'''
-CODE ORGANIZATION
-------------------
-------------------
-MainFrame - MainFrame class; gathers all other panels, toolbars etc.
-Menubar - Menubar class
-Pumppanel - Panel class
-Dropletpanel - Panel class
-Operationspanel - Panel class
-Sequencepanel - Panel class
-'''
+
 
 class PumpPanel(wx.Panel):
     def __init__(self, parent, pumpnrs):
@@ -300,128 +296,6 @@ class PumpPanel(wx.Panel):
     def onCombo(self, event):
         print 'pump changed'
 
-class DropletPanel(wx.Panel):
-    def __init__(self, parent):
-        wx.Panel.__init__(self,parent)
-        #######################################
-        ########DROPLET GENERATION#############
-        #######################################
-        #self.panel=panel
-        """Create and populate main sizer."""
-        DropletSizer = wx.FlexGridSizer(rows=3, cols=2, hgap=5, vgap=5)
-        boxa=wx.BoxSizer(wx.HORIZONTAL)
-        self.LeftBtn=wx.Button( self, label='Left', name='', size=(70,24)) #ADDED KS
-        self.LeftBtn.Bind(wx.EVT_BUTTON, self.onLeft)
-        boxa.Add(self.LeftBtn, flag=wx.RIGHT, border=8)
-        boxa1=wx.BoxSizer(wx.VERTICAL)
-        boxa11=wx.BoxSizer(wx.HORIZONTAL)
-        self.texta1=wx.StaticText(self,  wx.ID_ANY, label='# ')
-        boxa11.Add(self.texta1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entrya1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        boxa11.Add(self.entrya1, proportion=0.5, border=8)
-        boxa12=wx.BoxSizer(wx.HORIZONTAL)
-        self.texta2=wx.StaticText(self, wx.ID_ANY, label='wait time[s]  ')
-        boxa12.Add(self.texta2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entrya2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        boxa12.Add(self.entrya2, proportion=0.5, border=8)
-        boxa1.Add(boxa11,wx.ALL, border=8)
-        boxa1.AddSpacer(4)
-        boxa1.Add(boxa12,wx.ALL, border=8)
-        boxa.Add(boxa1, flag=wx.LEFT)
-        DropletSizer.Add(boxa, flag=wx.ALIGN_CENTER_VERTICAL)
-        ##
-        boxb=wx.BoxSizer(wx.HORIZONTAL)
-        self.RightBtn=wx.Button( self, label='Right', name='', size=(70,24)) #ADDED KS
-        self.RightBtn.Bind(wx.EVT_BUTTON, self.onRight)
-        boxb.Add(self.RightBtn, flag=wx.RIGHT, border=8)
-        boxb1=wx.BoxSizer(wx.VERTICAL)
-        boxb11=wx.BoxSizer(wx.HORIZONTAL)
-        self.textb1=wx.StaticText(self,  wx.ID_ANY, label='# ')
-        boxb11.Add(self.textb1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryb1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        boxb11.Add(self.entryb1, proportion=0.5, border=8)
-        boxb12=wx.BoxSizer(wx.HORIZONTAL)
-        self.textb2=wx.StaticText(self, wx.ID_ANY, label='wait time[s]   ')
-        boxb12.Add(self.textb2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryb2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        boxb12.Add(self.entryb2, proportion=0.5, border=8)
-        boxb1.Add(boxb11,wx.ALL, border=8)
-        boxb1.AddSpacer(4)
-        boxb1.Add(boxb12,wx.ALL, border=8)
-        boxb.Add(boxb1, flag=wx.LEFT)
-        DropletSizer.Add(boxb, flag=wx.ALIGN_CENTER_VERTICAL)
-        ##
-        boxc=wx.BoxSizer(wx.HORIZONTAL)
-        self.DoubleBtn=wx.Button( self, label='Double', name='', size=(70,24)) #ADDED KS
-        self.DoubleBtn.Bind(wx.EVT_BUTTON, self.onDouble)
-        boxc.Add(self.DoubleBtn, flag=wx.RIGHT, border=8)
-        boxc1=wx.BoxSizer(wx.VERTICAL)
-        boxc11=wx.BoxSizer(wx.HORIZONTAL)
-        self.textc1=wx.StaticText(self,  wx.ID_ANY, label='# ')
-        boxc11.Add(self.textc1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryc1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        boxc11.Add(self.entryc1, proportion=0.5, border=8)
-        boxc12=wx.BoxSizer(wx.HORIZONTAL)
-        self.textc2=wx.StaticText(self, wx.ID_ANY, label='wait time[s]  ')
-        boxc12.Add(self.textc2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryc2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        boxc12.Add(self.entryc2, proportion=0.5, border=8)
-        boxc1.Add(boxc11,wx.ALL, border=8)
-        boxc1.AddSpacer(4)
-        boxc1.Add(boxc12, wx.ALL, border=8)
-        boxc.Add(boxc1, flag=wx.LEFT)
-        DropletSizer.Add(boxc, flag=wx.ALIGN_CENTER_VERTICAL)
-        #
-        #MAINbox.Add(DropletSizer, 0, wx.ALL, 2)
-    def onLeft(self, event):
-        print '((Left Droplet Generation))'
-        nr=int(float(self.entrya1.GetValue()))
-        print nr
-        t=int(float(self.entrya2.GetValue()))
-        print t
-        flrt=float(self.entryDropflrtAct.GetValue())
-        print flrt
-        pumpID=int(self.combo3.GetValue())
-        print pumpID
-        if (nr or t)==0 or flrt == 0.0:
-            wx.MessageDialog(self, "Enter a correct number and/or flowrate", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        else:
-            s = 'setup.DropGenL(%d,%d,%d)'%(nr,t,pumpID)
-            pyperclip.copy(s)
-            if self.udpSend != False:
-                self.udpSend.Send(s)
-
-    def onRight(self, event):
-        print '((Right Droplet Generation))'
-        nr=int(float(self.entryb1.GetValue()))
-        t=int(float(self.entryb2.GetValue()))
-        #flrt=float(self.entryDropflrtAct.GetValue())
-        pumpID=int(self.combo3.GetValue())
-        dropV=float(self.entryDropV.GetValue())
-        #print pumpID
-        if (nr or t)==0 or dropV == 0.0:
-            wx.MessageDialog(self, "Enter a correct number and/or standard droplet volume", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        else:
-            s = 'setup.DropGenR(%d,%d,%d,%f)'%(nr,t,pumpID,dropV)
-            pyperclip.copy(s)
-            if self.udpSend != False:
-                self.udpSend.Send(s)
-
-    def onDouble(self, event):
-        print '((Double Droplet Generation))'
-        nr=int(float(self.entryc1.GetValue()))
-        t=int(float(self.entryc2.GetValue()))
-        flrt=float(self.entryDropflrtAct.GetValue())
-        pumpID=int(self.combo3.GetValue())
-        #print pumpID
-        if (nr or t)==0 or flrt == 0.0:
-            wx.MessageDialog(self, "Enter a correct number and/or flowrat", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        else:
-            s = 'setup.DropGenD(%d,%d,%f,%d)'%(nr,t,flrt,pumpID)
-            pyperclip.copy(s)
-            if self.udpSend != False:
-                self.udpSend.Send(s)
-
 class OperationsPanel(wx.Panel):
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)
@@ -499,18 +373,7 @@ class OperationsPanel(wx.Panel):
 
         #MAINbox.Add(fnSizer, 0, wx.ALL, 2)
 
-    def onKeep(self, event):
-        try:
-            nr=int(float(self.entry3.GetValue()))
-            t=int(float(self.entry4.GetValue()))
-        except:
-            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.Keep(%d,%d)'%(nr,t)
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
-
-    def onKeepAllBut(self, event):
+    def onSort(self, event):
         try:
             nr=int(float(self.entry5.GetValue()))
             t=int(float(self.entry6.GetValue()))
@@ -521,110 +384,47 @@ class OperationsPanel(wx.Panel):
         if self.udpSend != False:
             self.udpSend.Send(s)
 
-    def onEncapsulate(self, event):
-        try:
-            nr=int(float(self.entry1.GetValue()))
-        except:
-            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = str('setup.Encapsulate(%d)'%(nr))
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
-
-    def onRelease(self, event):
-        try:
-            nr=int(float(self.entry2.GetValue()))
-            reverse=self.checkrev.GetValue()
-
-        except:
-            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.Release(%d,%d)'%(nr,reverse)
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
-
     def onChecked(self, event):
           cb=event.GetEventObject()
           cb.GetValue()
 
-class SequencePanel(wx.Panel):
+class Incubationpanel(wx.Panel):
     def __init__(self, parent, setup):
         wx.Panel.__init__(self,parent,setup)
-        ###################################################
-        ##################SEQUENCES########################
-        ####################################################
-        #self.panel=panel
         self.setup=setup
         """Create and populate main sizer."""
-        seqSizer = wx.FlexGridSizer(rows=3, cols=2, hgap=5, vgap=5)
-        #getting some values to work with for sizing panel contents later...
-        categLengths = {}
-        for categories in self.setup.categoryDict.keys():
-            categLengths[categories]=(len(self.setup.categoryDict[categories]))
-        print categLengths
-        categVals = list(categLengths.values())
-        categKeys = list(categLengths.keys())
-        categDenominator = (int(max(categVals)/5))
-        for i in range(0,(len(categLengths))):
-            if categDenominator == 0:
-                categLengths[categKeys[i]]= 2
-            elif categDenominator == 1:
-                categLengths[categKeys[i]]= 2
-            elif (categVals[i]/categDenominator) <= 2:
-                categLengths[categKeys[i]]= 3
-            elif (categVals[i]/categDenominator) <= 4:
-                categLengths[categKeys[i]]= 4
-            else:
-                categLengths[categKeys[i]]=5
-        #...now there is a dictionary with the panelsizer's columns for each category key.
-        for categories in self.setup.categoryDict.keys():
-            self.categPanes=[]
-            self.categPanes.append(wx.CollapsiblePane(self, -1, label=categories))
-            self.buildPanes(self.categPanes[-1], seqSizer)
-            thisPanel = self.categPanes[-1].GetPane()
-            #sizer for the panel contents
-            if categDenominator >= 2: #more than 10 sequences in a category
-                panelSizer = wx.GridSizer( cols = categLengths[categories] )
-            else:
-                panelSizer = wx.GridSizer( cols = 2 )
-            sortedCategory = self.setup.categoryDict[categories]
-            sortedCategory.sort()
-            for i in range(0,len(self.setup.categoryDict[categories])):
-                thisSeq = wx.Button( thisPanel, label=sortedCategory[i], name=sortedCategory[i], size=(((len(sortedCategory[i])*7)+10),24))
-                self.buildButtons(thisSeq, seqSizer, self.setup.seq[sortedCategory[i]].desc )
-                panelSizer.Add( thisSeq, 0, wx.GROW | wx.ALL ,0 )
-                thisPanel.SetSizer(panelSizer)
-        panelSizer.SetSizeHints(thisPanel)
-        #seqSizer.Add(panelSizer, wx.ALL)
-        #MAINbox.Add(seqSizer, 0, wx.ALL )
+        incSizer = wx.FlexGridSizer(rows=3, cols=3, hgap=5, vgap=5)
+        #Temperature
+        box1=wx.BoxSizer(wx.HORIZONTAL)
+        self.text1=wx.StaticText(self,  wx.ID_ANY, label='Temperature [C]')
+        box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
+        box1.Add(self.entry1, proportion=1)
+        incSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
+        #Time
+        box2=wx.BoxSizer(wx.HORIZONTAL)
+        self.text2=wx.StaticText(self,  wx.ID_ANY, label='time')
+        box1.Add(self.text2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        self.entry2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
+        box2.Add(self.entry2, proportion=1)
+        fnSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
+        #start
+        box3=wx.BoxSizer(wx.HORIZONTAL)
+        self.IncBtn=wx.Button( self, label='Start', name='PID.start()', size=(70,24))
+        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
+        box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
+        fnSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
 
-
-        ####################
-        #self.panel.SetSizerAndFit(MAINbox)
-        #self.Fit()
-
-    def buildButtons(self, btn, sizer, desc):
-        btn.Bind(wx.EVT_BUTTON, self.onButton)
-        btn.SetToolTip(wx.ToolTip(desc))
-    def buildPanes(self, categPane, seqSizer):
-        categPane.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.OnPaneChanged)
-        seqSizer.Add(categPane, 0, wx.GROW | wx.ALL, 0)
-    def OnPaneChanged(self, evt):
-        self.GetSizer().Layout()
-        self.Fit()
-    def onButton(self, event):
-        label = event.GetEventObject().GetLabel()
-        s = str( 'setup.seq[\'%s\'].start(%s)'%(label, str(self.numActsTxtBox.GetValue())) )
-        pyperclip.copy(s)
-        if self.udpSend != False:
-          self.udpSend.Send(s)
-    def onFuncButton(self, event):
-        s = str(event.GetEventObject().GetName())
+    def onIncubate(self,event):
+        try:
+            temp=int(float(self.entry1.GetValue()))
+            t=int(float(self.entry2.GetValue()))
+        except:
+            wx.MessageDialog(self, "Enter a valid temperature", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        s = 'setup.PID.Incubation(%d,%d)'%(temp,t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
-
-    ####### EXTRA BUTTON FUNCTIONS #####
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
@@ -663,7 +463,7 @@ class MenuBar(wx.MenuBar):
         self.calibrateItem=[]
         for i in Pumpnrs:
             self.calibrateItem.append(calibrateMenu.Append(wx.ID_ANY, str(i), str(i)))
-            self.Bind(wx.EVT_MENU, self.onCalibratePump, self.calibrateItem[i]) 
+            self.Bind(wx.EVT_MENU, self.onCalibratePump, self.calibrateItem[i])
         nemMenu.Append(wx.ID_ANY, 'Calibrate', calibrateMenu)
         #menubar.Append(nemMenu, 'Nemesys')
         #self.SetMenuBar(menubar)
@@ -732,7 +532,6 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     date = '06/08/2018'
     print 'GUI: Protocol GUI Ver:%s'%(ver)
     print 'by Kenza Samlali, 2018'
-    print 'based on LLGUI (Laura Leclerc & Guy Soffer, 2018)'
     #Command line option parser
 
     parser = OptionParser()
