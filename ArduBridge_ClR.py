@@ -64,11 +64,11 @@ if __name__ == "__main__":
     ########################################################################################
     user= 'Kenza Samlali'
     lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
-    port = 'COM4' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
+    port = 'COM20' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = False #<-- False for simulation
-    PID1 = True #<-- True / False to build a PID controller.
+    ELEC_EN = True #<-- False for simulation
+    PID1 = False #<-- True / False to build a PID controller.
     PUMPS= False #<-- True when user wants to use Nemesys pump through python.
     SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
     SPEC= False #<-- True when user wants to use a spectrometer thread.
