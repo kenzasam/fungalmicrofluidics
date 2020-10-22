@@ -28,13 +28,13 @@ __copyright__ = "Copyright 2020"
 __credits__ = ["Guy Soffer"]
 __license__ = "GPL-3.0-or-later"
 __maintainer__ = ""
-__email__ =
+__email__ = ""
 __status__ = "Production"
 
 import math, time
 from GSOF_ArduBridge import threadBasic as BT
 from GSOF_ArduBridge import PidAlgorithm
-from GSOF_ArduBridge import movAvg
+#from GSOF_ArduBridge import movAvg
 
 class ArduPidThread(BT.BasicThread):
     """
@@ -80,7 +80,7 @@ class ArduPidThread(BT.BasicThread):
         self.Settle_tolerance = 1
 
         #Moving avarage for the feedback signal
-        self.fbFilter = movAvg.Stat_Recursive_X_Array( X=[25]*4 )
+        #self.fbFilter = movAvg.Stat_Recursive_X_Array( X=[25]*4 )
 
     def enIO(self, val=True):
         self.enOut = val
@@ -103,8 +103,8 @@ class ArduPidThread(BT.BasicThread):
         feedback = 25.0
         if self.enInput:
             feedback = self.getFeedback()
-        self.fbFilter.step(feedback)
-        feedback = fbFilter.Ex()
+        #self.fbFilter.step(feedback)
+        #feedback = fbFilter.Ex()
 
         #Calculate the control-loop
         dt = time.time() -self.T_Z[1] #Calculate the DT value

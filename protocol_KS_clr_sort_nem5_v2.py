@@ -80,11 +80,7 @@ class Setup():
         self.DropletVolume= 0.00025073 #-->  change to volume of 1 drop in microliter
         #>>>>>>>>>>>>> PARAMETER BLOCK END  <<<<<<<<<<<<<
         '''
-        self.gpio = gpio
-        self.ExtGpio = ExtGpio
-        self.chipViewer = chipViewer
-        self.seq = {} #initializes dictionary, which is an array of associations; returns associated value when a value is inputted
-        self.categoryDict = {}
+        '''
         print '>>>  <<<'
         print '>>>  Checking syringe pumps  <<<'
         #self.nem=Nem(Nemesys=Nemesys, Deviceconfig=deviceconfig, Syringe_param=syringe_param)
@@ -101,15 +97,42 @@ class Setup():
             #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.spec=Spec
-        #self.init_pumps()
-        #self.init_spec()
+        '''
+        self.init_pumps(Pumps=Pumps)
+        self.init_spec(Spec=Spec)
         #self.init_incubation()
-        self.init_elecs()
+        self.init_elecs(gpio=gpio,ExtGpio = ExtGpio, chipViewer = chipViewer)
 
-    def init_elecs(self):
+    def init_spec(self, Spec):
+        print '>>>  <<<'
+        print '>>>  Checking spectrometer  <<<'
+        if (Spec is None):
+            print "Spectrometer thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol."
+            #sys.exit(1)
+            #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
+        else:
+            self.spec=Spec
+
+    def init_pumps(self, Pumps):
+        print '>>>  <<<'
+        print '>>>  Checking syringe pumps  <<<'
+        #self.nem=Nem(Nemesys=Nemesys, Deviceconfig=deviceconfig, Syringe_param=syringe_param)
+        if (Pumps is None):
+            print "Pump bridge not found! No syringe pumps initiated. Syringe pumps are needed for this protocol."
+            #sys.exit(1)
+        else:
+            self.nem = Pumps
+
+    def init_elecs(self,gpio, ExtGpio,chipViewer):
         """
         Initializing electrode sequences.
         """
+        self.gpio = gpio
+        self.ExtGpio = ExtGpio
+        self.chipViewer = chipViewer
+        self.seq = {} #initializes dictionary, which is an array of associations; returns associated value when a value is inputted
+        self.categoryDict = {}
+
         # \/ ** START OF SEQUENCE ** \/
         seqCategory = 'Sorting'  #<-- EDIT THIS
         seqName = 'S1'  #<-- EDIT THIS

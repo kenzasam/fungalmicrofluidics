@@ -44,13 +44,16 @@ def extEval(s):
     eval(s)
 
 def close():
-    if PUMPS != False:
-       setup.nem.bus.stop()
-       print 'Nemesys Bus closed...'
 
     if udpConsol != False:
         udpConsol.active = False
-    setup.stop()
+
+    if SETUP != False:
+        if PUMPS != False:
+           setup.nem.bus.stop()
+           print 'Nemesys Bus closed...'
+        setup.stop()
+
     ardu.OpenClosePort(0)
     print 'Bye Bye...'
 
@@ -64,12 +67,12 @@ if __name__ == "__main__":
     ########################################################################################
     user= 'Kenza Samlali'
     lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
-    port = 'COM4' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
+    port = 'COM20' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
-    PUMPS= False #<-- True when user wants to use Nemesys pump through python.
+    PUMPS= True #<-- True when user wants to use Nemesys pump through python.
     SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
     SPEC= False #<-- True when user wants to use a spectrometer thread.
     GUI=False #<-- True for running GUI through serial
@@ -83,6 +86,7 @@ if __name__ == "__main__":
     import user protocol
     '''
     protocol = __import__(lib)
+    SETUP=False
     '''
     Set up communications with electrode stack and Arduino
     '''
@@ -128,8 +132,6 @@ if __name__ == "__main__":
         #print 'type PID.start() to start the PID thread\n'
 
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
-
-
     '''
     Set up spectrometer
     '''
@@ -194,7 +196,6 @@ if __name__ == "__main__":
     '''
     Start printouts
     '''
-
     print("/\  "*10)
     print("  \/"*10)
     print 'Now: %s'%(time.strftime("%Y-%m-%d %H:%M"))
@@ -212,7 +213,12 @@ if __name__ == "__main__":
       print 'status: %s' %(SPEC)
 
     print 'Loading protocol: %s' %(lib)
-    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec)
+    try:
+        setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec)
+        SETUP = True
+    except:
+        SETUP= False
+
       #setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps)
     print ''
     if GUI == True:
