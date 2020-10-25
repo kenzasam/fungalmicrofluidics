@@ -162,7 +162,7 @@ if __name__ == "__main__":
     if SPECGUI == True:
         SpecBridge = __import__('FLAME_bridge') #delete when you place in ArduBridge. For now place thread in folder
         specGui = SpecBridge.SBGUI(device= 'FLMS04421', # spectrometer serial number FLMS04421. If empty, first available.
-                                      inttime=100000, #integration time
+                                      inttime=100000, #integration time in
                                       autoexposure=False,
                                       autorepeat=False,
                                       autosave=True,
@@ -214,12 +214,12 @@ if __name__ == "__main__":
 
     print 'Loading protocol: %s' %(lib)
     try:
-        setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec)
+        setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, PID=PID)
         SETUP = True
     except:
         SETUP= False
 
-      #setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps)
+    #setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps)
     print ''
     if GUI == True:
           gui=__import__('GUI_KS_Nemesys.GUI_KS_SC_nemesys')

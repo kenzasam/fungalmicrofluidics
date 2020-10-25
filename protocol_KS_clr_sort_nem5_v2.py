@@ -71,39 +71,25 @@ class Protocol(bt.BasicThread):
 Start of setup class
 """
 class Setup():
-    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec):
+    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, PID):
         '''
-        # >>>>>>> PARAMETERS BLOCK <<<<<<< #
+        # >>>>>>> SETUP SPECIFIC PARAMETERS BLOCK <<<<<<< #
         deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308" #--> change path to device configuration folder
         syringe_param={'syringe_diam':[7.29,3.26,3.26,3.26,3.26],
                         'syringe_stroke':[59,40,40,40,40]} # --> change syringe parameters, in mm
         self.DropletVolume= 0.00025073 #-->  change to volume of 1 drop in microliter
-        #>>>>>>>>>>>>> PARAMETER BLOCK END  <<<<<<<<<<<<<
+        #>>>>>>>>>>>>> SETUP SPECIFIC PARAMETER BLOCK END  <<<<<<<<<<<<<
         '''
-        '''
-        print '>>>  <<<'
-        print '>>>  Checking syringe pumps  <<<'
-        #self.nem=Nem(Nemesys=Nemesys, Deviceconfig=deviceconfig, Syringe_param=syringe_param)
-        if (Pumps is None):
-            print "Pump bridge not found! No syringe pumps initiated. Syringe pumps are needed for this protocol."
-            #sys.exit(1)
-        else:
-            self.nem = Pumps
-        print '>>>  <<<'
-        print '>>>  Checking spectrometer  <<<'
-        if (Spec is None):
-            print "Spectrometer thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol."
-            #sys.exit(1)
-            #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
-        else:
-            self.spec=Spec
-        '''
+
         self.init_pumps(Pumps=Pumps)
         self.init_spec(Spec=Spec)
-        #self.init_incubation()
+        self.init_incubation(PID=PID)
         self.init_elecs(gpio=gpio,ExtGpio = ExtGpio, chipViewer = chipViewer)
 
     def init_spec(self, Spec):
+        """
+        Initializing spectrometer thread.
+        """
         print '>>>  <<<'
         print '>>>  Checking spectrometer  <<<'
         if (Spec is None):
@@ -114,6 +100,9 @@ class Setup():
             self.spec=Spec
 
     def init_pumps(self, Pumps):
+        """
+        Initializing NeMESYS syringe pump thread.
+        """
         print '>>>  <<<'
         print '>>>  Checking syringe pumps  <<<'
         #self.nem=Nem(Nemesys=Nemesys, Deviceconfig=deviceconfig, Syringe_param=syringe_param)
@@ -122,6 +111,18 @@ class Setup():
             #sys.exit(1)
         else:
             self.nem = Pumps
+    def init_incubation(self):
+        """
+        Initializing PID thread.
+        """
+        print '>>>  <<<'
+        print '>>>  Checking PID  <<<'
+
+        if (PID is None):
+            print "PID bridge not found! No incubation thread initiated. PID control is needed for this protocol."
+            #sys.exit(1)
+        else:
+            self.PID = PID
 
     def init_elecs(self,gpio, ExtGpio,chipViewer):
         """
@@ -241,7 +242,6 @@ class Setup():
 
     ####### droplet generation ###############
     def DropGen(self,n=1,t=0,pumpID=0):
-
         '''
         # n is amount of repeats (drops)
         # t is wait time (d*Period, seconds),
@@ -284,37 +284,20 @@ class Setup():
         self.seq['S%d'%(nr)].start(1)
         print "....................."
 
-    def hs(RC=0.5,T=37,t=30):
+    def incubation(RC=0.5,T=37,t=30):
+    	self.PID.start()
+        self.PID.RC_div_DT=RC
+    	self.PID.ctrl(T)
+        self.tempfeedbackstream(t,T,step=10)
+    	#time.sleep(t)
+        self.PID.stop()
+        print "....................."
 
-    	PID.RC_div_DT=RC
-    	PID.ctrl(T)
-    	time.sleep(t)
-    	PID.RC_div_DT=0.5
-    	PID.ctrl(0)
-    	time.sleep(3*60)
-    	PID.RC_div_DT=22
-    	PID.ctrl(24)
-######################################################################################################################
-######################################################################################################################
-"""
-End of Setup class
-"""
-
-"""
-Start of spectrometer class
-"""
-'''
-class Spec():
-    def __init__(self, Flame, Deviceconfig):
-
-        self.Deviceconfig=Deviceconfig
-        if Flame == True:
-            print '>>>  <<<'
-            print '>>>  FLAME is online <<<'
-            print '>>> Starting Flame Bridge communication... <<<'
-
-
-        else:
-            print '>>>  <<<'
-            print '>>>  FLAME is OFFLINE   <<<'
-'''
+    def tempfeedbackstream(t, T, step=1):
+        pad_str = ' ' * len('%d' % step)
+        fbT= self.PID.getFeedback()
+        for i in range(t, 0, -step):
+            print 'Incubating at target %d C, currently %s\r C' % (T, fbT, pad_str),
+            sys.stdout.flush()
+            time.sleep(step)
+            print 'Done incubating for %d sec at %d C!' % ( t, T)
