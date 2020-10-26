@@ -27,6 +27,7 @@ he parameters in the "PARAMETER BLOCK" in the __main__ section
 ########## RUN CHIPVIEWER AND LLGUI AFTER RUNNING THIS FILE ##########
 #Basic modules to load
 import time
+import sys
 from GSOF_ArduBridge import udpControl
 from GSOF_ArduBridge import ArduBridge
 from GSOF_ArduBridge import ElectrodeGpioStack
@@ -70,8 +71,8 @@ if __name__ == "__main__":
     port = 'COM20' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = False #<-- False for simulation
-    PID = True #<-- True / False to build a PID controller.
+    ELEC_EN = True #<-- False for simulation
+    PID = False #<-- True / False to build a PID controller.
     PUMPS= True #<-- True when user wants to use Nemesys pump through python.
     SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
     SPEC= False #<-- True when user wants to use a spectrometer thread.
@@ -213,12 +214,14 @@ if __name__ == "__main__":
       print 'status: %s' %(SPEC)
 
     print 'Loading protocol: %s' %(lib)
-    try:
-        setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, PID=PID)
-        SETUP = True
-    except:
-        SETUP= False
+    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, PID=PID)
 
+    #SETUP= False
+    #print 'setup wrongsihsoihs'
+
+    SETUP = True
+    setup.enOut(ELEC_EN)
+    prot = protocol.Protocol(setup)
     #setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps)
     print ''
     if GUI == True:
@@ -231,6 +234,3 @@ if __name__ == "__main__":
     print("/\  "*10)
     print("  \/"*10)
     #########################
-
-    setup.enOut(ELEC_EN)
-    prot = protocol.Protocol(setup)
