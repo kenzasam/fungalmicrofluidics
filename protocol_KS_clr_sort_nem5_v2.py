@@ -98,7 +98,7 @@ class Setup():
             #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.spec=Spec
-
+            print "ok."
     def init_pumps(self, Pumps):
         """
         Initializing NeMESYS syringe pump thread.
@@ -108,10 +108,10 @@ class Setup():
         #self.nem=Nem(Nemesys=Nemesys, Deviceconfig=deviceconfig, Syringe_param=syringe_param)
         if (Pumps is None):
             print "Pump bridge not found! No syringe pumps initiated. Syringe pumps are needed for this protocol."
-            #sys.exit(1)
         else:
             self.nem = Pumps
-    def init_incubation(self):
+            print "ok."
+    def init_incubation(self, PID):
         """
         Initializing PID thread.
         """
@@ -123,7 +123,7 @@ class Setup():
             #sys.exit(1)
         else:
             self.PID = PID
-
+            print "ok."
     def init_elecs(self,gpio, ExtGpio,chipViewer):
         """
         Initializing electrode sequences.
@@ -284,7 +284,7 @@ class Setup():
         self.seq['S%d'%(nr)].start(1)
         print "....................."
 
-    def incubation(RC=0.5,T=37,t=30):
+    def incubation(self,RC=0.5,T=37,t=30):
     	self.PID.start()
         self.PID.RC_div_DT=RC
     	self.PID.ctrl(T)
@@ -293,7 +293,7 @@ class Setup():
         self.PID.stop()
         print "....................."
 
-    def tempfeedbackstream(t, T, step=1):
+    def tempfeedbackstream(self,t, T, step=1):
         pad_str = ' ' * len('%d' % step)
         fbT= self.PID.getFeedback()
         for i in range(t, 0, -step):

@@ -73,7 +73,7 @@ if __name__ == "__main__":
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = True #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
-    PUMPS= True #<-- True when user wants to use Nemesys pump through python.
+    PUMPS= False #<-- True when user wants to use Nemesys pump through python.
     SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
     SPEC= False #<-- True when user wants to use a spectrometer thread.
     GUI=False #<-- True for running GUI through serial
