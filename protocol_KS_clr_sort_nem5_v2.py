@@ -111,14 +111,14 @@ class Setup():
             #sys.exit(1)
         else:
             self.nem = Pumps
-    def init_incubation(self):
+    def init_incubation(self, PID):
         """
         Initializing PID thread.
         """
         print '>>>  <<<'
         print '>>>  Checking PID  <<<'
 
-        if (PID is None):
+        if (self.PID is None):
             print "PID bridge not found! No incubation thread initiated. PID control is needed for this protocol."
             #sys.exit(1)
         else:
