@@ -72,21 +72,25 @@ class Nem():
             print '%s %s, obj.handle %s'%(pumpName, str(pump), str(pump.handle))
             self.pumpsObjList.append(pump)
         print  '>>> Starting bus communication...<<<'
-        self.bus.start()
-        print '>>> Enabling and configuring SI units, syringe diameter and stroke for all pumps<<<'
-        for i, pump in enumerate(self.pumpsObjList):
-            print 'pump: %d'%(i)
-            self.syringe_enable(pump)
-            #print "Setting SI units..."
-            self.syringe_units(pump)
-            #print "Configuring syringe diameters..."
-            self.syringe_config(pump, self.syringe_diam[i], self.syringe_stroke[i])
-            pump.max_volume = pump.get_volume_max()
-            print "max_volume = %f"%(pump.max_volume)
-            pump.max_flow = pump.get_flow_rate_max()
-            print "max_flow = %f"%(pump.max_flow)
-        print '>>> done <<<'
-
+        try:
+            self.bus.start()
+        except:
+            print "Can't start bus. Skipping pump setup. Do NOT use pumps! .... "
+            pumpfail=True
+        if pumpfail!=True:
+            print '>>> Enabling and configuring SI units, syringe diameter and stroke for all pumps<<<'
+            for i, pump in enumerate(self.pumpsObjList):
+                print 'pump: %d'%(i)
+                self.syringe_enable(pump)
+                #print "Setting SI units..."
+                self.syringe_units(pump)
+                #print "Configuring syringe diameters..."
+                self.syringe_config(pump, self.syringe_diam[i], self.syringe_stroke[i])
+                pump.max_volume = pump.get_volume_max()
+                print "max_volume = %f"%(pump.max_volume)
+                pump.max_flow = pump.get_flow_rate_max()
+                print "max_flow = %f"%(pump.max_flow)
+            print '>>> done <<<'
 
     def pumpID(self, pumpID):
         return self.pumpsObjList[pumpID]

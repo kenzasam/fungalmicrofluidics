@@ -560,9 +560,11 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     sys.path.append(os.path.abspath(lib))
     protocol= __import__("protocol_KS_wizzardv4_nemesys5")
     """
-    setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Nemesys=False)
-#   setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, magPin=0)
-#   setup.enOut(True)
+    setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, PID=False)
+
+    #setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Nemesys=False)
+    #setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, magPin=0)
+    #setup.enOut(True)
     app = wx.App(False)
     frame = MainFrame(setup, ip=options.ip, port=options.port)
     frame.Show()
