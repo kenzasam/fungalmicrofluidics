@@ -120,11 +120,11 @@ class Setup():
         print '>>>  <<<'
         print '>>>  Checking PID  <<<'
 
-        if (self.PID is None):
+        if (PID is None):
             print "PID bridge not found! No incubation thread initiated. PID control is needed for this protocol."
             #sys.exit(1)
         else:
-            self.PID = PID
+            PID = PID
             print "ok."
     def init_elecs(self,gpio, ExtGpio,chipViewer):
         """
