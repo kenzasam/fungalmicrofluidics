@@ -33,9 +33,9 @@ CODE STRUCTURE
 MainFrame - MainFrame class; gathers all other panels, toolbars etc.
 Menubar - Menubar class
 Pumppanel - Panel class to operate syringe pumps
-Operationspanel - Panel class with functions
+Operationspanel - Panel class with electrode functions
 Incubationpanel - Panel class for incubation (time input, temperature input to run PID thread)
-Specpanel - Panel class to start sorting procedure
+Sortingpanel - Panel class to start sorting procedure
 '''
 
 class MainFrame(wx.Frame):
@@ -60,35 +60,38 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
 
         '''Populate main frame.'''
-        #mainpanel = MainPanel(self)
-        pumppanel = PumpPanel(self,pumpnrs)
-        #dropletpanel=DropletPanel(self)
-        operationspanel=OperationsPanel(self)
-        #seqpanel=SequencePanel(self,self.setup)
-        incpanel=Incubationpanel(self)
         MAINbox = wx.BoxSizer(wx.VERTICAL)
         line1 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         MAINbox.Add( line1, 0, wx.ALL|wx.EXPAND, 2 )
         titleboxnem = wx.BoxSizer(wx.HORIZONTAL)
-        title0 = wx.StaticText(self, label='Pumps')
+        title0 = wx.StaticText(self, label='uurdxu')
         font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
         title0.SetFont(font)
         titleboxnem.Add(title0, flag=wx.ALIGN_LEFT, border=8)
         MAINbox.Add(titleboxnem, 0, wx.ALIGN_CENTER_VERTICAL)
         #
+        pumppanel = PumpPanel(self, pumpnrs)
         MAINbox.Add(pumppanel, 0, wx.ALL)
-        #
         line3 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         MAINbox.Add( line3, 0, wx.ALL|wx.EXPAND, 2 )
         titlebox1  = wx.BoxSizer(wx.HORIZONTAL)
-        title1 = wx.StaticText(self, label='Functions')
+        title1 = wx.StaticText(self, label='Pumps')
         title1.SetFont(font)
         titlebox1.Add(title1, flag=wx.ALIGN_LEFT, border=8)
         MAINbox.Add(titlebox1, 0, wx.ALIGN_CENTER_VERTICAL)
         #
+        operationspanel=OperationsPanel(self)
         MAINbox.Add(operationspanel, 0, wx.ALL, 2)
-        #MAINbox.Add(fnSizer, 0, wx.ALL, 2)
+        line4 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+        MAINbox.Add( line4, 0, wx.ALL|wx.EXPAND, 2 )
+        titlebox2  = wx.BoxSizer(wx.HORIZONTAL)
+        title2 = wx.StaticText(self, label='Electrode Functions')
+        title2.SetFont(font)
+        titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
+        MAINbox.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
         #
+        incpanel=Incubationpanel(self)
+        MAINbox.Add(incpanel, 0, wx.ALL, 2)
         line4 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         MAINbox.Add( line4, 0, wx.ALL|wx.EXPAND, 2 )
         titlebox2  = wx.BoxSizer(wx.HORIZONTAL)
@@ -97,8 +100,16 @@ class MainFrame(wx.Frame):
         titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
         MAINbox.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
         #
-        MAINbox.Add(incpanel)
-        #
+        sortingpanel=SortingPanel(self,)
+        MAINbox.Add(sortingpanel, 0, wx.ALL, 2)
+        line4 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+        MAINbox.Add( line4, 0, wx.ALL|wx.EXPAND, 2 )
+        titlebox2  = wx.BoxSizer(wx.HORIZONTAL)
+        title2 = wx.StaticText(self, label='Sorting')
+        title2.SetFont(font)
+        titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
+        MAINbox.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
+
         self.SetSizerAndFit(MAINbox)
         self.Fit()
         self.Centre()
@@ -305,93 +316,31 @@ class OperationsPanel(wx.Panel):
         #self.panel=panel
         """Create and populate main sizer."""
         fnSizer = wx.FlexGridSizer(rows=3, cols=2, hgap=5, vgap=5)
-        #Encapsulate
+        #Sort
         box1=wx.BoxSizer(wx.HORIZONTAL)
-        self.EncapsulateBtn=wx.Button( self, label='Encapsulate', name='Encapsulate()', size=(70,24)) #ADDED KS
-        self.EncapsulateBtn.Bind(wx.EVT_BUTTON, self.onEncapsulate)
-        box1.Add(self.EncapsulateBtn, flag=wx.RIGHT, border=8)
-        self.text1=wx.StaticText(self,  wx.ID_ANY, label='nr  ')
+        self.SortBtn=wx.Button( self, label='Sort', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
+        box1.Add(self.SortBtn, flag=wx.RIGHT, border=8)
+        self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]  ')
         box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box1.Add(self.entry1, proportion=1)
         fnSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
-        #Release
-        box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.ReleaseBtn=wx.Button( self, label='Release', name='Release()', size=(70,24)) #ADDED KS
-        self.ReleaseBtn.Bind(wx.EVT_BUTTON, self.onRelease)
-        box2.Add(self.ReleaseBtn, flag=wx.RIGHT, border=8)
-        self.text2=wx.StaticText(self,  wx.ID_ANY, label='nr  ')
-        box2.Add(self.text2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box2.Add(self.entry2, proportion=1)
-        self.checkrev=wx.CheckBox(self, wx.ID_ANY,label='reverse')
-        #self.checkrev.Bind(wx.EVT_CHECKBOX,self.onChecked)
-        box2.Add(self.checkrev,flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        fnSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
-        #Keep
-        box3=wx.BoxSizer(wx.HORIZONTAL)
-        self.KeepBtn=wx.Button( self, label='Keep', name='Keep()', size=(70,24)) #ADDED KS
-        self.KeepBtn.Bind(wx.EVT_BUTTON, self.onKeep)
-        box3.Add(self.KeepBtn, flag=wx.RIGHT, border=8)
-        box31=wx.BoxSizer(wx.VERTICAL)
-        box311=wx.BoxSizer(wx.HORIZONTAL)
-        self.text3=wx.StaticText(self,  wx.ID_ANY, label='nr  ')
-        box311.Add(self.text3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry3=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box311.Add(self.entry3, proportion=0.5, border=8)
-        box312=wx.BoxSizer(wx.HORIZONTAL)
-        self.text4=wx.StaticText(self, wx.ID_ANY, label='time[s]  ')
-        box312.Add(self.text4, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry4=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box312.Add(self.entry4, proportion=0.5, border=8)
-        box31.Add(box311,wx.ALL, border=8)
-        box31.AddSpacer(4)
-        box31.Add(box312,wx.ALL, border=8)
-        box3.Add(box31, flag=wx.LEFT)
-        fnSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
-        #KeepAllButOne
-        box4=wx.BoxSizer(wx.HORIZONTAL)
-        self.KeepAllBtn=wx.Button( self, label='Keep All', name='KeepAll()', size=(70,24)) #ADDED KS
-        self.KeepAllBtn.Bind(wx.EVT_BUTTON, self.onKeepAllBut)
-        box4.Add(self.KeepAllBtn, flag=wx.RIGHT, border=8)
-        box41=wx.BoxSizer(wx.VERTICAL)
-        box411=wx.BoxSizer(wx.HORIZONTAL)
-        self.text5=wx.StaticText(self,  wx.ID_ANY, label='except nr  ')
-        box411.Add(self.text5,  flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry5=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box411.Add(self.entry5, proportion=0.5)
-        box412=wx.BoxSizer(wx.HORIZONTAL)
-        self.text6=wx.StaticText(self,  wx.ID_ANY, label='Time[s]  ')
-        box412.Add(self.text6,  flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry6=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box412.Add(self.entry6, proportion=0.5)
-        box41.Add(box411, flag=wx.RIGHT, border=8)
-        box41.AddSpacer(4)
-        box41.Add(box412, flag=wx.RIGHT, border=8)
-        box4.Add(box41, flag=wx.RIGHT)
-        fnSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
 
-        #MAINbox.Add(fnSizer, 0, wx.ALL, 2)
 
     def onSort(self, event):
         try:
-            nr=int(float(self.entry5.GetValue()))
-            t=int(float(self.entry6.GetValue()))
+            t=int(float(self.entry1.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.KeepAllBut(%d,%d)'%(nr,t)
+        s = 'setup.Sorting(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
 
-    def onChecked(self, event):
-          cb=event.GetEventObject()
-          cb.GetValue()
-
 class Incubationpanel(wx.Panel):
-    def __init__(self, parent, setup):
-        wx.Panel.__init__(self,parent,setup)
-        self.setup=setup
+    def __init__(self, parent):
+        wx.Panel.__init__(self,parent)
         """Create and populate main sizer."""
         incSizer = wx.FlexGridSizer(rows=3, cols=3, hgap=5, vgap=5)
         #Temperature
@@ -412,7 +361,7 @@ class Incubationpanel(wx.Panel):
         self.IncBtn=wx.Button( self, label='Start', name='PID.start()', size=(70,24))
         self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
         box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
-        fnSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
+        incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
 
     def onIncubate(self,event):
         try:
@@ -421,6 +370,38 @@ class Incubationpanel(wx.Panel):
         except:
             wx.MessageDialog(self, "Enter a valid temperature", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         s = 'setup.PID.Incubation(%d,%d)'%(temp,t)
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+class SortingPanel(wx.Panel):
+    def __init__(self,parent):
+
+        #udpSend= udpSend
+        wx.Panel.__init__(self,parent)
+        ########################################
+        #############FUNCTIONS#####sizer########
+        #######################################
+        #self.panel=panel
+        """Create and populate main sizer."""
+        fnSizer = wx.FlexGridSizer(rows=3, cols=2, hgap=5, vgap=5)
+        #Sort
+        box1=wx.BoxSizer(wx.HORIZONTAL)
+        self.SortBtn=wx.Button( self, label='Sort', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
+        box1.Add(self.SortBtn, flag=wx.RIGHT, border=8)
+        self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]  ')
+        box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
+        box1.Add(self.entry1, proportion=1)
+        fnSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
+
+
+    def onSort(self, event):
+        try:
+            t=int(float(self.entry1.GetValue()))
+        except:
+            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        s = 'setup.Sorting(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -527,10 +508,10 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
         root.withdraw()
         filename = tkFileDialog.askopenfilename()
         return filename
-    ver = '3.0.2'
-    date = '06/08/2018'
+    ver = '3.1.2'
+    date = '28/10/2020'
     print 'GUI: Protocol GUI Ver:%s'%(ver)
-    print 'by Kenza Samlali, 2018'
+    print 'Copyright: Kenza Samlali, 2020'
     #Command line option parser
 
     parser = OptionParser()
