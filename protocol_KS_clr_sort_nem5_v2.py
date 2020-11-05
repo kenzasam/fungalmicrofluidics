@@ -99,6 +99,7 @@ class Setup():
         else:
             self.spec=Spec
             print "ok."
+
     def init_pumps(self, Pumps):
         """
         Initializing NeMESYS syringe pump thread.
@@ -110,10 +111,8 @@ class Setup():
             print "Pump bridge not found! No syringe pumps initiated. Syringe pumps are needed for this protocol."
         else:
             self.nem = Pumps
-<<<<<<< HEAD
-=======
             print "ok."
->>>>>>> 30711be085a9ea1e680576cc57e1cef0efabffb9
+
     def init_incubation(self, PID):
         """
         Initializing PID thread.
