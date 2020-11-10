@@ -20,6 +20,7 @@
 
 
 import wx
+import wx.lib.inspection
 import os, sys
 import pyperclip
 import Tkinter, tkFileDialog
@@ -54,58 +55,30 @@ class MainFrame(wx.Frame):
 
         '''setting up wx Main Frame window.'''
         self.setup=setup
+        panel=wx.Panel(self)
         ico=wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
-        self.SetMenuBar(MenuBar(self,pumpnrs))
+
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
 
         '''Populate main frame.'''
         MAINbox = wx.BoxSizer(wx.VERTICAL)
-        line1 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        MAINbox.Add( line1, 0, wx.ALL|wx.EXPAND, 2 )
-        titleboxnem = wx.BoxSizer(wx.HORIZONTAL)
-        title0 = wx.StaticText(self, label='Pumps')
-        font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
-        title0.SetFont(font)
-        titleboxnem.Add(title0, flag=wx.ALIGN_LEFT, border=8)
-        MAINbox.Add(titleboxnem, 0, wx.ALIGN_CENTER_VERTICAL)
-        pumppanel = PumpPanel(self, pumpnrs)
-        MAINbox.Add(pumppanel, 0, wx.ALL)
+        pumppanel = PumpPanel(panel, pumpnrs)
+        MAINbox.Add(pumppanel)
         #
-        line3 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        MAINbox.Add( line3, 0, wx.ALL|wx.EXPAND, 2 )
-        titlebox1  = wx.BoxSizer(wx.HORIZONTAL)
-        title1 = wx.StaticText(self, label='Electrode Functions')
-        title1.SetFont(font)
-        titlebox1.Add(title1, flag=wx.ALIGN_LEFT, border=8)
-        MAINbox.Add(titlebox1, 0, wx.ALIGN_CENTER_VERTICAL)
-        operationspanel=OperationsPanel(self)
-        MAINbox.Add(operationspanel, 0, wx.ALL, 2)
+        operationspanel=OperationsPanel(panel)
+        MAINbox.Add(operationspanel)
         #
-        line4 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        MAINbox.Add( line4, 0, wx.ALL|wx.EXPAND, 2 )
-        titlebox2  = wx.BoxSizer(wx.HORIZONTAL)
-        title2 = wx.StaticText(self, label='Incubation')
-        title2.SetFont(font)
-        titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
-        MAINbox.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
-        incpanel=Incubationpanel(self)
-        MAINbox.Add(incpanel, 0, wx.ALL, 2)
+        incpanel=Incubationpanel(panel)
+        MAINbox.Add(incpanel)
         #
-        line4 = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        MAINbox.Add( line4, 0, wx.ALL|wx.EXPAND, 2 )
-        titlebox3  = wx.BoxSizer(wx.HORIZONTAL)
-        title3 = wx.StaticText(self, label='Sorting')
-        title3.SetFont(font)
-        titlebox2.Add(title3, flag=wx.ALIGN_LEFT, border=8)
-        MAINbox.Add(titlebox3, 0, wx.ALIGN_CENTER_VERTICAL)
-        sortingpanel=SortingPanel(self,)
-        MAINbox.Add(sortingpanel, 0, wx.ALL, 2)
+        sortingpanel=SortingPanel(panel)
+        MAINbox.Add(sortingpanel)
         #
-        self.SetSizerAndFit(MAINbox)
-        self.Fit()
+        panel.SetSizerAndFit(MAINbox)
+        #self.Fit()
         self.Centre()
-        #self.Show()
+        self.SetMenuBar(MenuBar(self,pumpnrs))
 
     def on_quit_click(self, event):
         """Handle close event."""
@@ -140,28 +113,37 @@ class PumpPanel(wx.Panel):
         Pumpnrs=list(range(self.pumpnrs))
         choices=[str(i) for i in Pumpnrs]
         NemSizer = wx.BoxSizer(wx.VERTICAL)
+        #
+        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+        NemSizer.Add(line, 0, wx.ALL|wx.EXPAND, 2 )
+        titlebox = wx.BoxSizer(wx.HORIZONTAL)
+        title = wx.StaticText(self, label='Pumps')
+        font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
+        title.SetFont(font)
+        titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
+        NemSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         #Entry of OTHER flow rate
         boxNemf=wx.BoxSizer(wx.HORIZONTAL)
-        self.textOtherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other[uL/s]')
-        boxNemf.Add(self.textOtherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryOtherflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNemf.Add(self.entryOtherflrt, proportion=0.5, border=8)
-        self.textPump=wx.StaticText(self,  wx.ID_ANY, label='Pump ')
-        boxNemf.Add(self.textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.combo6 = wx.ComboBox(self, value=choices[0], choices=choices)
-        self.combo6.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNemf.Add(self.combo6, 0, wx.ALIGN_RIGHT)
-        self.OtherBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        self.OtherBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
-        boxNemf.Add(self.OtherBtn, 0, wx.ALIGN_RIGHT)
+        textOtherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
+        boxNemf.Add(textOtherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entryOtherflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNemf.Add(entryOtherflrt, proportion=0.5, border=8)
+        textPump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
+        boxNemf.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        combo6 = wx.ComboBox(self, value=choices[0], choices=choices)
+        combo6.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNemf.Add(combo6, 0, wx.ALIGN_RIGHT)
+        OtherBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        OtherBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
+        boxNemf.Add(OtherBtn, 0, wx.ALIGN_RIGHT)
         NemSizer.Add(boxNemf, flag=wx.LEFT, border=8)
         # pumpnrs  == 4:
         boxNeme=wx.BoxSizer(wx.HORIZONTAL)
-        self.text4Otherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other[uL/s]')
+        self.text4Otherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
         boxNeme.Add(self.text4Otherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry4Otherflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
         boxNeme.Add(self.entry4Otherflrt, proportion=0.5, border=8)
-        self.text4Pump=wx.StaticText(self,  wx.ID_ANY, label='Pump ')
+        self.text4Pump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
         boxNeme.Add(self.text4Pump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.combo46 = wx.ComboBox(self , value=choices[0], choices=choices)
         self.combo46.Bind(wx.EVT_COMBOBOX, self.onCombo)
@@ -171,7 +153,7 @@ class PumpPanel(wx.Panel):
         boxNeme.Add(self.Other4Btn, 0, wx.ALIGN_RIGHT)
         # pumpnrs == 5:
         boxNemd=wx.BoxSizer(wx.HORIZONTAL)
-        self.text5Otherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other[uL/s]')
+        self.text5Otherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
         boxNemd.Add(self.text5Otherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry5Otherflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
         boxNemd.Add(self.entry5Otherflrt, proportion=0.5, border=8)
@@ -190,43 +172,33 @@ class PumpPanel(wx.Panel):
             NemSizer.Add(boxNeme, flag=wx.LEFT, border=8)
         #Entry of Oil consant flow rate
         boxNema=wx.BoxSizer(wx.HORIZONTAL)
-        self.textOilflrt=wx.StaticText(self,  wx.ID_ANY, label='Oil[uL/s]')
-        boxNema.Add(self.textOilflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryOilflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNema.Add(self.entryOilflrt, proportion=0.5, border=8)
-        boxNema.Add(self.textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        boxNema.Add(self.combo6, 0, wx.ALIGN_RIGHT)
-        self.OilBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        self.OilBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
-        boxNema.Add(self.OilBtn, 0, wx.ALIGN_RIGHT)
+        textOilflrt=wx.StaticText(self,  wx.ID_ANY, label='Oil [uL/s]')
+        boxNema.Add(textOilflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entryOilflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNema.Add(entryOilflrt, proportion=0.5, border=8)
+        boxNema.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        boxNema.Add(combo6, 0, wx.ALIGN_RIGHT)
+        OilBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        OilBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
+        boxNema.Add(OilBtn, 0, wx.ALIGN_RIGHT)
         NemSizer.Add(boxNema, flag=wx.LEFT, border=8)
         ##Entry of Flowrate continuous aqueous
         boxNemc=wx.BoxSizer(wx.HORIZONTAL)
-        self.textAqflrt=wx.StaticText(self,  wx.ID_ANY, label='Aq[uL/s]')
-        boxNemc.Add(self.textAqflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryAqflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNemc.Add(self.entryAqflrt, proportion=0.5, border=8)
-        boxNemc.Add(self.textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        boxNemc.Add(self.combo6, 0, wx.ALIGN_RIGHT)
-        self.AqBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        self.AqBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
-        boxNemc.Add(self.AqBtn, 0, wx.ALIGN_RIGHT)
+        textAqflrt=wx.StaticText(self,  wx.ID_ANY, label='Aq [uL/s]')
+        boxNemc.Add(textAqflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entryAqflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNemc.Add(entryAqflrt, proportion=0.5, border=8)
+        boxNemc.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        boxNemc.Add(combo6, 0, wx.ALIGN_RIGHT)
+        AqBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        AqBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
+        boxNemc.Add(AqBtn, 0, wx.ALIGN_RIGHT)
         NemSizer.Add(boxNemc, flag=wx.LEFT, border=8)
-        #Entry of Flowrate for on demand
-        boxNemb=wx.BoxSizer(wx.HORIZONTAL)
-        self.textDropflrt=wx.StaticText(self,  wx.ID_ANY, label='Actuation: [uL/s]')
-        boxNemb.Add(self.textDropflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryDropflrtAct=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNemb.Add(self.entryDropflrtAct, proportion=0.5, border=8)
-        boxNemb.Add(self.textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        boxNemb.Add(self.combo6, 0, wx.ALIGN_RIGHT)
-        self.textDropV=wx.StaticText(self,  wx.ID_ANY, label='DropletV [uL]')
-        boxNemb.Add(self.textDropV, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        NemSizer.Add(boxNemb, flag=wx.LEFT, border=8)
-        self.entryDropV=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNemb.Add(self.entryDropV, border=8)
         ##
+        self.SetSizer(NemSizer)
         #MAINbox.Add(NemSizer, 0, wx.ALL)
+        self.SetBackgroundColour('#6f8089')
+
     def onOilFlow(self, event):
         flrt=float(self.entryOilflrt.GetValue())
         print flrt
@@ -274,9 +246,9 @@ class PumpPanel(wx.Panel):
                if self.udpSend != False:
                    self.udpSend.Send(s)
     def onOtherFlow(self, event):
-        flrt=float(self.entryOtherflrt.GetValue())
+        flrt=float(entryOtherflrt.GetValue())
         print flrt
-        pumpID=int(self.combo4.GetValue())
+        pumpID=int(combo4.GetValue())
         print pumpID
         if flrt == 0.0:
             wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
@@ -307,7 +279,16 @@ class OperationsPanel(wx.Panel):
         #######################################
         #self.panel=panel
         """Create and populate main sizer."""
-        fnSizer = wx.FlexGridSizer(rows=3, cols=2, hgap=5, vgap=5)
+        fnSizer = wx.BoxSizer(wx.VERTICAL)
+        #
+        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+        fnSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
+        titlebox  = wx.BoxSizer(wx.HORIZONTAL)
+        title = wx.StaticText(self, label='Electrode Functions')
+        font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
+        title.SetFont(font)
+        titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
+        fnSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         #Sort
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.SortBtn=wx.Button( self, label='Sort', name='Sort()', size=(70,24)) #ADDED KS
@@ -318,6 +299,8 @@ class OperationsPanel(wx.Panel):
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box1.Add(self.entry1, proportion=1)
         fnSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
+        self.SetSizer(fnSizer)
+        self.SetBackgroundColour('#32a852')
 
 
     def onSort(self, event):
@@ -335,6 +318,15 @@ class Incubationpanel(wx.Panel):
         wx.Panel.__init__(self,parent)
         """Create and populate main sizer."""
         incSizer = wx.FlexGridSizer(rows=3, cols=3, hgap=5, vgap=5)
+        #
+        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+        incSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
+        titlebox  = wx.BoxSizer(wx.HORIZONTAL)
+        title = wx.StaticText(self, label='Electrode Functions')
+        font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
+        title.SetFont(font)
+        titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
+        incSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         #Temperature
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='Temperature [C]:')
@@ -354,6 +346,8 @@ class Incubationpanel(wx.Panel):
         self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
         box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
+        self.SetSizer(incSizer)
+        self.SetBackgroundColour('#c597c72')
 
     def onIncubate(self,event):
         try:
@@ -375,20 +369,30 @@ class SortingPanel(wx.Panel):
         #######################################
         #self.panel=panel
         """Create and populate main sizer."""
-        fnSizer = wx.FlexGridSizer(rows=3, cols=2, hgap=5, vgap=5)
+        srtSizer = wx.FlexGridSizer(rows=3, cols=2, hgap=5, vgap=5)
+        #
+        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+        srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
+        titlebox  = wx.BoxSizer(wx.HORIZONTAL)
+        title = wx.StaticText(self, label='Electrode Functions')
+        font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
+        title.SetFont(font)
+        titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
+        srtSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         #Sort
         box1=wx.BoxSizer(wx.HORIZONTAL)
-        self.SortBtn=wx.Button( self, label='Sort', name='Sort()', size=(70,24)) #ADDED KS
-        self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
-        box1.Add(self.SortBtn, flag=wx.RIGHT, border=8)
+        self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
+        self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStart)
+        box1.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]  ')
         box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box1.Add(self.entry1, proportion=1)
-        fnSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
+        self.SetSizer(srtSizer)
+        self.SetBackgroundColour('#f2dd88')
 
-
-    def onSort(self, event):
+    def onStart(self, event):
         try:
             t=int(float(self.entry1.GetValue()))
         except:
@@ -541,4 +545,5 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     app = wx.App(False)
     frame = MainFrame(setup, ip=options.ip, port=options.port)
     frame.Show()
+    wx.lib.inspection.InspectionTool().Show()
     app.MainLoop()
