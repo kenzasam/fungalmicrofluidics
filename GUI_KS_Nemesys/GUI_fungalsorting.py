@@ -49,36 +49,38 @@ class MainFrame(wx.Frame):
         self.Title = 'Fungal Sorting hybrid microfluidics GUI'
 
         '''setup sending protocol for ArduBridge Shell.'''
-        self.udpSend = False
+        udpSend = False
         if port > 1:
-            self.udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
+            udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
 
         '''setting up wx Main Frame window.'''
         self.setup=setup
-        panel=wx.Panel(self)
+        self.SetMenuBar(MenuBar(self,pumpnrs))
+        self.CreateStatusBar()
         ico=wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
-
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
 
-        '''Populate main frame.'''
+        '''Create and populate Panel.'''
+        panel=wx.Panel(self)
+        #
         MAINbox = wx.BoxSizer(wx.VERTICAL)
-        pumppanel = PumpPanel(panel, pumpnrs)
+        pumppanel = PumpPanel(panel, pumpnrs, udpSend)
         MAINbox.Add(pumppanel)
         #
-        operationspanel=OperationsPanel(panel)
+        operationspanel=OperationsPanel(panel, udpSend)
         MAINbox.Add(operationspanel)
         #
-        incpanel=Incubationpanel(panel)
+        incpanel=Incubationpanel(panel, udpSend)
         MAINbox.Add(incpanel)
         #
-        sortingpanel=SortingPanel(panel)
+        sortingpanel=SortingPanel(panel, udpSend)
         MAINbox.Add(sortingpanel)
         #
         panel.SetSizerAndFit(MAINbox)
         #self.Fit()
         self.Centre()
-        self.SetMenuBar(MenuBar(self,pumpnrs))
+
 
     def on_quit_click(self, event):
         """Handle close event."""
@@ -103,12 +105,9 @@ class MainPanel(wx.Panel):
 
 
 class PumpPanel(wx.Panel):
-    def __init__(self, parent, pumpnrs):
+    def __init__(self, parent, pumpnrs,udpSend):
         super(PumpPanel, self).__init__(parent, pumpnrs)
-        #######################################
-        #############PUMP#####################
-        #######################################
-        #self.panel=panel
+        self.udpSend=udpSend
         self.pumpnrs=pumpnrs
         Pumpnrs=list(range(self.pumpnrs))
         choices=[str(i) for i in Pumpnrs]
@@ -272,12 +271,9 @@ class PumpPanel(wx.Panel):
         print 'pump changed'
 
 class OperationsPanel(wx.Panel):
-    def __init__(self,parent):
-        wx.Panel.__init__(self,parent)
-        ########################################
-        #############FUNCTIONS#####sizer########
-        #######################################
-        #self.panel=panel
+    def __init__(self,parent,udpSend):
+        wx.Panel.__init__(self,parent,udpSend)
+        self.udpSend=udpSend
         """Create and populate main sizer."""
         fnSizer = wx.BoxSizer(wx.VERTICAL)
         #
@@ -314,19 +310,29 @@ class OperationsPanel(wx.Panel):
             self.udpSend.Send(s)
 
 class Incubationpanel(wx.Panel):
-    def __init__(self, parent):
-        wx.Panel.__init__(self,parent)
+    def __init__(self, parent,udpSend):
+        wx.Panel.__init__(self,parent,udpSend)
+        self.udpSend=udpSend
         """Create and populate main sizer."""
-        incSizer = wx.FlexGridSizer(rows=3, cols=3, hgap=5, vgap=5)
+        incSizer = wx.BoxSizer(wx.VERTICAL)
         #
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         incSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         titlebox  = wx.BoxSizer(wx.HORIZONTAL)
-        title = wx.StaticText(self, label='Electrode Functions')
+        title = wx.StaticText(self, label='Droplet Incubation')
         font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
         title.SetFont(font)
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         incSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
+        #pid
+        box3=wx.BoxSizer(wx.HORIZONTAL)
+        self.pidBtn=wx.Button( self, label='Show PID control', name='PID.start()', size=(70,24))
+        self.pidBtn.Bind(wx.EVT_BUTTON, self.onPid)
+        box3.Add(self.pidBtn, flag=wx.RIGHT, border=8)
+        self.IncBtn=wx.Button( self, label='Start', name='PID.start()', size=(70,24))
+        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
+        box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
+        incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         #Temperature
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='Temperature [C]:')
@@ -340,12 +346,17 @@ class Incubationpanel(wx.Panel):
         box2.Add(self.text2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box2.Add(self.entry2, proportion=1)
-        #start
-        box3=wx.BoxSizer(wx.HORIZONTAL)
-        self.IncBtn=wx.Button( self, label='Start', name='PID.start()', size=(70,24))
-        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
-        box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
-        incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
+        incSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
+        #imaging pipeline
+        box4=wx.BoxSizer(wx.HORIZONTAL)
+        self.imgsetupBtn=wx.Button( self, label='Show PID control', name='PID.start()', size=(70,24))
+        self.imgsetupBtn.Bind(wx.EVT_BUTTON, self.onImgsetup)
+        box4.Add(self.imgsetupBtn, flag=wx.RIGHT, border=8)
+        self.ImgBtn=wx.Button( self, label='Start', name='PID.start()', size=(70,24))
+        self.ImgBtn.Bind(wx.EVT_BUTTON, self.onImage)
+        box4.Add(self.ImgBtn, flag=wx.RIGHT, border=8)
+        incSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
+
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
 
@@ -359,22 +370,34 @@ class Incubationpanel(wx.Panel):
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
-class SortingPanel(wx.Panel):
-    def __init__(self,parent):
 
-        #udpSend= udpSend
-        wx.Panel.__init__(self,parent)
+    def onPid(self,event):
+        s = 'setup.PID.plot()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onImgsetup(self, event):
+        return
+
+    def onImage(self, event):
+        return
+
+
+class SortingPanel(wx.Panel):
+    def __init__(self,paren,udpSend):
+        wx.Panel.__init__(self,parent,udpSend)
         ########################################
         #############FUNCTIONS#####sizer########
         #######################################
-        #self.panel=panel
+        self.udpSend=udpSend
         """Create and populate main sizer."""
-        srtSizer = wx.FlexGridSizer(rows=3, cols=2, hgap=5, vgap=5)
+        srtSizer = wx.BoxSizer(wx.VERTICAL)
         #
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         titlebox  = wx.BoxSizer(wx.HORIZONTAL)
-        title = wx.StaticText(self, label='Electrode Functions')
+        title = wx.StaticText(self, label='Droplet Sorting')
         font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
         title.SetFont(font)
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
