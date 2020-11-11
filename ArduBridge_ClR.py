@@ -138,7 +138,7 @@ if __name__ == "__main__":
     '''
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
-        threadSpec = __import__('spectroThread') #delete when you place in ArduBridge. For now place thread in folder
+        threadSpec = __import__('threadSpec') #delete when you place in ArduBridge. For now place thread in folder
         Spec = threadSpec.spectroThread(bridge=ardu,
                                       nameID='FLAME', #proces name
                                       Period=0.5,   #Period-time of the control-loop.
