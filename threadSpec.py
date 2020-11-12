@@ -31,6 +31,7 @@ __email__ = ""
 __status__ = "Production"
 
 import math, time
+import sys
 import numpy
 
 '''
@@ -41,9 +42,9 @@ from sb import Spectrometer, list_devices
 '''
 try:
     import seabreeze
-    #seabreeze.use('pyseabreeze')
+    seabreeze.use('pyseabreeze')
     import seabreeze.spectrometers as sb
-    from seabreeze.spectrometers import Spectrometer, list_devices
+    from sb import Spectrometer, list_devices
 except ImportError:
     sb=None
 
@@ -51,52 +52,60 @@ except ImportError:
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
 
-def __init__(self,
-            device,
-            inttime,
-            autoexposure,
-            autorepeat,
-            autosave,
-            dark_frames,
-            enable_plot,
-            output_file,
-            scan_frames,
-            scan_time,
-            root= None,
-            ):
-    self.init_device(device=device)
+class Flame:
+    def __init__(self,
+                device,
+                inttime,
+                autoexposure,
+                autorepeat,
+                autosave,
+                dark_frames,
+                enable_plot,
+                output_file,
+                scan_frames,
+                scan_time
+                ):
+        self.init_device(device=device)
+        self.init_variables(
+                           autoexposure=False,
+                           autorepeat=False,
+                           autosave=True,
+                           dark_frames=1,
+                           enable_plot=True,
+                           output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
+                           scan_frames=1,
+                           scan_time=100000)
+        self.init_plot()
 
-def init_device(self, device='#0'):
-    #Initialize spectrometer device
-    try:
-        if ('SIMULATOR'.startswith(device.upper())):
-            self.spec = SBSimulator()
-        elif (device == ''):
-            #print('allo')
-            #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
-            print('No spec serial number listed. Picking first spec found.')
-            dev=list_devices()
-            self.spec = Spectrometer(dev[0])
-        else:
-            print('Serial number listed.')
-            self.spec = Spectrometer.from_serial_number(device)
-    except:
-        print('ERROR: Could not initialize device "' + device + '"!')
-        if (sb is None):
-            print('SeaBreeze library not found!')
-        else:
-            print('Available devices:')
-            index = 0
-            for dev in list_devices():
-                print(' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial)
-                index += 1
-        if ('Y'.startswith(input('Simulate spectrometer device instead?  [Y/n] ').upper())):
-            self.spec = SBSimulator()
-        else:
-            sys.exit(1)
-    print(self.spec)
-    self.wavelengths = self.spec.wavelengths()
-    self.samplesize = len(self.wavelengths)
+    def init_device(self, device=''):
+        #Initialize spectrometer device
+        try:
+            if (device =='#0'):
+                #print('allo')
+                #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
+                print('No spec serial number listed. Picking first spec found.')
+                dev=list_devices()
+                print dev
+                self.spec = Spectrometer(dev[0])
+            else:
+                print('Serial number listed.')
+                self.spec = Spectrometer.from_serial_number(device)
+        except:
+            print('ERROR: Could not initialize device "' + device + '"!')
+            if (sb is None):
+                print('SeaBreeze library not found!')
+                sys.exit(1)
+            else:
+                print('Available devices:')
+                index = 0
+                for dev in list_devices():
+                    print(' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial)
+                    index += 1
+                sys.exit(1)
+
+        print(self.spec)
+        self.wavelengths = self.spec.wavelengths()
+        self.samplesize = len(self.wavelengths)
     def init_variables(self,
                        autoexposure=False,
                        autorepeat=False,
@@ -104,7 +113,6 @@ def init_device(self, device='#0'):
                        dark_frames=1,
                        enable_plot=True,
                        output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                       root=None,
                        scan_frames=1,
                        scan_time=100000):
         """Initialize instance variables"""
@@ -127,23 +135,56 @@ def init_device(self, device='#0'):
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
         self.data = [0.0]*(len(self.spec.wavelengths()))
-def init_plot(self):
-    """Initialize plotting subsystem"""
-    # Plot setup
-    self.figure = plot.figure()
-    self.axes = self.figure.gca()
-    self.graph, = self.axes.plot(self.wavelengths, self.data)
-    self.figure.suptitle('No measurement taken so far.')
-    self.axes.set_xlabel('Wavelengths [nm]')
-    self.axes.set_ylabel('Intensity [count]')
-    #self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
 
-def update_plot(self,i):
-    scan_frames = int(self.scan_frames.get())
-    if (self.measurement == scan_frames) or \
-       (self.enable_plot.get() > 0):
-        self.graph.set_ydata(self.data)
-        self.axes.relim()
-        self.axes.autoscale_view(True, True, True)
-def startplot(self):
-    plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
+    def init_plot(self):
+        """Initialize plotting subsystem"""
+        # Plot setup
+        self.figure = plot.figure()
+        self.axes = self.figure.gca()
+        self.graph, = self.axes.plot(self.wavelengths, self.data)
+        self.figure.suptitle('No measurement taken so far.')
+        self.axes.set_xlabel('Wavelengths [nm]')
+        self.axes.set_ylabel('Intensity [count]')
+        #self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
+
+    def update_plot(self,i):
+        scan_frames = int(self.scan_frames.get())
+        if (self.measurement == scan_frames) or \
+           (self.enable_plot.get() > 0):
+            self.graph.set_ydata(self.data)
+            self.axes.relim()
+            self.axes.autoscale_view(True, True, True)
+    def startplot(self):
+        plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
+
+    def measure(self, scan_frames):
+            newData = list(map(lambda x,y:x-y, self.spec.intensities(), self.darkness_correction))
+            if (self.measurement == 0):
+                self.data = newData
+            else:
+                self.data = list(map(lambda x,y:x+y, self.data, newData))
+            self.measurement += 1
+
+            plot.suptitle(time.strftime(self.timestamp, time.gmtime()) +
+                         ' (sum of ' + str(self.measurement) + ' measurement(s)' +
+                         ' with scan time ' + str(self.scan_time.get()) + ' us)')
+
+            if (self.measurement % 100 == 0):
+                print('O', end='', flush=True)
+            elif (self.measurement % 10 == 0):
+                print('o', end='', flush=True)
+            else:
+                print('.', end='', flush=True)
+            if (scan_frames > 0):
+                if self.measurement % scan_frames == 0:
+                    #print(time.strftime(self.timestamp, time.gmtime()), self.data)
+                    if self.autosave.get() != 0:
+                        self.save()
+                    self.measurement = 0
+                    if self.autorepeat.get() == 0:
+                        self.run_measurement = False
+                        self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
+                        self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
+                        self.message.set('Ready.')
+
+        self.root.after(1, self.measure)

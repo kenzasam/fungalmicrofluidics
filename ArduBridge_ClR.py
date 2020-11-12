@@ -75,7 +75,7 @@ if __name__ == "__main__":
     PID = True #<-- True / False to build a PID controller.
     PUMPS= False #<-- True when user wants to use Nemesys pump through python.
     SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
-    SPEC= False #<-- True when user wants to use a spectrometer thread.
+    SPEC= True #<-- True when user wants to use a spectrometer thread.
     GUI=False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
@@ -139,11 +139,11 @@ if __name__ == "__main__":
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
         threadSpec = __import__('threadSpec') #delete when you place in ArduBridge. For now place thread in folder
-        Spec = threadSpec.spectroThread(bridge=ardu,
-                                      nameID='FLAME', #proces name
-                                      Period=0.5,   #Period-time of the control-loop.
-                                      device= '', # spectrometer serial number FLMS04421. If empty, first available.
-                                      inttime=100000, #integration time
+        Spec = threadSpec.Flame(
+                                      #nameID='FLAME', #proces name
+                                      #Period=0.5,   #Period-time of the control-loop.
+                                      device= '#0', # spectrometer serial number FLMS04421. If empty, first available.
+                                      inttime=10000, #integration time
                                       autoexposure=False,
                                       autorepeat=False,
                                       autosave=True,
