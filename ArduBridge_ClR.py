@@ -32,7 +32,6 @@ from GSOF_ArduBridge import udpControl
 from GSOF_ArduBridge import ArduBridge
 from GSOF_ArduBridge import ElectrodeGpioStack
 from GSOF_ArduBridge import threadPID
-
 #from GSOF_ArduBridge import threadPID_KS as threadPID
 from GSOF_ArduBridge import UDP_Send
 #from GSOF_ArduBridge import threadFLAME
@@ -68,14 +67,14 @@ if __name__ == "__main__":
     ########################################################################################
     user= 'Kenza Samlali'
     lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
-    port = 'COM20' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
+    port = '/dev/cu.usbmodem14201' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
     PUMPS= False #<-- True when user wants to use Nemesys pump through python.
     SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
-    SPEC= True #<-- True when user wants to use a spectrometer thread.
+    SPEC= False #<-- True when user wants to use a spectrometer thread.
     GUI=False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
@@ -120,9 +119,9 @@ if __name__ == "__main__":
         PID = threadPID.ArduPidThread(bridge=ardu,
                                       nameID='PID', #proces name
                                       Period=0.5,   #Period-time of the control-loop. PID calculation cycle time in sec.
-                                      fbPin=1,      #The analog pin of the temp sensor.
-                                      outPin=10,    #The output pin  of the driver.
-                                      dirPin=7      #The direction pin for the driver.
+                                      fbPin=1,      #The analog pin (Ardu) of the temp sensor.
+                                      outPin=10,    #The output pin  of the driver (Ardu connection).
+                                      dirPin=7      #The direction pin for the driver (Ardu connection).
                                       )
         PID.PID.Kp = 30 # proportional control of PID
         PID.PID.Ki = 1.2 # integral of PID

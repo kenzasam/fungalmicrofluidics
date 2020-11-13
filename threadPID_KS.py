@@ -66,16 +66,14 @@ class ArduPidThread(BT.BasicThread):
         self.b = -1010.0
 
         #Coefficients for Steinhart temperature calculation
-        self.RTDstd = 100000
+        self.RTDstd = 10000
         self.Tstd = 25.0
-        self.Kbeta = 4040  #4250
+        self.Kbeta = 3920.855 #Amphenol  MA300
         self.Rser = 98400  #4700
-
         self.T0 = time.time()
         self.ctrl_Z0 = time.time()
         self.ctrl_Rise = -1
         self.ctrl_Settle = -1
-
         self.Rise_tolerance = 2
         self.Settle_tolerance = 1
 
