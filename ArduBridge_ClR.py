@@ -67,7 +67,7 @@ if __name__ == "__main__":
     ########################################################################################
     user= 'Kenza Samlali'
     lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
-    port = '/dev/cu.usbmodem14201' #COM20 #/dev/cu.usbmodem14201 <--Change to the correct COM-Port to access the Arduino
+    port = 'COM20' # '/dev/cu.usbmodem14201' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         PID.PID.Kd = 0.0 # rate of change of PID (derivative)
         PID.addViewer('UDP',udpSendPid.Send) #'UDP',udpSendPid1.Send)
         PID.enIO(True) #PID.enOut = True
-        ardu.gpio.pinMode(9,0)
+        ardu.gpio.pinMode(10,0)
         #print 'type PID.start() to start the PID thread\n'
 
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
