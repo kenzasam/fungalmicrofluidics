@@ -69,7 +69,7 @@ class ArduPidThread(BT.BasicThread):
         self.RTDstd = 10000
         self.Tstd = 25.0
         self.Kbeta = 3920.855 #Amphenol  MA300
-        self.Rser = 98400  #4700
+        self.Rser = 101800  #4700
         self.T0 = time.time()
         self.ctrl_Z0 = time.time()
         self.ctrl_Rise = -1

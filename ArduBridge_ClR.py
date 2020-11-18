@@ -128,7 +128,7 @@ if __name__ == "__main__":
         PID.PID.Kd = 0.0 # rate of change of PID (derivative)
         PID.addViewer('UDP',udpSendPid.Send) #'UDP',udpSendPid1.Send)
         PID.enIO(True) #PID.enOut = True
-        ardu.gpio.pinMode(10,0)
+        ardu.gpio.pinMode(7,0)
         #print 'type PID.start() to start the PID thread\n'
 
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
