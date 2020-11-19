@@ -55,31 +55,33 @@ class MainFrame(wx.Frame):
 
         '''setting up wx Main Frame window.'''
         self.setup=setup
-        self.SetMenuBar(MenuBar(self,pumpnrs))
+
         self.CreateStatusBar()
         ico=wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
+
 
         '''Create and populate Panel.'''
         panel=wx.Panel(self)
         #
         MAINbox = wx.BoxSizer(wx.VERTICAL)
         pumppanel = PumpPanel(panel, pumpnrs, udpSend)
-        MAINbox.Add(pumppanel)
+        MAINbox.Add(pumppanel, 1, wx.EXPAND|wx.ALL, 2)
         #
         operationspanel=OperationsPanel(panel, udpSend)
-        MAINbox.Add(operationspanel)
+        MAINbox.Add(operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #
-        incpanel=Incubationpanel(panel, udpSend)
-        MAINbox.Add(incpanel)
+        incpanel=IncubationPanel(panel, udpSend)
+        MAINbox.Add(incpanel, 1, wx.EXPAND|wx.ALL, 2)
         #
         sortingpanel=SortingPanel(panel, udpSend)
-        MAINbox.Add(sortingpanel)
+        MAINbox.Add(sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         #
         panel.SetSizerAndFit(MAINbox)
-        #self.Fit()
-        self.Centre()
+        menubar=MenuBar(pumpnrs)
+        self.SetMenuBar(menubar)
+        #self.Centre()
 
 
     def on_quit_click(self, event):
@@ -115,12 +117,14 @@ class PumpPanel(wx.Panel):
         #
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         NemSizer.Add(line, 0, wx.ALL|wx.EXPAND, 2 )
+        NemSizer.AddSpacer(5)
         titlebox = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Pumps')
         font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
         title.SetFont(font)
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         NemSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
+        NemSizer.AddSpacer(10)
         #Entry of OTHER flow rate
         boxNemf=wx.BoxSizer(wx.HORIZONTAL)
         textOtherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
@@ -195,8 +199,8 @@ class PumpPanel(wx.Panel):
         NemSizer.Add(boxNemc, flag=wx.LEFT, border=8)
         ##
         self.SetSizer(NemSizer)
-        #MAINbox.Add(NemSizer, 0, wx.ALL)
-        self.SetBackgroundColour('#6f8089')
+        NemSizer.AddSpacer(5)
+        #self.SetBackgroundColour('#6f8089')
 
     def onOilFlow(self, event):
         flrt=float(self.entryOilflrt.GetValue())
@@ -272,20 +276,26 @@ class PumpPanel(wx.Panel):
 
 class OperationsPanel(wx.Panel):
     def __init__(self,parent,udpSend):
-        wx.Panel.__init__(self,parent,udpSend)
+        super(OperationsPanel, self).__init__(parent)
+        #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend=udpSend
         """Create and populate main sizer."""
         fnSizer = wx.BoxSizer(wx.VERTICAL)
         #
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         fnSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
+        fnSizer.AddSpacer(5)
         titlebox  = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Electrode Functions')
         font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
         title.SetFont(font)
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         fnSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
-        #Sort
+        fnSizer.AddSpacer(10)
+        self.vwrBtn=wx.Button( self, label='Show chip viewer', name='PID.start()',style=wx.BU_EXACTFIT)
+        self.vwrBtn.Bind(wx.EVT_BUTTON, self.onVwr)
+        fnSizer.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
+        #sorting
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.SortBtn=wx.Button( self, label='Sort', name='Sort()', size=(70,24)) #ADDED KS
         self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
@@ -295,9 +305,12 @@ class OperationsPanel(wx.Panel):
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box1.Add(self.entry1, proportion=1)
         fnSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
+        fnSizer.AddSpacer(5)
         self.SetSizer(fnSizer)
-        self.SetBackgroundColour('#32a852')
+        #self.SetBackgroundColour('#32a852')
 
+    def onVwr(self, event):
+        return
 
     def onSort(self, event):
         try:
@@ -309,27 +322,30 @@ class OperationsPanel(wx.Panel):
         if self.udpSend != False:
             self.udpSend.Send(s)
 
-class Incubationpanel(wx.Panel):
+class IncubationPanel(wx.Panel):
     def __init__(self, parent,udpSend):
-        wx.Panel.__init__(self,parent,udpSend)
+        super(IncubationPanel, self).__init__(parent)
+        #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend=udpSend
         """Create and populate main sizer."""
         incSizer = wx.BoxSizer(wx.VERTICAL)
         #
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         incSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
+        incSizer.AddSpacer(5)
         titlebox  = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Droplet Incubation')
         font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
         title.SetFont(font)
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         incSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
+        incSizer.AddSpacer(10)
         #pid
         box3=wx.BoxSizer(wx.HORIZONTAL)
-        self.pidBtn=wx.Button( self, label='Show PID control', name='PID.start()', size=(70,24))
+        self.pidBtn=wx.Button( self, label='Show PID control viewer', name='PID.start()',style=wx.BU_EXACTFIT)
         self.pidBtn.Bind(wx.EVT_BUTTON, self.onPid)
         box3.Add(self.pidBtn, flag=wx.RIGHT, border=8)
-        self.IncBtn=wx.Button( self, label='Start', name='PID.start()', size=(70,24))
+        self.IncBtn=wx.Button( self, label='Start incubation', name='PID.start()', style=wx.BU_EXACTFIT)
         self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
         box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
@@ -347,15 +363,18 @@ class Incubationpanel(wx.Panel):
         self.entry2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box2.Add(self.entry2, proportion=1)
         incSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
+        #spacer
+        incSizer.AddSpacer(10)
         #imaging pipeline
         box4=wx.BoxSizer(wx.HORIZONTAL)
-        self.imgsetupBtn=wx.Button( self, label='Show PID control', name='PID.start()', size=(70,24))
+        self.imgsetupBtn=wx.Button( self, label='Set up imaging pipeline ...', name='PID.start()', style=wx.BU_EXACTFIT)
         self.imgsetupBtn.Bind(wx.EVT_BUTTON, self.onImgsetup)
         box4.Add(self.imgsetupBtn, flag=wx.RIGHT, border=8)
-        self.ImgBtn=wx.Button( self, label='Start', name='PID.start()', size=(70,24))
+        self.ImgBtn=wx.Button( self, label='Start imaging', name='PID.start()', style=wx.BU_EXACTFIT)
         self.ImgBtn.Bind(wx.EVT_BUTTON, self.onImage)
         box4.Add(self.ImgBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
+        incSizer.AddSpacer(5)
 
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
@@ -383,10 +402,10 @@ class Incubationpanel(wx.Panel):
     def onImage(self, event):
         return
 
-
 class SortingPanel(wx.Panel):
-    def __init__(self,paren,udpSend):
-        wx.Panel.__init__(self,parent,udpSend)
+    def __init__(self,parent,udpSend):
+        super(SortingPanel, self).__init__(parent)
+        #wx.Panel.__init__(self,parent,udpSend)
         ########################################
         #############FUNCTIONS#####sizer########
         #######################################
@@ -396,24 +415,28 @@ class SortingPanel(wx.Panel):
         #
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
+        srtSizer.AddSpacer(5)
         titlebox  = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Droplet Sorting')
         font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
         title.SetFont(font)
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.AddSpacer(10)
         #Sort
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
         self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStart)
         box1.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
-        self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]  ')
+        self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]')
         box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box1.Add(self.entry1, proportion=1)
         srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.AddSpacer(10)
+
         self.SetSizer(srtSizer)
-        self.SetBackgroundColour('#f2dd88')
+        #self.SetBackgroundColour('#f2dd88')
 
     def onStart(self, event):
         try:
@@ -427,43 +450,46 @@ class SortingPanel(wx.Panel):
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
-    def __init__(self, parent, pumpnrs):
+    def __init__(self, pumpnrs):
         wx.MenuBar.__init__(self)
         self.pumpnrs=pumpnrs
         Pumpnrs=list(range(self.pumpnrs))
         # File menu
         #menubar = wx.MenuBar()
         fileMenu = wx.Menu()
-        self.fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
-        self.Bind(wx.EVT_MENU, self.onQuit, self.fileItem1)
+        fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
+        #self.Bind(wx.EVT_MENU, self.onQuit, self.fileItem1)
+        self.Append(fileMenu, 'File')
         #menubar.Append(fileMenu, 'File')
         arduMenu = wx.Menu()
-        self.arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port', 'openPort()')
-        self.Bind(wx.EVT_MENU, self.onRemoteOpenPort,self.arduItem1)
-        self.arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'closePort()')
-        self.Bind(wx.EVT_MENU, self.onRemoteClosePort,self.arduItem2)
-        self.arduItem3 = arduMenu.Append(wx.ID_ANY, 'Close Arduino comm', 'close()')
-        self.Bind(wx.EVT_MENU, self.onCloseArdu,self.arduItem3)
+        arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port', 'openPort()')
+        #self.Bind(wx.EVT_MENU, self.onRemoteOpenPort,self.arduItem1)
+        arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'closePort()')
+        #self.Bind(wx.EVT_MENU, self.onRemoteClosePort,self.arduItem2)
+        arduItem3 = arduMenu.Append(wx.ID_ANY, 'Close Arduino comm', 'close()')
+        #self.Bind(wx.EVT_MENU, self.onCloseArdu,self.arduItem3)
+        self.Append(arduMenu, 'Ardu')
         #menubar.Append(arduMenu, 'Ardu')
         nemMenu = wx.Menu()
-        self.nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'nem.bus_open()')
-        self.Bind(wx.EVT_MENU, self.onOpenNem, self.nemItem1)
-        self.nemItem2 = nemMenu.Append(wx.ID_ANY, 'Close NeMESYS bus', 'nem.bus_close()')
-        self.Bind(wx.EVT_MENU, self.onCloseNem, self.nemItem2)
+        nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'nem.bus_open()')
+        #self.Bind(wx.EVT_MENU, self.onOpenNem, self.nemItem1)
+        nemItem2 = nemMenu.Append(wx.ID_ANY, 'Close NeMESYS bus', 'nem.bus_close()')
+        #self.Bind(wx.EVT_MENU, self.onCloseNem, self.nemItem2)
         stopMenu = wx.Menu()
-        self.stopAll = stopMenu.Append(wx.ID_ANY, 'Stop All', '')
-        self.Bind(wx.EVT_MENU, self.onStopPumps, self.stopAll)
-        self.stopItem=[]
+        stopAll = stopMenu.Append(wx.ID_ANY, 'Stop All', '')
+        #self.Bind(wx.EVT_MENU, self.onStopPumps, self.stopAll)
+        stopItem=[]
         for i in Pumpnrs:
-            self.stopItem.append(stopMenu.Append(wx.ID_ANY, str(i), str(i)))
-            self.Bind(wx.EVT_MENU, self.onStopOnePump, self.stopItem[i])
+            stopItem.append(stopMenu.Append(wx.ID_ANY, str(i), str(i)))
+            #self.Bind(wx.EVT_MENU, self.onStopOnePump, self.stopItem[i])
         nemMenu.Append(wx.ID_ANY, 'Stop Pumps', stopMenu)
         calibrateMenu = wx.Menu()
-        self.calibrateItem=[]
+        calibrateItem=[]
         for i in Pumpnrs:
-            self.calibrateItem.append(calibrateMenu.Append(wx.ID_ANY, str(i), str(i)))
-            self.Bind(wx.EVT_MENU, self.onCalibratePump, self.calibrateItem[i])
+            calibrateItem.append(calibrateMenu.Append(wx.ID_ANY, str(i), str(i)))
+            self.Bind(wx.EVT_MENU, self.onCalibratePump, calibrateItem[i])
         nemMenu.Append(wx.ID_ANY, 'Calibrate', calibrateMenu)
+        self.Append(nemMenu, 'Nemesys')
         #menubar.Append(nemMenu, 'Nemesys')
         #self.SetMenuBar(menubar)
         ##############
