@@ -140,13 +140,41 @@ class PumpPanel(wx.Panel):
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         NemSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         NemSizer.AddSpacer(10)
+
+
+        #Entry of Oil consant flow rate
+        boxNem3=wx.BoxSizer(wx.HORIZONTAL)
+        flrt3=wx.StaticText(self,  wx.ID_ANY, label='Oil [uL/s]')
+        boxNem3.Add(flrt3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entryflrt3=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem3.Add(entryflrt3, proportion=0.5, border=8)
+        textPump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
+        boxNem3.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        combo3 = wx.ComboBox(self, value=choices[0], choices=choices)
+        combo3.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem3.Add(combo3, 0, wx.ALIGN_RIGHT)
+        Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
+        boxNem3.Add(Btn3, 0, wx.ALIGN_RIGHT)
+        ##Entry of Flowrate continuous aqueous
+        boxNem4=wx.BoxSizer(wx.HORIZONTAL)
+        flrt4=wx.StaticText(self,  wx.ID_ANY, label='Aq [uL/s]')
+        boxNem4.Add(flrt4, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entryflrt4=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem4.Add(entryflrt4, proportion=0.5, border=8)
+        boxNem4.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        combo4 = wx.ComboBox(self, value=choices[0], choices=choices)
+        combo4.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem4.Add(combo4, 0, wx.ALIGN_RIGHT)
+        Btn4=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn4.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
+        boxNem4.Add(Btn4, 0, wx.ALIGN_RIGHT)
         #Entry of OTHER flow rate
         boxNem0=wx.BoxSizer(wx.HORIZONTAL)
         flrt0=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
         boxNem0.Add(flrt0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         entryflrt0=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
         boxNem0.Add(entryflrt0, proportion=0.5, border=8)
-        textPump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
         boxNem0.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         combo0 = wx.ComboBox(self, value=choices[0], choices=choices)
         combo0.Bind(wx.EVT_COMBOBOX, self.onCombo)
@@ -154,15 +182,13 @@ class PumpPanel(wx.Panel):
         Btn0=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
         Btn0.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem0.Add(Btn0, 0, wx.ALIGN_RIGHT)
-        NemSizer.Add(boxNem0, flag=wx.LEFT, border=8)
         # pumpnrs  == 4:
         boxNem1=wx.BoxSizer(wx.HORIZONTAL)
         flrt1=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNem1.Add(self.flrt1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        boxNem1.Add(flrt1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         entryflrt1=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem1.Add(self.entryflrt1, proportion=0.5, border=8)
-        #self.textPump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
-        boxNeme.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        boxNem1.Add(entryflrt1, proportion=0.5, border=8)
+        boxNem1.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         combo1 = wx.ComboBox(self , value=choices[0], choices=choices)
         combo1.Bind(wx.EVT_COMBOBOX, self.onCombo)
         boxNem1.Add(combo1, 0, wx.ALIGN_RIGHT)
@@ -171,10 +197,10 @@ class PumpPanel(wx.Panel):
         boxNem1.Add(Btn1, 0, wx.ALIGN_RIGHT)
         # pumpnrs == 5:
         boxNem2=wx.BoxSizer(wx.HORIZONTAL)
-        flrt2=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNem2.Add(self.text5Otherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        flrt2=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem2.Add(self.entry5Otherflrt, proportion=0.5, border=8)
+        #flrt2=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
+        boxNem2.Add(flrt1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entryflrt2=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem2.Add(entryflrt2, proportion=0.5, border=8)
         #self.text5Pump=wx.StaticText(self,  wx.ID_ANY, label='Pump ')
         boxNem2.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         combo2 = wx.ComboBox(self, value=choices[0], choices=choices)
@@ -183,35 +209,16 @@ class PumpPanel(wx.Panel):
         Btn2=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
         Btn2.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem2.Add(Btn2, 0, wx.ALIGN_RIGHT)
-        if pumpnrs  == 4:
-            NemSizer.Add(boxNem3, flag=wx.LEFT, border=8)
-        elif pumpnrs  == 5:
-            NemSizer.Add(boxNem3, flag=wx.LEFT, border=8)
-            NemSizer.Add(boxNem4, flag=wx.LEFT, border=8)
-        #Entry of Oil consant flow rate
-        boxNem3=wx.BoxSizer(wx.HORIZONTAL)
-        flrt3=wx.StaticText(self,  wx.ID_ANY, label='Oil [uL/s]')
-        boxNem3.Add(textOilflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        flrt3=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem3.Add(flrt1, proportion=0.5, border=8)
-        boxNem3.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        boxNem3.Add(combo6, 0, wx.ALIGN_RIGHT)
-        Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
-        boxNem3.Add(OilBtn, 0, wx.ALIGN_RIGHT)
+        #
         NemSizer.Add(boxNem3, flag=wx.LEFT, border=8)
-        ##Entry of Flowrate continuous aqueous
-        boxNem4=wx.BoxSizer(wx.HORIZONTAL)
-        flrt4=wx.StaticText(self,  wx.ID_ANY, label='Aq [uL/s]')
-        boxNem4.Add(textAqflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        flrt4=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem4.Add(flrt4, proportion=0.5, border=8)
-        boxNem4.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        boxNem4.Add(combo6, 0, wx.ALIGN_RIGHT)
-        Btn4=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        Btn4.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
-        boxNem4.Add(Btn4, 0, wx.ALIGN_RIGHT)
         NemSizer.Add(boxNem4, flag=wx.LEFT, border=8)
+        NemSizer.Add(boxNem0, flag=wx.LEFT, border=8)
+        if pumpnrs  == 4:
+            NemSizer.Add(boxNem1, flag=wx.LEFT, border=8)
+        elif pumpnrs  == 5:
+            NemSizer.Add(boxNem1, flag=wx.LEFT, border=8)
+            NemSizer.Add(boxNem2, flag=wx.LEFT, border=8)
+
         ##
         self.SetSizer(NemSizer)
         NemSizer.AddSpacer(5)

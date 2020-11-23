@@ -23,7 +23,7 @@ Features:
 
 __version__ = "1.0.0"
 
-__author__ = "Guy Soffer"
+__author__ = "Guy Soffer, edits by Kenza Samlali"
 __copyright__ = "Copyright 2020"
 __credits__ = ["Guy Soffer"]
 __license__ = "GPL-3.0-or-later"
@@ -51,7 +51,7 @@ class ArduPidThread(BT.BasicThread):
         self.dirPin = dirPin #save the pin# that should be used
         self.ct = 25.0       #Init value of target value
         self.ct_now = self.ct
-        self.RC_div_DT = 100.0 #Period #Exponential pulse-shaping coef'
+        self.RC_div_DT = 10.0 #Period #Exponential pulse-shaping coef'
         self.PID = PidAlgorithm.PidAlgorithm( P=1, I=0, D=0)
         self.PID.outMax = 100   #Maximum output value
         self.PID.outMin = -100  #Minimum output value
@@ -66,10 +66,10 @@ class ArduPidThread(BT.BasicThread):
         self.b = -1010.0
 
         #Coefficients for Steinhart temperature calculation
-        self.RTDstd = 10000
-        self.Tstd = 25.0
-        self.Kbeta = 3920.855 #Amphenol  MA300
-        self.Rser = 101800  #4700
+        self.RTDstd = 10000  #Amphenol  MA300 thermistor, resistance at 25C
+        self.Tstd = 25.0 # Standard temperature at which thermistor resistance RTDstd is true
+        self.Kbeta = 3920.855 #Amphenol  MA300 thermistor, Beta value
+        self.Rser = 101800  #Resistor in voltage divider
         self.T0 = time.time()
         self.ctrl_Z0 = time.time()
         self.ctrl_Rise = -1
