@@ -78,9 +78,24 @@ class MainFrame(wx.Frame):
         sortingpanel=SortingPanel(panel, udpSend)
         MAINbox.Add(sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         #
-        panel.SetSizerAndFit(MAINbox)
         menubar=MenuBar(pumpnrs)
+        self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
+        self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
+        self.Bind(wx.EVT_MENU, menubar.onRemoteClosePort, menubar.arduItem2)
+        self.Bind(wx.EVT_MENU, menubar.onCloseArdu, menubar.arduItem3)
+        self.Bind(wx.EVT_MENU, menubar.onOpenNem, menubar.nemItem1)
+        self.Bind(wx.EVT_MENU, menubar.onCloseNem, menubar.nemItem2)
+        self.Bind(wx.EVT_MENU, menubar.onStopPumps, menubar.stopAll)
+        self.Bind(wx.EVT_MENU, menubar.onPIDstart, menubar.pidItem1)
+        self.Bind(wx.EVT_MENU, menubar.onPIDpause, menubar.pidItem2)
+        self.Bind(wx.EVT_MENU, menubar.onPIDstop, menubar.pidItem3)
+        Pumpnrs=list(range(pumpnrs))
+        for i in Pumpnrs:
+            self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
+            self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
         self.SetMenuBar(menubar)
+        #
+        panel.SetSizerAndFit(MAINbox)
         #self.Centre()
 
 
@@ -126,77 +141,77 @@ class PumpPanel(wx.Panel):
         NemSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         NemSizer.AddSpacer(10)
         #Entry of OTHER flow rate
-        boxNemf=wx.BoxSizer(wx.HORIZONTAL)
-        textOtherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNemf.Add(textOtherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entryOtherflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNemf.Add(entryOtherflrt, proportion=0.5, border=8)
+        boxNem0=wx.BoxSizer(wx.HORIZONTAL)
+        flrt0=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
+        boxNem0.Add(flrt0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entryflrt0=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem0.Add(entryflrt0, proportion=0.5, border=8)
         textPump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
-        boxNemf.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        combo6 = wx.ComboBox(self, value=choices[0], choices=choices)
-        combo6.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNemf.Add(combo6, 0, wx.ALIGN_RIGHT)
-        OtherBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        OtherBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
-        boxNemf.Add(OtherBtn, 0, wx.ALIGN_RIGHT)
-        NemSizer.Add(boxNemf, flag=wx.LEFT, border=8)
+        boxNem0.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        combo0 = wx.ComboBox(self, value=choices[0], choices=choices)
+        combo0.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem0.Add(combo0, 0, wx.ALIGN_RIGHT)
+        Btn0=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn0.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
+        boxNem0.Add(Btn0, 0, wx.ALIGN_RIGHT)
+        NemSizer.Add(boxNem0, flag=wx.LEFT, border=8)
         # pumpnrs  == 4:
-        boxNeme=wx.BoxSizer(wx.HORIZONTAL)
-        self.text4Otherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNeme.Add(self.text4Otherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry4Otherflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNeme.Add(self.entry4Otherflrt, proportion=0.5, border=8)
-        self.text4Pump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
-        boxNeme.Add(self.text4Pump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.combo46 = wx.ComboBox(self , value=choices[0], choices=choices)
-        self.combo46.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNeme.Add(self.combo46, 0, wx.ALIGN_RIGHT)
-        self.Other4Btn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        self.Other4Btn.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
-        boxNeme.Add(self.Other4Btn, 0, wx.ALIGN_RIGHT)
+        boxNem1=wx.BoxSizer(wx.HORIZONTAL)
+        flrt1=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
+        boxNem1.Add(self.flrt1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entryflrt1=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem1.Add(self.entryflrt1, proportion=0.5, border=8)
+        #self.textPump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
+        boxNeme.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        combo1 = wx.ComboBox(self , value=choices[0], choices=choices)
+        combo1.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem1.Add(combo1, 0, wx.ALIGN_RIGHT)
+        Btn1=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn1.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
+        boxNem1.Add(Btn1, 0, wx.ALIGN_RIGHT)
         # pumpnrs == 5:
-        boxNemd=wx.BoxSizer(wx.HORIZONTAL)
-        self.text5Otherflrt=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNemd.Add(self.text5Otherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry5Otherflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNemd.Add(self.entry5Otherflrt, proportion=0.5, border=8)
-        self.text5Pump=wx.StaticText(self,  wx.ID_ANY, label='Pump ')
-        boxNemd.Add(self.text5Pump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.combo56 = wx.ComboBox(self, value=choices[0], choices=choices)
-        self.combo56.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNemd.Add(self.combo56, 0, wx.ALIGN_RIGHT)
-        self.Other5Btn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        self.Other5Btn.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
-        boxNemd.Add(self.Other5Btn, 0, wx.ALIGN_RIGHT)
+        boxNem2=wx.BoxSizer(wx.HORIZONTAL)
+        flrt2=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
+        boxNem2.Add(self.text5Otherflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        flrt2=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem2.Add(self.entry5Otherflrt, proportion=0.5, border=8)
+        #self.text5Pump=wx.StaticText(self,  wx.ID_ANY, label='Pump ')
+        boxNem2.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        combo2 = wx.ComboBox(self, value=choices[0], choices=choices)
+        combo2.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem2.Add(combo2, 0, wx.ALIGN_RIGHT)
+        Btn2=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn2.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
+        boxNem2.Add(Btn2, 0, wx.ALIGN_RIGHT)
         if pumpnrs  == 4:
-            NemSizer.Add(boxNemd, flag=wx.LEFT, border=8)
+            NemSizer.Add(boxNem3, flag=wx.LEFT, border=8)
         elif pumpnrs  == 5:
-            NemSizer.Add(boxNemd, flag=wx.LEFT, border=8)
-            NemSizer.Add(boxNeme, flag=wx.LEFT, border=8)
+            NemSizer.Add(boxNem3, flag=wx.LEFT, border=8)
+            NemSizer.Add(boxNem4, flag=wx.LEFT, border=8)
         #Entry of Oil consant flow rate
-        boxNema=wx.BoxSizer(wx.HORIZONTAL)
-        textOilflrt=wx.StaticText(self,  wx.ID_ANY, label='Oil [uL/s]')
-        boxNema.Add(textOilflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entryOilflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNema.Add(entryOilflrt, proportion=0.5, border=8)
-        boxNema.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        boxNema.Add(combo6, 0, wx.ALIGN_RIGHT)
-        OilBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        OilBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
-        boxNema.Add(OilBtn, 0, wx.ALIGN_RIGHT)
-        NemSizer.Add(boxNema, flag=wx.LEFT, border=8)
+        boxNem3=wx.BoxSizer(wx.HORIZONTAL)
+        flrt3=wx.StaticText(self,  wx.ID_ANY, label='Oil [uL/s]')
+        boxNem3.Add(textOilflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        flrt3=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem3.Add(flrt1, proportion=0.5, border=8)
+        boxNem3.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        boxNem3.Add(combo6, 0, wx.ALIGN_RIGHT)
+        Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
+        boxNem3.Add(OilBtn, 0, wx.ALIGN_RIGHT)
+        NemSizer.Add(boxNem3, flag=wx.LEFT, border=8)
         ##Entry of Flowrate continuous aqueous
-        boxNemc=wx.BoxSizer(wx.HORIZONTAL)
-        textAqflrt=wx.StaticText(self,  wx.ID_ANY, label='Aq [uL/s]')
-        boxNemc.Add(textAqflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entryAqflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNemc.Add(entryAqflrt, proportion=0.5, border=8)
-        boxNemc.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        boxNemc.Add(combo6, 0, wx.ALIGN_RIGHT)
-        AqBtn=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
-        AqBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
-        boxNemc.Add(AqBtn, 0, wx.ALIGN_RIGHT)
-        NemSizer.Add(boxNemc, flag=wx.LEFT, border=8)
+        boxNem4=wx.BoxSizer(wx.HORIZONTAL)
+        flrt4=wx.StaticText(self,  wx.ID_ANY, label='Aq [uL/s]')
+        boxNem4.Add(textAqflrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        flrt4=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem4.Add(flrt4, proportion=0.5, border=8)
+        boxNem4.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        boxNem4.Add(combo6, 0, wx.ALIGN_RIGHT)
+        Btn4=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn4.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
+        boxNem4.Add(Btn4, 0, wx.ALIGN_RIGHT)
+        NemSizer.Add(boxNem4, flag=wx.LEFT, border=8)
         ##
         self.SetSizer(NemSizer)
         NemSizer.AddSpacer(5)
@@ -454,45 +469,34 @@ class MenuBar(wx.MenuBar):
         wx.MenuBar.__init__(self)
         self.pumpnrs=pumpnrs
         Pumpnrs=list(range(self.pumpnrs))
-        # File menu
-        #menubar = wx.MenuBar()
         fileMenu = wx.Menu()
-        fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
-        #self.Bind(wx.EVT_MENU, self.onQuit, self.fileItem1)
+        self.fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
         self.Append(fileMenu, 'File')
-        #menubar.Append(fileMenu, 'File')
         arduMenu = wx.Menu()
-        arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port', 'openPort()')
-        #self.Bind(wx.EVT_MENU, self.onRemoteOpenPort,self.arduItem1)
-        arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'closePort()')
-        #self.Bind(wx.EVT_MENU, self.onRemoteClosePort,self.arduItem2)
-        arduItem3 = arduMenu.Append(wx.ID_ANY, 'Close Arduino comm', 'close()')
-        #self.Bind(wx.EVT_MENU, self.onCloseArdu,self.arduItem3)
+        self.arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port', 'openPort()')
+        self.arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'closePort()')
+        self.arduItem3 = arduMenu.Append(wx.ID_ANY, 'Close Arduino comm', 'close()')
         self.Append(arduMenu, 'Ardu')
-        #menubar.Append(arduMenu, 'Ardu')
         nemMenu = wx.Menu()
-        nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'nem.bus_open()')
-        #self.Bind(wx.EVT_MENU, self.onOpenNem, self.nemItem1)
-        nemItem2 = nemMenu.Append(wx.ID_ANY, 'Close NeMESYS bus', 'nem.bus_close()')
-        #self.Bind(wx.EVT_MENU, self.onCloseNem, self.nemItem2)
+        self.nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'nem.bus_open()')
+        self.nemItem2 = nemMenu.Append(wx.ID_ANY, 'Close NeMESYS bus', 'nem.bus_close()')
         stopMenu = wx.Menu()
-        stopAll = stopMenu.Append(wx.ID_ANY, 'Stop All', '')
-        #self.Bind(wx.EVT_MENU, self.onStopPumps, self.stopAll)
-        stopItem=[]
+        self.stopAll = stopMenu.Append(wx.ID_ANY, 'Stop All', '')
+        self.stopItem=[]
         for i in Pumpnrs:
-            stopItem.append(stopMenu.Append(wx.ID_ANY, str(i), str(i)))
-            #self.Bind(wx.EVT_MENU, self.onStopOnePump, self.stopItem[i])
+            self.stopItem.append(stopMenu.Append(wx.ID_ANY, str(i), str(i)))
         nemMenu.Append(wx.ID_ANY, 'Stop Pumps', stopMenu)
         calibrateMenu = wx.Menu()
-        calibrateItem=[]
+        self.calibrateItem=[]
         for i in Pumpnrs:
-            calibrateItem.append(calibrateMenu.Append(wx.ID_ANY, str(i), str(i)))
-            self.Bind(wx.EVT_MENU, self.onCalibratePump, calibrateItem[i])
+            self.calibrateItem.append(calibrateMenu.Append(wx.ID_ANY, str(i), str(i)))
         nemMenu.Append(wx.ID_ANY, 'Calibrate', calibrateMenu)
         self.Append(nemMenu, 'Nemesys')
-        #menubar.Append(nemMenu, 'Nemesys')
-        #self.SetMenuBar(menubar)
-        ##############
+        pidMenu = wx.Menu()
+        self.pidItem1 = pidMenu.Append(wx.ID_ANY, 'Open PID', 'PID.start()')
+        self.pidItem2 = pidMenu.Append(wx.ID_ANY, 'Pause PID', 'PID.pause()')
+        self.pidItem3 = pidMenu.Append(wx.ID_ANY, 'Stop PID', 'PID.stop()')
+        self.Append(pidMenu, 'PID')
     def onQuit(self,event):
         self.Close()
     def onCloseArdu(self,event):
@@ -540,6 +544,21 @@ class MenuBar(wx.MenuBar):
                 self.udpSend.Send(s)
     def onRemoteClosePort(self, event):
         s = 'ardu.OpenClosePort(0)'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+                self.udpSend.Send(s)
+    def onPIDstart(self, event):
+        s = 'PID.start()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+                self.udpSend.Send(s)
+    def onPIDpause(self, event):
+        s = 'PID.pause()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+                self.udpSend.Send(s)
+    def onPIDstop(self, event):
+        s = 'PID.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
