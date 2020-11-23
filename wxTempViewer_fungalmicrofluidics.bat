@@ -1,3 +1,4 @@
+cd "%~dp0"
 rem Block sensor
 start .\UdpTo_wxPlotViewer\UdpTo_wxPlotViewer.exe -p 7000 > blockTempToday.csv
 

@@ -78,7 +78,7 @@ class MainFrame(wx.Frame):
         sortingpanel=SortingPanel(panel, udpSend)
         MAINbox.Add(sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         #
-        menubar=MenuBar(pumpnrs)
+        menubar=MenuBar(pumpnrs, udpSend)
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteClosePort, menubar.arduItem2)
@@ -332,7 +332,8 @@ class OperationsPanel(wx.Panel):
         #self.SetBackgroundColour('#32a852')
 
     def onVwr(self, event):
-        return
+        dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat"'
+        os.system(dir)
 
     def onSort(self, event):
         try:
@@ -413,11 +414,14 @@ class IncubationPanel(wx.Panel):
             self.udpSend.Send(s)
 
     def onPid(self,event):
+        dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
+        os.system(dir)
+        '''
         s = 'setup.PID.plot()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
-
+        '''
     def onImgsetup(self, event):
         return
 
@@ -472,9 +476,10 @@ class SortingPanel(wx.Panel):
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
-    def __init__(self, pumpnrs):
+    def __init__(self, pumpnrs, udpSend):
         wx.MenuBar.__init__(self)
         self.pumpnrs=pumpnrs
+        self.udpSend=udpSend
         Pumpnrs=list(range(self.pumpnrs))
         fileMenu = wx.Menu()
         self.fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
@@ -577,7 +582,7 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     def fileChooser():
         root = Tkinter.Tk()
         root.withdraw()
-        filename = tkFileDialog.askopenfilename()
+        filename = tkFileDialog.askopenfilename(title = "Select ArduBridge Protocol file", filetypes = (("python files","*.py"),("all files","*.*")))
         return filename
     ver = '3.1.2'
     date = '28/10/2020'
@@ -620,5 +625,8 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     app = wx.App(False)
     frame = MainFrame(setup, ip=options.ip, port=options.port)
     frame.Show()
+
+    #inspection tool for GUI troubleshooting
     wx.lib.inspection.InspectionTool().Show()
+    #
     app.MainLoop()
