@@ -55,7 +55,7 @@ class ArduPidThread(BT.BasicThread):
         self.PID = PidAlgorithm.PidAlgorithm( P=1, I=0, D=0)
         self.PID.outMax = 100   #Maximum output value
         self.PID.outMin = -100  #Minimum output value
-
+        self.PIDstatus = False  #init
         if self.ardu:
             self.ardu.gpio.pinMode(self.dirPin, 0) #Set the pins direction to output
         self.enOut = False
@@ -85,6 +85,7 @@ class ArduPidThread(BT.BasicThread):
         self.enInput = val
 
     def start(self):
+        self.PIDstatus = True
         self.T0 = time.time()
         BT.BasicThread.start(self)
         if self.enOut:
@@ -130,6 +131,7 @@ class ArduPidThread(BT.BasicThread):
         ## /\  Code ends above  /\
 
     def stop(self):
+        self.PIDstatus = False
         self.setOutput(0)
         BT.BasicThread.stop(self)
 

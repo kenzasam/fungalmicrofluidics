@@ -74,6 +74,8 @@ class Nem():
         print  '>>> Starting bus communication...<<<'
         try:
             self.bus.start()
+            pumpfail=False
+            print "Bus started.... "
         except:
             print "Can't start bus. Skipping pump setup. Do NOT use pumps! .... "
             pumpfail=True

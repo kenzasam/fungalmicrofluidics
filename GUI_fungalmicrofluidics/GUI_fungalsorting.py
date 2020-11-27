@@ -65,19 +65,6 @@ class MainFrame(wx.Frame):
         '''Create and populate Panel.'''
         panel=wx.Panel(self)
         #
-        MAINbox = wx.BoxSizer(wx.VERTICAL)
-        pumppanel = PumpPanel(panel, pumpnrs, udpSend)
-        MAINbox.Add(pumppanel, 1, wx.EXPAND|wx.ALL, 2)
-        #
-        operationspanel=OperationsPanel(panel, udpSend)
-        MAINbox.Add(operationspanel, 1, wx.EXPAND|wx.ALL, 2)
-        #
-        incpanel=IncubationPanel(panel, udpSend)
-        MAINbox.Add(incpanel, 1, wx.EXPAND|wx.ALL, 2)
-        #
-        sortingpanel=SortingPanel(panel, udpSend)
-        MAINbox.Add(sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
-        #
         menubar=MenuBar(pumpnrs, udpSend)
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
@@ -93,6 +80,21 @@ class MainFrame(wx.Frame):
         for i in Pumpnrs:
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
+        #
+        MAINbox = wx.BoxSizer(wx.VERTICAL)
+        pumppanel = PumpPanel(panel, pumpnrs, udpSend)
+        MAINbox.Add(pumppanel, 1, wx.EXPAND|wx.ALL, 2)
+        #
+        operationspanel=OperationsPanel(panel, udpSend)
+        MAINbox.Add(operationspanel, 1, wx.EXPAND|wx.ALL, 2)
+        #
+        #PID = self.PID_status(menubar)
+        incpanel=IncubationPanel(panel, udpSend)
+        MAINbox.Add(incpanel, 1, wx.EXPAND|wx.ALL, 2)
+        #
+        sortingpanel=SortingPanel(panel, udpSend)
+        MAINbox.Add(sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
+        #
         self.SetMenuBar(menubar)
         #
         panel.SetSizerAndFit(MAINbox)
@@ -104,6 +106,9 @@ class MainFrame(wx.Frame):
         del event
         wx.CallAfter(self.Destroy)
 
+    def PID_status(self, menubar):
+        """checkPID status"""
+        return menubar.PID
 """
 class MainPanel(wx.Panel):
     #Panel class to contain frame widgets.
@@ -350,6 +355,7 @@ class IncubationPanel(wx.Panel):
         super(IncubationPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend=udpSend
+        #self.PID_status=PID
         """Create and populate main sizer."""
         incSizer = wx.BoxSizer(wx.VERTICAL)
         #
@@ -369,7 +375,7 @@ class IncubationPanel(wx.Panel):
         self.pidBtn.Bind(wx.EVT_BUTTON, self.onPid)
         box3.Add(self.pidBtn, flag=wx.RIGHT, border=8)
         self.IncBtn=wx.Button( self, label='Start incubation', name='PID.start()', style=wx.BU_EXACTFIT)
-        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
+        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate(parent))
         box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         #Temperature
@@ -402,16 +408,20 @@ class IncubationPanel(wx.Panel):
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
 
-    def onIncubate(self,event):
-        try:
-            temp=int(float(self.entry1.GetValue()))
-            t=int(float(self.entry2.GetValue()))
-        except:
-            wx.MessageDialog(self, "Enter a valid temperature", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.PID.Incubation(%d,%d)'%(temp,t)
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
+    def onIncubate(self,parent, event):
+        status= parent.PID_status(parent.menubar)
+        if status != True:
+            wx.MessageDialog(self, "Please first start the PID", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            try:
+                temp=int(float(self.entry1.GetValue()))
+                t=int(float(self.entry2.GetValue()))
+            except:
+                wx.MessageDialog(self, "Enter a valid temperature", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+            s = 'setup.incubation(0.5,%d,%d)'%(temp,t)
+            pyperclip.copy(s)
+            if self.udpSend != False:
+                self.udpSend.Send(s)
 
     def onPid(self,event):
         dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
@@ -480,6 +490,8 @@ class MenuBar(wx.MenuBar):
         wx.MenuBar.__init__(self)
         self.pumpnrs=pumpnrs
         self.udpSend=udpSend
+        self.PID= False
+
         Pumpnrs=list(range(self.pumpnrs))
         fileMenu = wx.Menu()
         self.fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
@@ -517,7 +529,7 @@ class MenuBar(wx.MenuBar):
         if self.udpSend != False:
             self.udpSend.Send(s)
     def onCloseNem(self,event):
-        s= 'setup.bus.close()'
+        s= 'Pumps.bus.close()'
         self.setup.pumpsObjList[pumpID]
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -528,24 +540,24 @@ class MenuBar(wx.MenuBar):
             if self.udpSend != False:
                 self.udpSend.Send(f)
     def onOpenNem(self,event):
-        s= 'setup.bus.open()'
+        s= 'Pumps.bus.open()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
     def onStopOnePump(self,event):
         item=self.GetMenuBar().FindItemById(event.GetId())
-        s = 'setup.nem.pump_stop(setup.nem.pumpID(%s))' %(str(item.GetText()))
+        s = 'Pumps.pump_stop(setup.nem.pumpID(%s))' %(str(item.GetText()))
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
     def onStopPumps(self,event):
-        s= 'setup.nem.pump_stop_all()'
+        s= 'Pumps.pump_stop_all()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
     def onCalibratePump(self,event):
         item=self.GetMenuBar().FindItemById(event.GetId())
-        s = 'setup.nem.pump_calibration(setup.nem.pumpID(%s))' %(str(item.GetText()))
+        s = 'Pumps.pump_calibration(setup.nem.pumpID(%s))' %(str(item.GetText()))
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -560,6 +572,7 @@ class MenuBar(wx.MenuBar):
         if self.udpSend != False:
                 self.udpSend.Send(s)
     def onPIDstart(self, event):
+        self.PID=True
         s = 'PID.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -570,6 +583,7 @@ class MenuBar(wx.MenuBar):
         if self.udpSend != False:
                 self.udpSend.Send(s)
     def onPIDstop(self, event):
+        self.PID=False
         s = 'PID.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:

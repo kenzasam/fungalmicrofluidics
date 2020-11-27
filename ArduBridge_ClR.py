@@ -50,8 +50,11 @@ def close():
 
     if SETUP != False:
         if PUMPS != False:
-           setup.nem.bus.stop()
-           print 'Nemesys Bus closed...'
+            setup.nem.bus.stop()
+            print 'Nemesys Bus closed...'
+        if PID != False & PID.PIDstatus != False:
+            PID.stop()
+            print 'PID stopped...'
         setup.stop()
 
     ardu.OpenClosePort(0)
@@ -70,9 +73,9 @@ if __name__ == "__main__":
     port = 'COM20' # '/dev/cu.usbmodem14201' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = True #<-- False for simulation
+    ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
-    PUMPS= False #<-- True when user wants to use Nemesys pump through python.
+    PUMPS= True #<-- True when user wants to use Nemesys pump through python.
     SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
     SPEC= False #<-- True when user wants to use a spectrometer thread.
     GUI=False #<-- True for running GUI through serial
