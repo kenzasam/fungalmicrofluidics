@@ -95,6 +95,7 @@ if __name__ == "__main__":
     '''
     udpSendPid = UDP_Send.udpSend(nameID='', DesIP='127.0.0.1', DesPort=PORT_BASE +0)
     udpSendChip = UDP_Send.udpSend(nameID='', DesIP='127.0.0.1', DesPort=PORT_BASE +1)
+    udpSendSpec = UDP_Send.udpSend(nameID='', DesIP='127.0.0.1', DesPort=PORT_BASE +2)
     udpConsol = False
     if REMOTE_CTRL_PORT > 1:
         udpConsol = udpControl.udpControl(nameID='udpIDLE', RxPort=REMOTE_CTRL_PORT, callFunc=extEval)
@@ -131,7 +132,7 @@ if __name__ == "__main__":
         PID.PID.Kd = 0.0 # rate of change of PID (derivative)
         PID.addViewer('UDP',udpSendPid.Send) #'UDP',udpSendPid1.Send)
         PID.enIO(True) #PID.enOut = True
-        ardu.gpio.pinMode(7,0)
+        ardu.gpio.pinMode(7,0) # Initialize pin to 0
         #print 'type PID.start() to start the PID thread\n'
 
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
@@ -155,6 +156,7 @@ if __name__ == "__main__":
                                       scan_frames=1,
                                       scan_time=100000 #integration time in microseconds
                                       )
+        Spec.addViewer('UDP',udpSendPid.Send)
         print 'type Spec.start() to start the FLAME thread\n'
     else:
         Spec=None

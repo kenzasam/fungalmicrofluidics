@@ -226,7 +226,7 @@ class SpectrOMat:
         self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
 
 
-"""
+    """
     def init_audio(self):
         #"Initialize sound subsystem
         #Set sound vars
@@ -240,7 +240,7 @@ class SpectrOMat:
         pygame.init()
 
         self.sound = None
-"""
+    """
 
     def init_ui(self):
         """Start the UI"""

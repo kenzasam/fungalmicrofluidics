@@ -52,18 +52,18 @@ except ImportError:
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
 
-class Flame:
-    def openspec(nr):
-        devices=list_devices()
-        spec= Spectrometer(devices[nr])
-        return spec
 
-    def acquire(spec, t):
-        #setting integration time in microseconds
-        spec.integration_time_micros(t)
-        # get wavelengths
-        wavelengths = spec.wavelengths()
-        wavelengths #array output
-        # get intensities
-        intensities = spec.intensities()
-        return intensities  #array output
+def openspec(nr):
+    devices=list_devices()
+    spec= Spectrometer(devices[nr])
+    return spec
+
+def acquire(spec, t):
+    #setting integration time in microseconds
+    spec.integration_time_micros(t)
+    # get wavelengths
+    wavelengths = spec.wavelengths()
+    wavelengths #array output
+    # get intensities
+    intensities = spec.intensities()
+    return intensities  #array output

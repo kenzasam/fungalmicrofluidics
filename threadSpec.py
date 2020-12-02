@@ -33,7 +33,7 @@ __status__ = "Production"
 import math, time
 import sys
 import numpy
-
+from GSOF_ArduBridge import threadBasic as TB
 '''
 #import seabreeze
 #seabreeze.use('pyseabreeze')
@@ -52,7 +52,7 @@ except ImportError:
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
 
-class Flame:
+class Flame(TB.BasicThread):
     def __init__(self,
                 device,
                 inttime,
@@ -65,6 +65,8 @@ class Flame:
                 scan_frames,
                 scan_time
                 ):
+        TB.BasicThread.__init__(self, nameID=name, Period = period)
+        self.T0 = time.time()
         self.init_device(device=device)
         self.init_variables(
                            autoexposure=False,
@@ -128,9 +130,9 @@ class Flame:
         #self.output_file = StringVar(value=output_file)
         #self.scan_frames = StringVar(value=scan_frames)
         #self.scan_time = StringVar(value=scan_time)
-        #self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
+        self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
         self.message = StringVar()
-        #self.total_exposure = int(scan_frames) * int(scan_time)
+        self.total_exposure = int(scan_frames) * int(scan_time)
         # Initialize variables
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
@@ -147,17 +149,22 @@ class Flame:
         self.axes.set_ylabel('Intensity [count]')
         #self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
 
-    def update_plot(self,i):
-        scan_frames = int(self.scan_frames.get())
+    def update_plot(self, scan_frames,enable_plot, i):
         if (self.measurement == scan_frames) or \
-           (self.enable_plot.get() > 0):
+           (enable_plot > 0):
             self.graph.set_ydata(self.data)
             self.axes.relim()
             self.axes.autoscale_view(True, True, True)
+
     def startplot(self):
         plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
 
-    def measure(self, scan_frames):
+    def start(self):
+        self.T0 = time.time() = 0
+        #self.state = 'STBL'
+        TB.BasicThread.start(self)
+
+    def measure(self, scan_frames, autosave, autorepeat):
             newData = list(map(lambda x,y:x-y, self.spec.intensities(), self.darkness_correction))
             if (self.measurement == 0):
                 self.data = newData
@@ -167,7 +174,7 @@ class Flame:
 
             plot.suptitle(time.strftime(self.timestamp, time.gmtime()) +
                          ' (sum of ' + str(self.measurement) + ' measurement(s)' +
-                         ' with scan time ' + str(self.scan_time.get()) + ' us)')
+                         ' with integration time ' + str(self.scan_time.get()) + ' us)')
 
             if (self.measurement % 100 == 0):
                 print('O', end='', flush=True)
@@ -178,13 +185,18 @@ class Flame:
             if (scan_frames > 0):
                 if self.measurement % scan_frames == 0:
                     #print(time.strftime(self.timestamp, time.gmtime()), self.data)
-                    if self.autosave.get() != 0:
+                    if autosave != 0:
                         self.save()
                     self.measurement = 0
-                    if self.autorepeat.get() == 0:
+                    if autorepeat == 0:
                         self.run_measurement = False
-                        self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
-                        self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
-                        self.message.set('Ready.')
+                        #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
+                        #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
+                        #self.message.set('Ready.')
 
-        self.root.after(1, self.measure)
+        #self.root.after(1, self.measure) #after 1 msec, run self.measure!
+        #thread with period = 1, run self.measure.
+
+
+    def addViewer('UDP',udpSendPid.Send):
+        return
