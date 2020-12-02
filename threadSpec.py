@@ -65,7 +65,7 @@ class Flame(TB.BasicThread):
                 scan_frames,
                 scan_time
                 ):
-        TB.BasicThread.__init__(self, nameID=name, Period = period)
+        TB.BasicThread.__init__(self, nameID=name, Period = period, viewer=viewer)
         self.T0 = time.time()
         self.init_device(device=device)
         self.init_variables(
@@ -164,7 +164,7 @@ class Flame(TB.BasicThread):
         #self.state = 'STBL'
         TB.BasicThread.start(self)
 
-    def measure(self, scan_frames, autosave, autorepeat):
+    def process(self): #, scan_frames, autosave, autorepeat
             newData = list(map(lambda x,y:x-y, self.spec.intensities(), self.darkness_correction))
             if (self.measurement == 0):
                 self.data = newData
@@ -182,10 +182,10 @@ class Flame(TB.BasicThread):
                 print('o', end='', flush=True)
             else:
                 print('.', end='', flush=True)
-            if (scan_frames > 0):
-                if self.measurement % scan_frames == 0:
+            if (self.scan_frames > 0):
+                if self.measurement % self.scan_frames == 0:
                     #print(time.strftime(self.timestamp, time.gmtime()), self.data)
-                    if autosave != 0:
+                    if self.autosave != 0:
                         self.save()
                     self.measurement = 0
                     if autorepeat == 0:

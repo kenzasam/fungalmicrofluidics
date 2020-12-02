@@ -133,7 +133,7 @@ if __name__ == "__main__":
         PID.addViewer('UDP',udpSendPid.Send) #'UDP',udpSendPid1.Send)
         PID.enIO(True) #PID.enOut = True
         ardu.gpio.pinMode(7,0) # Initialize pin to 0
-        #print 'type PID.start() to start the PID thread\n'
+        print 'type PID.start() to start the PID thread process\n'
 
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
     '''
@@ -143,8 +143,8 @@ if __name__ == "__main__":
     if SPEC == True:
         threadSpec = __import__('threadSpec') #delete when you place in ArduBridge. For now place thread in folder
         Spec = threadSpec.Flame(
-                                      #nameID='FLAME', #proces name
-                                      #Period=0.5,   #Period-time of the control-loop.
+                                      nameID='FLAME', #proces name
+                                      Period=0.5,   #Period-time of the control-loop.
                                       device= '#0', # spectrometer serial number FLMS04421. If empty, first available.
                                       inttime=10000, #integration time
                                       autoexposure=False,
@@ -156,8 +156,8 @@ if __name__ == "__main__":
                                       scan_frames=1,
                                       scan_time=100000 #integration time in microseconds
                                       )
-        Spec.addViewer('UDP',udpSendPid.Send)
-        print 'type Spec.start() to start the FLAME thread\n'
+        Spec.addViewer('UDP',udpSendSpec.Send)
+        print 'type Spec.start() to start the spectrometer thread process\n'
     else:
         Spec=None
     '''
