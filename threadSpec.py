@@ -51,9 +51,12 @@ except ImportError:
 # Plotting
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
+plot_animation= None
 
 class Flame(TB.BasicThread):
     def __init__(self,
+                Period,
+                nameID,
                 device,
                 inttime,
                 autoexposure,
@@ -63,9 +66,10 @@ class Flame(TB.BasicThread):
                 enable_plot,
                 output_file,
                 scan_frames,
-                scan_time
+                scan_time,
+                viewer={}
                 ):
-        TB.BasicThread.__init__(self, nameID=name, Period = period, viewer=viewer)
+        TB.BasicThread.__init__(self, nameID=nameID, Period = Period, viewer=viewer)
         self.T0 = time.time()
         self.init_device(device=device)
         self.init_variables(
@@ -108,6 +112,7 @@ class Flame(TB.BasicThread):
         print(self.spec)
         self.wavelengths = self.spec.wavelengths()
         self.samplesize = len(self.wavelengths)
+
     def init_variables(self,
                        autoexposure=False,
                        autorepeat=False,
@@ -155,14 +160,16 @@ class Flame(TB.BasicThread):
             self.graph.set_ydata(self.data)
             self.axes.relim()
             self.axes.autoscale_view(True, True, True)
-
+    """
     def startplot(self):
         plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
+    """
 
     def start(self):
-        self.T0 = time.time() = 0
+        self.T0 = time.time()
         #self.state = 'STBL'
-        TB.BasicThread.start(self)
+        plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
+        TB.BasicThread.start(self) #Basicthread parent class start() runs the process()
 
     def process(self): #, scan_frames, autosave, autorepeat
             newData = list(map(lambda x,y:x-y, self.spec.intensities(), self.darkness_correction))
@@ -177,11 +184,11 @@ class Flame(TB.BasicThread):
                          ' with integration time ' + str(self.scan_time.get()) + ' us)')
 
             if (self.measurement % 100 == 0):
-                print('O', end='', flush=True)
+                print("'O', end='', flush=True")
             elif (self.measurement % 10 == 0):
-                print('o', end='', flush=True)
+                print("'o', end='', flush=True")
             else:
-                print('.', end='', flush=True)
+                print("'.', end='', flush=True")
             if (self.scan_frames > 0):
                 if self.measurement % self.scan_frames == 0:
                     #print(time.strftime(self.timestamp, time.gmtime()), self.data)
@@ -197,6 +204,7 @@ class Flame(TB.BasicThread):
         #self.root.after(1, self.measure) #after 1 msec, run self.measure!
         #thread with period = 1, run self.measure.
 
-
+    """
     def addViewer('UDP',udpSendPid.Send):
         return
+    """
