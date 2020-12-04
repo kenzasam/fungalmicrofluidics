@@ -192,6 +192,7 @@ class Flame(BT.BasicThread):
         self.axes.set_xlabel('Wavelengths [nm]')
         self.axes.set_ylabel('Intensity [count]')
         #self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
+        return self.graph
 
     def update_plot(self, i):
         if (self.measurement == scan_frames) or \
@@ -199,6 +200,7 @@ class Flame(BT.BasicThread):
             self.graph.set_ydata(self.data)
             self.axes.relim()
             self.axes.autoscale_view(True, True, True)
+        return self.graph, #KS
     """
     def startplot(self):
         plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
