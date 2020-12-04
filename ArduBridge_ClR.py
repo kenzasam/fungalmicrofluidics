@@ -142,20 +142,19 @@ if __name__ == "__main__":
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
         threadSpec = __import__('threadSpec') #delete when you place in ArduBridge. For now place thread in folder
-        Spec = threadSpec.Flame(
-                                      nameID='FLAME', #proces name
-                                      Period=0.5,   #Period-time of the control-loop.
-                                      device= '#0', # spectrometer serial number FLMS04421. If empty, first available.
-                                      inttime=10000, #integration time
-                                      autoexposure=False,
-                                      autorepeat=False,
-                                      autosave=True,
-                                      dark_frames=1,
-                                      enable_plot=True,
-                                      output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                                      scan_frames=1,
-                                      scan_time=100000 #integration time in microseconds
-                                      )
+        Spec = threadSpec.Flame(nameID='FLAME', #proces name
+                                Period=0.5,   #Period-time of the control-loop.
+                                device= 'FLMS04421', # spectrometer serial number FLMS04421. If empty, first available.
+                                inttime=10000, #integration time
+                                autoexposure=False,
+                                autorepeat=False,
+                                autosave=True,
+                                dark_frames=1,
+                                enable_plot=True,
+                                output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
+                                scan_frames=1,
+                                scan_time=100000 #integration time in microseconds
+                                )
         Spec.addViewer('UDP',udpSendSpec.Send)
         print 'type Spec.start() to start the spectrometer thread process\n'
     else:
@@ -181,7 +180,7 @@ if __name__ == "__main__":
 
         print 'Spectrometer started'
     else:
-        Spec=None
+        specGUI=None
     '''
     Start Nemesys syringe pump bridge
     '''

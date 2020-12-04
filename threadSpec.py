@@ -33,12 +33,12 @@ __status__ = "Production"
 import math, time
 import sys
 import numpy
-from GSOF_ArduBridge import threadBasic as TB
-'''
-#import seabreeze
+from GSOF_ArduBridge import threadBasic as BT
+
+import seabreeze
 #seabreeze.use('pyseabreeze')
 import seabreeze.spectrometers as sb
-from sb import Spectrometer, list_devices
+from seabreeze.spectrometers import Spectrometer, list_devices
 '''
 try:
     import seabreeze
@@ -47,13 +47,43 @@ try:
     from sb import Spectrometer, list_devices
 except ImportError:
     sb=None
-
+'''
 # Plotting
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
 plot_animation= None
 
-class Flame(TB.BasicThread):
+class SBSimulator:
+    """SeaBreeze specrogrameter simulator class"""
+    def __init__(self,
+                 integration_time_micros=100000,
+                 minimum_integration_time_micros = 8000,
+                 wavelengths=list(range(2048)),
+                 generator=numpy.random.normal,
+                 histogram=True):
+        self._integration_time_micros = integration_time_micros
+        self.minimum_integration_time_micros = minimum_integration_time_micros
+        self._wavelengths = wavelengths
+        self.samplesize = len(wavelengths)
+        self.generator = generator
+        self.histogram = histogram
+
+    def integration_time_micros(self, newValue):
+        if (newValue >= self.minimum_integration_time_micros):
+            self._integration_time_micros = newValue
+
+    def intensities(self):
+        time.sleep(self._integration_time_micros / 1000000)
+        if self.histogram:
+            return(numpy.histogram(self.generator(size=self.samplesize), bins=self.samplesize)[0])
+        else:
+            return(self.generator(size=self.samplesize))
+
+    def wavelengths(self):
+        return(self._wavelengths)
+
+
+class Flame(BT.BasicThread):
     def __init__(self,
                 Period,
                 nameID,
@@ -69,9 +99,10 @@ class Flame(TB.BasicThread):
                 scan_time,
                 viewer={}
                 ):
-        TB.BasicThread.__init__(self, nameID=nameID, Period = Period, viewer=viewer)
+        BT.BasicThread.__init__(self, nameID=nameID, Period = Period, viewer=viewer)
         self.T0 = time.time()
         self.init_device(device=device)
+        print("dev init")
         self.init_variables(
                            autoexposure=False,
                            autorepeat=False,
@@ -81,33 +112,41 @@ class Flame(TB.BasicThread):
                            output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
                            scan_frames=1,
                            scan_time=100000)
+        print("var init")
         self.init_plot()
+        print("plot init")
 
     def init_device(self, device=''):
         #Initialize spectrometer device
         try:
-            if (device =='#0'):
+            #if (device =='#0'):
                 #print('allo')
                 #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
-                print('No spec serial number listed. Picking first spec found.')
-                dev=list_devices()
-                print dev
-                self.spec = Spectrometer(dev[0])
+            print('No spec serial number listed. Picking first spec found.')
+            dev=list_devices()
+            print dev
+            self.spec = Spectrometer(dev[0])
+            """
             else:
                 print('Serial number listed.')
                 self.spec = Spectrometer.from_serial_number(device)
+            """
         except:
             print('ERROR: Could not initialize device "' + device + '"!')
             if (sb is None):
                 print('SeaBreeze library not found!')
-                sys.exit(1)
+                #sys.exit(1)
             else:
                 print('Available devices:')
                 index = 0
                 for dev in list_devices():
                     print(' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial)
                     index += 1
+            if ('Y'.startswith(input('Simulate spectrometer device instead?  [Y/n] ').upper())):
+                self.spectrometer = SBSimulator()
+            else:
                 sys.exit(1)
+                #sys.exit(1)
 
         print(self.spec)
         self.wavelengths = self.spec.wavelengths()
@@ -116,7 +155,7 @@ class Flame(TB.BasicThread):
     def init_variables(self,
                        autoexposure=False,
                        autorepeat=False,
-                       autosave=True,
+                       autosave=False,
                        dark_frames=1,
                        enable_plot=True,
                        output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
@@ -127,17 +166,17 @@ class Flame(TB.BasicThread):
         self.have_darkness_correction = False
         #self.button_startpause_texts = { True: 'Pause Measurement', False: 'Start Measurement' }
         #self.button_stopdarkness_texts = { True: 'Stop Measurement', False: 'Get Darkness Correction' }
-        #self.autoexposure = IntVar(value=autoexposure)
-        #self.autorepeat = IntVar(value=autorepeat)
-        #self.autosave = IntVar(value=autosave)
-        #self.dark_frames = StringVar(value=dark_frames)
-        #self.enable_plot = IntVar(value=enable_plot)
-        #self.output_file = StringVar(value=output_file)
-        #self.scan_frames = StringVar(value=scan_frames)
-        #self.scan_time = StringVar(value=scan_time)
+        self.autoexposure = autoexposure
+        self.autorepeat = autorepeat
+        self.autosave =autosave
+        self.dark_frames = dark_frames
+        self.enable_plot = enable_plot
+        self.output_file = output_file
+        self.scan_frames = scan_frames
+        self.scan_time = scan_time
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
-        self.message = StringVar()
-        self.total_exposure = int(scan_frames) * int(scan_time)
+        #self.message = StringVar()
+        self.total_exposure = int(self.scan_frames) * int(self.scan_time)
         # Initialize variables
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
@@ -154,7 +193,7 @@ class Flame(TB.BasicThread):
         self.axes.set_ylabel('Intensity [count]')
         #self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
 
-    def update_plot(self, scan_frames,enable_plot, i):
+    def update_plot(self, i):
         if (self.measurement == scan_frames) or \
            (enable_plot > 0):
             self.graph.set_ydata(self.data)
@@ -169,7 +208,7 @@ class Flame(TB.BasicThread):
         self.T0 = time.time()
         #self.state = 'STBL'
         plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
-        TB.BasicThread.start(self) #Basicthread parent class start() runs the process()
+        BT.BasicThread.start(self) #Basicthread parent class start() runs the process(), every period time
 
     def process(self): #, scan_frames, autosave, autorepeat
             newData = list(map(lambda x,y:x-y, self.spec.intensities(), self.darkness_correction))
@@ -178,24 +217,24 @@ class Flame(TB.BasicThread):
             else:
                 self.data = list(map(lambda x,y:x+y, self.data, newData))
             self.measurement += 1
-
-            plot.suptitle(time.strftime(self.timestamp, time.gmtime()) +
-                         ' (sum of ' + str(self.measurement) + ' measurement(s)' +
-                         ' with integration time ' + str(self.scan_time.get()) + ' us)')
-
-            if (self.measurement % 100 == 0):
-                print("'O', end='', flush=True")
-            elif (self.measurement % 10 == 0):
-                print("'o', end='', flush=True")
+            #py3: title=time.strftime(self.timestamp, time.gmtime()) +' (sum of ' + str(self.measurement) + ' measurement(s)' +' with integration time ' + str(self.scan_time + ' us)'
+            title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
+            plot.suptitle(title)
+            if ((self.measurement % 100) == 0):
+                print 'O', #py3: print ('O', end='', flush=True)
+            elif (self.measurement % 10) == 0:
+                print 'o', #py3: print('o', end='', flush=True)
             else:
-                print("'.', end='', flush=True")
+                print '.',
+                #py3: print('.', end='', flush=True)
             if (self.scan_frames > 0):
                 if self.measurement % self.scan_frames == 0:
                     #print(time.strftime(self.timestamp, time.gmtime()), self.data)
                     if self.autosave != 0:
-                        self.save()
+                        #self.save()
+                        print 'cant save'
                     self.measurement = 0
-                    if autorepeat == 0:
+                    if self.autorepeat == 0:
                         self.run_measurement = False
                         #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
                         #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
