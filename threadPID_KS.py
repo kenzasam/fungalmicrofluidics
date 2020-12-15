@@ -58,8 +58,8 @@ class ArduPidThread(BT.BasicThread):
         self.PIDstatus = False  #init
         if self.ardu:
             self.ardu.gpio.pinMode(self.dirPin, 0) #Set the pins direction to output
-        self.enOut = False
-        self.enInput = True
+        self.enOut = False #enable sending output, ct, control target temperature
+        self.enInput = True # enable input, feedback temperature read by temp probe, into PID algorithm.
 
         #Coefficients for linear approximation temperature calculation
         self.a = -0.7
@@ -81,6 +81,10 @@ class ArduPidThread(BT.BasicThread):
         #self.fbFilter = movAvg.Stat_Recursive_X_Array( X=[25]*4 )
 
     def enIO(self, val=True):
+        '''
+        enables PID algortithm to receive input (feedback temp read from temp probe) and
+        output (user target temp ct)
+        '''
         self.enOut = val
         self.enInput = val
 
@@ -110,7 +114,7 @@ class ArduPidThread(BT.BasicThread):
         self.ct_now += dt*(self.ct -self.ct_now)/self.RC_div_DT #Exponential transition curve
         out = self.PID.NextStep(ctrl=self.ct_now, feedback=feedback, dt=dt)
 
-        #Set the output
+        #Set the output (= ct = new temperature)
         if self.enOut:
             self.setOutput(val=out)
 

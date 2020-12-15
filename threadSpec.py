@@ -15,7 +15,8 @@
     along with GSOF_ArduBridge.  If not, see <https://www.gnu.org/licenses/>.
 """
 """
-Class to view spectrum from Ocean Optics spectrometer as a thread.
+Server.
+Class collecting spectrum from Ocean Optics spectrometer in a thread.
 Based on and adapted from SpectrOMat, copyright Tobias Dusa.
 """
 
@@ -34,7 +35,7 @@ import math, time
 import sys
 import numpy
 from GSOF_ArduBridge import threadBasic as BT
-
+from GSOF_ArduBridge import UDP_Send
 import seabreeze
 #seabreeze.use('pyseabreeze')
 import seabreeze.spectrometers as sb
@@ -101,6 +102,7 @@ class Flame(BT.BasicThread):
                 ):
         BT.BasicThread.__init__(self, nameID=nameID, Period = Period, viewer=viewer)
         self.T0 = time.time()
+        self.SPECstatus = False
         self.init_device(device=device)
         print("dev init")
         self.init_variables(
@@ -113,8 +115,8 @@ class Flame(BT.BasicThread):
                            scan_frames=1,
                            scan_time=100000)
         print("var init")
-        self.init_plot()
-        print("plot init")
+        #self.init_plot()
+        #print("plot init")
 
     def init_device(self, device=''):
         #Initialize spectrometer device
@@ -181,7 +183,14 @@ class Flame(BT.BasicThread):
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
         self.data = [0.0]*(len(self.spec.wavelengths()))
+        self.client=False
+    '''
+    def init_plot(self):
+        """Initialize plotting subsystem"""
+        self.send_df(self.measurement,self.wavelengths, self.data)
 
+    '''
+    '''
     def init_plot(self):
         """Initialize plotting subsystem"""
         # Plot setup
@@ -192,36 +201,66 @@ class Flame(BT.BasicThread):
         self.axes.set_xlabel('Wavelengths [nm]')
         self.axes.set_ylabel('Intensity [count]')
         #self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
-        return self.graph
+        #return self.graph
 
     def update_plot(self, i):
-        if (self.measurement == scan_frames) or \
+        if (self.measurement == self.scan_frames) or \
            (enable_plot > 0):
             self.graph.set_ydata(self.data)
             self.axes.relim()
             self.axes.autoscale_view(True, True, True)
-        return self.graph, #KS
-    """
-    def startplot(self):
-        plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
-    """
+            print 'alolo'
+        #return self.graph, #KS
+
+    '''
 
     def start(self):
+        self.SPECstatus = True
         self.T0 = time.time()
+
+        try:
+            self.viewer['TCPspec'].udpTx.listen(5) #stream 5 at a time
+            print 'Listening for client...'
+            while True:
+                print 'Please run spec viewer.'
+                self.client, addr = self.viewer['TCPspec'].udpTx.accept()
+                print 'Connected...'
+                print 'Starting...'
+                #T=BT.BasicThread(self,args=(c,a))
+                BT.BasicThread.start(self)
+                print 'ello'
+                #T.start(self)
+
+        except:
+            print 'Something went wrong. Can not connect to client.'
         #self.state = 'STBL'
-        plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
-        BT.BasicThread.start(self) #Basicthread parent class start() runs the process(), every period time
+        #plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
+        #print 'Starting...'
+        #BT.BasicThread.start(self) #Basicthread parent class start() runs the process(), every period time
+        #self.init.plot()
+        #plot.show()
+
+    def stop(self):
+        self.SPECstatus = False
+        BT.BasicThread.stop(self)
 
     def process(self): #, scan_frames, autosave, autorepeat
             newData = list(map(lambda x,y:x-y, self.spec.intensities(), self.darkness_correction))
+            print 'New Data'
             if (self.measurement == 0):
                 self.data = newData
             else:
                 self.data = list(map(lambda x,y:x+y, self.data, newData))
+
+            d={'Msr':self.measurement,'L':self.wavelengths,'Dat':self.data}
+            #self.send_df(d)
+            self.viewer['TCPspec'].Send(d,self.client)
+            print 'NewData sent to Client'
+
             self.measurement += 1
             #py3: title=time.strftime(self.timestamp, time.gmtime()) +' (sum of ' + str(self.measurement) + ' measurement(s)' +' with integration time ' + str(self.scan_time + ' us)'
-            title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
-            plot.suptitle(title)
+            #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
+            #plot.suptitle(title)
             if ((self.measurement % 100) == 0):
                 print 'O', #py3: print ('O', end='', flush=True)
             elif (self.measurement % 10) == 0:
@@ -229,9 +268,10 @@ class Flame(BT.BasicThread):
             else:
                 print '.',
                 #py3: print('.', end='', flush=True)
+
             if (self.scan_frames > 0):
                 if self.measurement % self.scan_frames == 0:
-                    #print(time.strftime(self.timestamp, time.gmtime()), self.data)
+                    #print time.strftime(self.timestamp, time.gmtime()), self.data
                     if self.autosave != 0:
                         #self.save()
                         print 'cant save'
@@ -244,8 +284,12 @@ class Flame(BT.BasicThread):
 
         #self.root.after(1, self.measure) #after 1 msec, run self.measure!
         #thread with period = 1, run self.measure.
+    def send_df(self,d,c):
+        '''
+        Function sending package to viewer. Viewer defined in ArduBridge.
+        '''
+        print 'sending...'
+        self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
 
-    """
-    def addViewer('UDP',udpSendPid.Send):
-        return
-    """
+    def teleUpdate(self,tele):
+            print str(tele)
