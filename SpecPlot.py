@@ -89,7 +89,11 @@ class Spectogram():
         """
         return self.graph,
 
-    #def gen_function():
+    '''
+    def gen_function(): #fumction checking if new TCP package arrived
+        gfdsfh
+
+    '''
 
 
     def animate(self,frame):
@@ -146,6 +150,6 @@ if __name__== "__main__":
         udpConsol = udpControl_objects.udpControl(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT) # callFunc=decodingPayload
         print 'Remote-Consol-Active on port %s\n'%(str(CLIENT_PORT))
     ag=Spectogram(TCP=udpConsol, enable_plot=True, scan_frames=scan_frames, measurement=measurement, scan_time=scan_time)
-    #udpConsol.run() #receiving on RxPort and running CallFunc for each payload received
+    #udpConsol.run() #receiving on RxPort and running CallFunc (self.animate) for each payload received
     #self.plot_animation= animation.FuncAnimation(self.figure, self.animate, init_func=ag.init_plot, frames=gen_function, interval=10, blit=True)
     #plot.show()

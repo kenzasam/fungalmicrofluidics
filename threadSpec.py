@@ -223,11 +223,13 @@ class Flame(BT.BasicThread):
             print 'Listening for client...'
             while True:
                 print 'Please run spec viewer.'
-                self.client, addr = self.viewer['TCPspec'].udpTx.accept()
+                self.client, addr = self.viewer['TCPspec'].udpTx.accept() #blocking call. While loop waits here until conn accepted.
                 print 'Connected...'
                 print 'Starting...'
-                #T=BT.BasicThread(self,args=(c,a))
-                BT.BasicThread.start(self)
+                T=BT.BasicThread(args=(c,a))
+                print 'ok'
+                T.start(self)
+                #BT.BasicThread.start(self)
                 print 'ello'
                 #T.start(self)
 
@@ -254,7 +256,7 @@ class Flame(BT.BasicThread):
 
             d={'Msr':self.measurement,'L':self.wavelengths,'Dat':self.data}
             #self.send_df(d)
-            self.viewer['TCPspec'].Send(d,self.client)
+            self.viewer['TCPspec'].Send(d,c) #self.client
             print 'NewData sent to Client'
 
             self.measurement += 1
@@ -284,12 +286,10 @@ class Flame(BT.BasicThread):
 
         #self.root.after(1, self.measure) #after 1 msec, run self.measure!
         #thread with period = 1, run self.measure.
+    '''
     def send_df(self,d,c):
-        '''
-        Function sending package to viewer. Viewer defined in ArduBridge.
-        '''
         print 'sending...'
         self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
-
+    '''
     def teleUpdate(self,tele):
             print str(tele)
