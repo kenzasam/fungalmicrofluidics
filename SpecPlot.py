@@ -44,9 +44,13 @@ import udpControl_objects
 
 
 
-class Spectogram():
+class Spectogram(udpControl_objects.udpControl):
     def __init__(self,
-                TCP,
+                #TCP,
+                nameID,
+                DesIP,
+                RxPort,
+                callFunc,
                 enable_plot,
                 #xdata,
                 #ydata,
@@ -57,7 +61,9 @@ class Spectogram():
 
         #self.init_plot()
         #print("plot init")
-
+        if RxPort > 1:
+            udpControl_objects.udpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
+            print 'Remote-Consol-Active on port %s\n'%(str(ClientPort))
         """Initialize instance variables"""
         #self.wavelengths, self.data,self.measurement == self.scan_frames
         #self.run_measurement = False
@@ -70,7 +76,8 @@ class Spectogram():
         self.scan_frames = scan_frames
         self.scan_time = scan_time
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
-        self.TCP=TCP
+        #self.TCP=TCP
+        self.init_plot()
 
     def init_plot(self):
         """Initialize plotting subsystem"""
@@ -87,37 +94,41 @@ class Spectogram():
         self.animate: function which updates the plot from one frame to the next
         msg_values: our array
         """
-        return self.graph,
+        self.plot_animation= animation.FuncAnimation(self.figure, self.animate, init_func=self.init_plot, interval=10, blit=True) #frames=gen_function
+        plot.show()
+        #return self.graph,
+
 
     '''
-    def gen_function(): #fumction checking if new TCP package arrived
-        gfdsfh
-
+    def gen_function(): #function checking if new TCP package arrived
+            self.decodingPayload(object)
+            #xdata=object['L']
+            #ydata=object['Dat']
     '''
 
-
-    def animate(self,frame):
-       object=self.TCP.run()#(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload)
-       print 'Decoding now...'
+    def animate(self): #,frame
+       #object=self.TCP.run()#(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload)
+       #print 'Decoding now...'
        #print object
        #self.decodingPayload(object) #once full message received
-       self.measurement=object['Msr']
-       xdata=object['L']
-       ydata=object['Dat']
+       #self.measurement=object['Msr']
+       #xdata=object['L']
+       #ydata=object['Dat']
        if i==0:
-           return self.init()
+           print 'lll'
+           #return self.init()
        if (self.measurement == self.scan_frames) or \
           (self.enable_plot > 0):
            title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
            plot.suptitle(title)
-           self.graph.set_ydata(ydata)
+           self.graph.set_ydata(self.ydata)
            self.axes.relim()
            self.axes.autoscale_view(True, True, True)
            print 'alolo'
            return self.graph,
 
 
-    '''
+
     def decodingPayload(self, object):
 
         #Object received from Server (udpControl_objects, threadSpec)
@@ -125,13 +136,16 @@ class Spectogram():
 
         print 'Received.'
         self.measurement=object['Msr']
+        #DATA=object['Dat']
         self.ydata=object['Dat']
         self.xdata=object['L']
+        print 'Msrmt #'
         print self.measurement
+        print 'Wavelengths data'
         print self.xdata
         #return measurement,ydata,xdata
         #self.ydata=self.data[-1][1]
-    '''
+        #return DATA
 
 if __name__== "__main__":
     #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
@@ -144,12 +158,17 @@ if __name__== "__main__":
     ydata=[]
     xdata=[]
     measurement=0
-
+    '''
     udpConsol = False
+
     if CLIENT_PORT > 1:
-        udpConsol = udpControl_objects.udpControl(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT) # callFunc=decodingPayload
+        udpConsol = udpControl_objects.udpControl(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload) # callFunc=decodingPayload
         print 'Remote-Consol-Active on port %s\n'%(str(CLIENT_PORT))
+
     ag=Spectogram(TCP=udpConsol, enable_plot=True, scan_frames=scan_frames, measurement=measurement, scan_time=scan_time)
+    '''
+    udpConsol = False
+    ag=Spectogram(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=Spectogram.decodingPayload,enable_plot=True, scan_frames=scan_frames, measurement=measurement, scan_time=scan_time)
     #udpConsol.run() #receiving on RxPort and running CallFunc (self.animate) for each payload received
     #self.plot_animation= animation.FuncAnimation(self.figure, self.animate, init_func=ag.init_plot, frames=gen_function, interval=10, blit=True)
     #plot.show()

@@ -76,7 +76,7 @@ if __name__ == "__main__":
     ########################################################################################
     user= 'Kenza Samlali'
     lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
-    port = 'COM20' # '/dev/cu.usbmodem14201' <--Change to the correct COM-Port to access the Arduino
+    port = '/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = False #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation

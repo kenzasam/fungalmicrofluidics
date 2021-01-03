@@ -41,9 +41,9 @@ import socket, sys, time, threading, pickle
 HEADERSIZE=10
 
 class udpControl():
-    def __init__(self, nameID='',  DesIP='127.0.0.1', RxPort=7010): # callFunc=False
+    def __init__(self, nameID='',  DesIP='127.0.0.1', RxPort=7010, callFunc=False): # callFunc=False
         self.nameID = str(nameID)
-        #self.callFunc = callFunc
+        self.callFunc = callFunc
         self.RxPort = int(RxPort)
         self.DesIP=str(DesIP)
         self.active = False
@@ -73,11 +73,11 @@ class udpControl():
             self.Thread = threading.Thread(target=self.run)
             self.Thread.start()
             #'''
-    '''
+
     def update(self, object):
         if self.callFunc != False:
-            self.callFunc(object)
-    '''
+            self.callFunc(self,object)
+
     def run(self):
         global HEADERSIZE
         #print 'TCP-running...'
@@ -90,26 +90,29 @@ class udpControl():
             #print 'TCP-running...'
             #self.udpRx.settimeout(1)
             #try:
-            print 'hello, receiiving data'
+            print 'hello, receiving data'
             msg= self.udpRx.recv(512)
-            print 'message:'
-            print msg
+            #print 'message:'
+            #print msg
             if new_msg:
-                #print("new msg len:",msg[:HEADERSIZE])
-                msglen = int(msg[:HEADERSIZE])
-                new_msg = False
+                if msg=='':
+                    continue
+                else:
+                    #print("new msg len:",msg[:HEADERSIZE])
+                    msglen = int(msg[:HEADERSIZE])
+                    new_msg = False
             #py3 print(f"full message length: {msglen}")
             #print 'full message length: %d' %(msglen)
             full_msg += msg
             #print len(full_msg)
             if len(full_msg)-HEADERSIZE == msglen:
-                print "full msg recvd"
+                print "Full msg recvd"
                 #print(full_msg[HEADERSIZE:])
                 #print(pickle.loads(full_msg[HEADERSIZE:]))
                 msg_obj=pickle.loads(full_msg[HEADERSIZE:])
-                print msg_obj
+                #print msg_obj
                 #return msg_obj
-                #self.update(msg_obj)
+                self.update(msg_obj)
                 new_msg = True
                 full_msg = b''
                 print 'thats it'
