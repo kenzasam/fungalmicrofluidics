@@ -69,7 +69,10 @@ class udpControl():
             self.active = True
             #self.run()
             #''' #If you wish to thread, keep this CODE
-            self.active = True
+
+
+    def start(self):
+        if self.active == True:
             self.Thread = threading.Thread(target=self.run)
             self.Thread.start()
             #'''
