@@ -97,7 +97,7 @@ class udpSend():
             # adding a header to our payload.
             # The header contains the length in bytes of our payload.
             # This will  help us adjust to the buffer size. (See client)
-            print msg
+            #print msg
             client.send(msg)
             print 'Data sent to %s:%d\n'%(self.DesIP, self.DesPort)
             #self.udpTx.close()
