@@ -34,6 +34,7 @@ __status__ = "Production"
 import math, time
 import sys
 import numpy
+import scipy.signal as sps
 from GSOF_ArduBridge import threadBasic as BT
 from GSOF_ArduBridge import UDP_Send
 import seabreeze
@@ -99,20 +100,21 @@ class Flame(BT.BasicThread):
                 scan_time,
                 viewer={}
                 ):
-        BT.BasicThread.__init__(self, nameID=nameID, Period = Period, viewer=viewer)
+        BT.BasicThread.__init__(self, nameID = nameID, Period = Period, viewer = viewer)
         self.T0 = time.time()
         self.SPECstatus = False
         self.init_device(device=device)
         print("dev init")
         self.init_variables(
-                           autoexposure=False,
-                           autorepeat=True,
-                           autosave=False,
-                           dark_frames=1,
-                           enable_plot=True,
-                           output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat', #saved file name
-                           scan_frames=1, #
-                           scan_time=100000) #integration time
+                           autoexposure = False,
+                           autorepeat = True,
+                           autosave = False,
+                           dark_frames = 1,
+                           enable_plot = True,
+                           output_file = 'Snapshot-%Y-%m-%dT%H:%M:%S%z.dat', #saved file name
+                           scan_frames = 1 , #
+                           scan_time = 100000,
+                           treshold = 8000) #integration time
         print("var init")
         #self.init_plot()
         #print("plot init")
@@ -159,13 +161,15 @@ class Flame(BT.BasicThread):
                        enable_plot=True,
                        output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
                        scan_frames=1,
-                       scan_time=100000):
+                       scan_time=100000,
+                       treshold=8000
+                       ):
         """Initialize instance variables"""
         self.run_measurement = False
         self.have_darkness_correction = False
         self.autoexposure = autoexposure
         self.autorepeat = autorepeat
-        self.autosave =autosave
+        self.autosave = autosave
         self.dark_frames = dark_frames
         self.enable_plot = enable_plot
         self.output_file = output_file
@@ -173,6 +177,7 @@ class Flame(BT.BasicThread):
         self.scan_time = scan_time
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
         #self.message = StringVar()
+        self.treshold = treshold
         self.total_exposure = int(self.scan_frames) * int(self.scan_time)
         # Initialize variables
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
@@ -202,16 +207,31 @@ class Flame(BT.BasicThread):
         self.SPECstatus = False
         BT.BasicThread.stop(self)
 
+    def denoising(self,d):
+        return df
+
+    def peakfinding(self,d, treshold):
+        peaks, properties=sps.find_peaks(x,
+                                         height=treshold,
+                                         prominence=None,
+                                         width=None,
+                                         wlen=None)
+        #return df
+
     def process(self):
         """This is invoked by run() of the Threading class. This process is repeated, with a Period.
         """
         #perform darkness Correction
         newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
+
         if (self.measurement == 0):
             self.data = newData
         else:
             self.data = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
-        d={'Msr':self.measurement,'L':self.wavelengths,'Dat':self.data}
+        peaks, properties=sps.find_peaks(self.data,
+                                         height=self.treshold,
+                                         prominence=None, width=None, wlen=None)
+        d={'Msr':self.measurement,'L':self.wavelengths,'Dat':self.data, 'peaks':peaks}
         #sending data disctionary to client, by TCP
         self.send_df(d,self.client)
         print 'NewData sent to Client'

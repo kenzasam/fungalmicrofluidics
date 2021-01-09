@@ -67,6 +67,7 @@ class Spectogram(server.udpControl):
         self.ydata = []
         self.xdata = []
         self.measurement = 0
+        self.peaks= []
         ###########
         self.received = False
         self.init_plot()
@@ -109,6 +110,7 @@ class Spectogram(server.udpControl):
            title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
            plot.suptitle(title)
            self.graph.set_data(self.xdata,self.ydata)
+           plot.plot(self.peaks,self.xdata[self.peaks], 'r+')
            #self.graph.set_ydata(self.ydata)
            self.axes.relim()
            self.axes.autoscale_view(True, True, True)
@@ -124,6 +126,7 @@ class Spectogram(server.udpControl):
         self.measurement=object['Msr']
         self.ydata=object['Dat']
         self.xdata=object['L']
+        self.peaks=object['peaks']
         print 'Msrmt #'
         print self.measurement
         print self.ydata
