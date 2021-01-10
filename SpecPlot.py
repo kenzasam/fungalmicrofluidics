@@ -15,8 +15,9 @@
     along with GSOF_ArduBridge.  If not, see <https://www.gnu.org/licenses/>.
 """
 """
-Client
-Plotting of incoming data from spectrometer, using matplotlib animation
+Plotting of incoming data from spectrometer, using matplotlib animation.
+TCP Client.
+TCP server (ThreadSpec, TCP_Send) sends data (dataframe) to this client.
 """
 
 
@@ -29,18 +30,19 @@ __maintainer__ = ""
 __email__ = ""
 __status__ = "Production"
 
+from optparse import OptionParser
 # Plotting
 import math, time
 import sys
-import numpy
+import numpy as np
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
 plot_animation= None
 # TCP client
 import socket
-import udpControl_objects as server
+import tcpControl as server
 
-class Spectogram(server.udpControl):
+class Spectogram(server.tcpControl):
     def __init__(self,
                 nameID,
                 DesIP,
@@ -52,10 +54,9 @@ class Spectogram(server.udpControl):
                 ):
         """Initialize TCP server"""
         if RxPort > 1:
-            server.udpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
+            server.tcpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
             print 'Remote-Consol-Active on port %s\n'%(str(RxPort))
         """Initialize instance variables"""
-        #self.wavelengths, self.data,self.measurement == self.scan_frames
         #self.run_measurement = False
         print 'started thread'
         self.enable_plot = enable_plot
@@ -67,7 +68,7 @@ class Spectogram(server.udpControl):
         self.ydata = []
         self.xdata = []
         self.measurement = 0
-        self.peaks= []
+        self.peaks= np.array([])
         ###########
         self.received = False
         self.init_plot()
@@ -82,14 +83,6 @@ class Spectogram(server.udpControl):
         self.figure.suptitle('No measurement taken so far.')
         self.axes.set_xlabel('Wavelengths [nm]')
         self.axes.set_ylabel('Intensity [count]')
-
-
-    '''
-    def gen_function(): #function checking if new TCP package arrived
-            self.decodingPayload(object)
-            #xdata=object['L']
-            #ydata=object['Dat']
-    '''
 
     def animate(self,i): #,frame
        #object=self.TCP.run()#(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload)
@@ -110,46 +103,64 @@ class Spectogram(server.udpControl):
            title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
            plot.suptitle(title)
            self.graph.set_data(self.xdata,self.ydata)
-           plot.plot(self.peaks,self.xdata[self.peaks], 'r+')
+           #print 'peaks:'
+           #print self.peaks
+           #plot.plot(self.peaks,self.xdata[self.peaks], 'r+')
            #self.graph.set_ydata(self.ydata)
            self.axes.relim()
            self.axes.autoscale_view(True, True, True)
            print 'alolo'
            return self.graph,
 
-
-
     def decodingPayload(self, object):
-        """Object received from Server (udpControl_objects, threadSpec)
+        """Object received from Server (tpControl, threadSpec)
         In this case, a dictionary d={'Msr':self.measurement,'Dat':self.data}"""
+        self.received == True
         print 'Received.'
         self.measurement=object['Msr']
+        #self.scan_frames=object['Fr']
         self.ydata=object['Dat']
         self.xdata=object['L']
-        self.peaks=object['peaks']
+        #self.peaks=object['Peaks']
         print 'Msrmt #'
         print self.measurement
         print self.ydata
-        self.received == True
 
 if __name__== "__main__":
-    #\\\\\\\\\\\\\\\\VARIABLES\\\\\\\\\\\\\\\\\#
+    #\\\\\\\\\\\\\\\\USER SET VARIABLES\\\\\\\\\\\\\\\\\#
+    PLOT_EN = True # Allow plotting
     CLIENT_PORT = 7002 # Client port to which udpSend package is sent. See ArduBridge.
     IP = '127.0.0.1' # Client ip adress to which udpSend package is sent. See ArduBridge.
-    SCANTIME=1000 # The integration time in us.
-    SCANFRAMES=1 # The total nr of measurements/frames that will be summed.
-    #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
+    SCANTIME = 1000 # The integration time in us.
+    SCANFRAMES = 1 # The total nr of measurements/frames that will be summed.
+    VERSION = '1.0.0' # version
+    #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
+    print 'GUI: Protocol GUI Ver:%s'%(VERSION)
+    print 'Copyright: Kenza Samlali, 2020'
+
+    """Command line option parser"""
+    parser = OptionParser()
+    parser.add_option('-i', '--ip', dest='ip', help='Client IP address', type='string', default=IP)
+    parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=CLIENT_PORT)
+    parser.add_option('-t', '--scantime', dest='scantime', help='Integration time of spectrometer. See ArduBridge', type='int', default=SCANTIME)
+    parser.add_option('-f', '--frames', dest='frames', help='Number of scan frames to sum for each experiment. See ArduBridge', type='int', default=SCANFRAMES)
+    parser.add_option('-p', '--plot', dest='plot', help='Enable plotting', type='int', default=PLOT_EN)
+    (options, args) = parser.parse_args()
+
     """Spectogram class Instance"""
-    ag=Spectogram(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=Spectogram.decodingPayload,enable_plot=True, scan_frames=SCANFRAMES, scan_time=SCANTIME)
+    ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, scan_frames=options.frames, scan_time=options.scantime)
     #ag=Spectogram(TCP=udpConsol, enable_plot=True, scan_frames=scan_frames, measurement=measurement, scan_time=scan_time)
     #ag=Spectogram(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=Spectogram.decodingPayload,enable_plot=True, scan_frames=scan_frames, scan_time=scan_time) # , measurement=measurement
+
     """Start server thread"""
-    server.udpControl.start(ag)
+    server.tcpControl.start(ag)
+
     """Create a FuncAnimation object to make the animation. The arguments are:
            ag.figure: the current active figure
            ag.animate: function which updates the plot from one frame to the next. Is looped continuously.
     """
     print 'TCP plotting thread started succesfully. Waiting for data from client.'
+    #if ag.received==True: #we should check this conditions beforehand. But I tried and somehow the plot remains empty.....
     plot_animation= animation.FuncAnimation(ag.figure, ag.animate, blit=False) #frames=gen_function, init_func=self.init_plot
     plot.show()
     #self.plot_animation= animation.FuncAnimation(self.figure, self.animate, init_func=ag.init_plot, frames=gen_function, interval=10, blit=True)

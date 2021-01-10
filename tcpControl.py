@@ -36,11 +36,15 @@ __maintainer__ = ""
 __email__ = ""
 __status__ = "Production"
 
-import socket, sys, time, threading, pickle
+import socket
+import sys
+import time
+import threading
+import pickle
 
 HEADERSIZE=10
 
-class udpControl():
+class tcpControl():
     def __init__(self, nameID='',  DesIP='127.0.0.1', RxPort=7010, callFunc=False): # callFunc=False
         self.nameID = str(nameID)
         self.callFunc = callFunc
@@ -55,9 +59,7 @@ class udpControl():
         except socket.error, msg :
             print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
             ok = False
-
-        if ok:
-            # Bind socket to local host and port
+        if ok: # Bind socket to local host and port
             try:
                 #self.udpRx.setblocking(1)
                 self.udpRx.connect((self.DesIP,self.RxPort))
@@ -67,21 +69,20 @@ class udpControl():
                 ok = False
             print '%s: Ready on port %d\n'%(nameID, self.RxPort)
             self.active = True
-            #self.run()
-            #''' #If you wish to thread, keep this CODE
-
 
     def start(self):
+        """Start threading"""
         if self.active == True:
             self.Thread = threading.Thread(target=self.run)
             self.Thread.start()
-            #'''
 
     def update(self, object):
+        """Function to call external function, in client class."""
         if self.callFunc != False:
             self.callFunc(self,object)
 
     def run(self):
+        """Threading process"""
         global HEADERSIZE
         #print 'TCP-running...'
         full_msg = b''
@@ -94,8 +95,7 @@ class udpControl():
             #self.udpRx.settimeout(1)
             #try:
             print 'hello, receiving data'
-            msg= self.udpRx.recv(512)
-            #print 'message:'
+            msg= self.udpRx.recv(512) #512 is size of message received each loop.
             #print msg
             if new_msg:
                 if msg=='':
@@ -112,16 +112,14 @@ class udpControl():
                 print "Full msg recvd"
                 #print(full_msg[HEADERSIZE:])
                 #print(pickle.loads(full_msg[HEADERSIZE:]))
-                msg_obj=pickle.loads(full_msg[HEADERSIZE:])
+                msg_obj=pickle.loads(full_msg[HEADERSIZE:]) #pickle to convert message
                 #print msg_obj
-                #return msg_obj
                 self.update(msg_obj)
                 new_msg = True
                 full_msg = b''
-                print 'thats it'
-        '''
+        """
         except socket.timeout:
             full_msg=b''
-        '''
+        """
         self.running = False
         print 'TCP-stopped...'

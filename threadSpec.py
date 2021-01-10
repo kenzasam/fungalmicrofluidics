@@ -15,9 +15,10 @@
     along with GSOF_ArduBridge.  If not, see <https://www.gnu.org/licenses/>.
 """
 """
-Server.
-Class collecting spectrum from Ocean Optics spectrometer in a thread.
-Based on and adapted from SpectrOMat, copyright Tobias Dusa.
+Flame Class, uses Seabreeze to collect spectrum from Ocean Optics spectrometer.
+Data collection is threaded.
+TCP Server. Data is sent to TCP client, SpecPlot (tcpControl).
+Based on and adapted from SpectrOMat, copyright Tobias Dusa. See:
 """
 
 
@@ -36,7 +37,6 @@ import sys
 import numpy
 import scipy.signal as sps
 from GSOF_ArduBridge import threadBasic as BT
-from GSOF_ArduBridge import UDP_Send
 import seabreeze
 #seabreeze.use('pyseabreeze')
 import seabreeze.spectrometers as sb
@@ -53,7 +53,7 @@ except ImportError:
 # Plotting
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
-plot_animation= None
+plot_animation = None
 
 class SBSimulator:
     """SeaBreeze specrogrameter simulator class"""
@@ -100,10 +100,10 @@ class Flame(BT.BasicThread):
                 scan_time,
                 viewer={}
                 ):
-        BT.BasicThread.__init__(self, nameID = nameID, Period = Period, viewer = viewer)
+        BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
         self.T0 = time.time()
         self.SPECstatus = False
-        self.init_device(device=device)
+        self.init_device(device = device)
         print("dev init")
         self.init_variables(
                            autoexposure = False,
@@ -126,7 +126,7 @@ class Flame(BT.BasicThread):
                 #print('allo')
                 #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
             print('No spec serial number listed. Picking first spec found.')
-            dev=list_devices()
+            dev = list_devices()
             print dev
             self.spec = Spectrometer(dev[0])
             """
@@ -183,7 +183,7 @@ class Flame(BT.BasicThread):
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
         self.data = [0.0]*(len(self.spec.wavelengths()))
-        self.client=False
+        self.client = False
 
     def start(self):
         """Start the Threading process
@@ -191,11 +191,11 @@ class Flame(BT.BasicThread):
         self.SPECstatus = True
         self.T0 = time.time()
         try:
-            self.viewer['TCPspec'].udpTx.listen(5) #stream 5 at a time
+            self.viewer['TCPspec'].tcpTx.listen(5) #stream 5 at a time
             print 'Listening for client...'
             while True:
                 print 'Please run spec viewer.'
-                self.client, addr = self.viewer['TCPspec'].udpTx.accept() #blocking call. While loop waits here until conn accepted.
+                self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
                 print 'Connected and starting thread...'
                 BT.BasicThread.start(self)
         except:
@@ -210,13 +210,19 @@ class Flame(BT.BasicThread):
     def denoising(self,d):
         return df
 
-    def peakfinding(self,d, treshold):
-        peaks, properties=sps.find_peaks(x,
-                                         height=treshold,
-                                         prominence=None,
-                                         width=None,
-                                         wlen=None)
-        #return df
+    def peakfinding(self,x):
+        HEIGHT = self.treshold
+        PROM = None
+        W = None
+        WLEN = None
+        #-------------------
+        self.peaks = True
+        peaks, properties = sps.find_peaks(x,
+                                         height = HEIGHT,
+                                         prominence = PROM,
+                                         width = W,
+                                         wlen = WLEN)
+        return peaks
 
     def process(self):
         """This is invoked by run() of the Threading class. This process is repeated, with a Period.
@@ -228,11 +234,10 @@ class Flame(BT.BasicThread):
             self.data = newData
         else:
             self.data = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
-        peaks, properties=sps.find_peaks(self.data,
-                                         height=self.treshold,
-                                         prominence=None, width=None, wlen=None)
-        d={'Msr':self.measurement,'L':self.wavelengths,'Dat':self.data, 'peaks':peaks}
-        #sending data disctionary to client, by TCP
+        #peaks, properties = self.peakfinding(self.data)
+        #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
+        d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
+        #sending data dictionary to client, by TCP
         self.send_df(d,self.client)
         print 'NewData sent to Client'
         self.measurement += 1

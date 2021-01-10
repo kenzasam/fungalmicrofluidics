@@ -101,7 +101,7 @@ if __name__ == "__main__":
     '''
     udpSendPid = UDP_Send.udpSend(nameID='UDP1', DesIP='127.0.0.1', DesPort=PORT_BASE +0)
     udpSendChip = UDP_Send.udpSend(nameID='UDP2', DesIP='127.0.0.1', DesPort=PORT_BASE +1)
-    tcpSendSpec = UDP_Send_objects.udpSend(nameID='TCP1', DesIP='127.0.0.1', DesPort=PORT_BASE +2)
+    tcpSendSpec = TCP_Send.tcpSend(nameID='TCP1', DesIP='127.0.0.1', DesPort=PORT_BASE +2)
     udpConsol = False
     if REMOTE_CTRL_PORT > 1:
         udpConsol = udpControl.udpControl(nameID='udpIDLE', RxPort=REMOTE_CTRL_PORT, callFunc=extEval)
