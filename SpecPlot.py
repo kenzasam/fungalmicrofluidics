@@ -54,11 +54,11 @@ class Spectogram(server.tcpControl):
                 ):
         """Initialize TCP server"""
         if RxPort > 1:
+            print 'Initiating client.'
             server.tcpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
             print 'Remote-Consol-Active on port %s\n'%(str(RxPort))
         """Initialize instance variables"""
         #self.run_measurement = False
-        print 'started thread'
         self.enable_plot = enable_plot
         #self.output_file = output_file
         self.scan_frames = scan_frames
@@ -109,7 +109,6 @@ class Spectogram(server.tcpControl):
            #self.graph.set_ydata(self.ydata)
            self.axes.relim()
            self.axes.autoscale_view(True, True, True)
-           print 'alolo'
            return self.graph,
 
     def decodingPayload(self, object):

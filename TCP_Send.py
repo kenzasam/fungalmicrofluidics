@@ -67,15 +67,14 @@ class tcpSend():
         c, addr = self.udpTx.accept()
         print 'connected...'
     '''
-    def Send(self, d,c):
+    def Send(self, data, client):
         """
         Starts the TCP/IP server.
         Using this function, you can send objects as a message to your client.
         """
         self.active = True
-        self.run(d,c)
-
-    def run(self, data, client):
+        #self.run(d,c)
+        #def run(self, data, client):
         global HEADERSIZE
         self.running = True
         #while self.active:

@@ -89,8 +89,6 @@ class Flame(BT.BasicThread):
                 Period,
                 nameID,
                 device,
-                inttime,
-                autoexposure,
                 autorepeat,
                 autosave,
                 dark_frames,
@@ -98,26 +96,23 @@ class Flame(BT.BasicThread):
                 output_file,
                 scan_frames,
                 scan_time,
+                treshold,
                 viewer={}
                 ):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
         self.T0 = time.time()
         self.SPECstatus = False
         self.init_device(device = device)
-        print("dev init")
         self.init_variables(
-                           autoexposure = False,
-                           autorepeat = True,
-                           autosave = False,
-                           dark_frames = 1,
-                           enable_plot = True,
-                           output_file = 'Snapshot-%Y-%m-%dT%H:%M:%S%z.dat', #saved file name
-                           scan_frames = 1 , #
-                           scan_time = 100000,
-                           treshold = 8000) #integration time
-        print("var init")
-        #self.init_plot()
-        #print("plot init")
+                           autorepeat = autorepeat,
+                           autosave = autosave,
+                           dark_frames = dark_frames,
+                           enable_plot = enable_plot,
+                           output_file = output_file,
+                           scan_frames = scan_frames,
+                           scan_time = scan_time,
+                           treshold = treshold)
+        self.spec.integration_time_micros(self.scan_time)
 
     def init_device(self, device=''):
         #Initialize spectrometer device
@@ -146,7 +141,7 @@ class Flame(BT.BasicThread):
                     print(' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial)
                     index += 1
             if ('Y'.startswith(input('Simulate spectrometer device instead?  [Y/n] ').upper())):
-                self.spectrometer = SBSimulator()
+                self.spec = SBSimulator()
             else:
                 sys.exit(1)
         print(self.spec)
@@ -154,20 +149,16 @@ class Flame(BT.BasicThread):
         self.samplesize = len(self.wavelengths)
 
     def init_variables(self,
-                       autoexposure=False,
-                       autorepeat=False,
-                       autosave=False,
-                       dark_frames=1,
-                       enable_plot=True,
-                       output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                       scan_frames=1,
-                       scan_time=100000,
-                       treshold=8000
+                       autorepeat,
+                       autosave,
+                       dark_frames,
+                       enable_plot,
+                       output_file,
+                       scan_frames,
+                       scan_time,
+                       treshold
                        ):
         """Initialize instance variables"""
-        self.run_measurement = False
-        self.have_darkness_correction = False
-        self.autoexposure = autoexposure
         self.autorepeat = autorepeat
         self.autosave = autosave
         self.dark_frames = dark_frames
@@ -175,10 +166,11 @@ class Flame(BT.BasicThread):
         self.output_file = output_file
         self.scan_frames = scan_frames
         self.scan_time = scan_time
-        self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
-        #self.message = StringVar()
         self.treshold = treshold
-        self.total_exposure = int(self.scan_frames) * int(self.scan_time)
+        self.run_measurement = False
+        self.have_darkness_correction = False
+        self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
+        #self.total_exposure = int(self.scan_frames) * int(self.scan_time)
         # Initialize variables
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
@@ -229,7 +221,6 @@ class Flame(BT.BasicThread):
         """
         #perform darkness Correction
         newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
-
         if (self.measurement == 0):
             self.data = newData
         else:
@@ -239,7 +230,6 @@ class Flame(BT.BasicThread):
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         #sending data dictionary to client, by TCP
         self.send_df(d,self.client)
-        print 'NewData sent to Client'
         self.measurement += 1
         if ((self.measurement % 100) == 0):
             print 'O', #py3: print ('O', end='', flush=True)
@@ -263,7 +253,7 @@ class Flame(BT.BasicThread):
     def send_df(self,d,c):
         """Function to send data to TCP client
         """
-        print 'sending...'
+        #print 'sending...'
         self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
 
     def teleUpdate(self,tele):

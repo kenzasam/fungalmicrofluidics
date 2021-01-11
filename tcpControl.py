@@ -94,7 +94,6 @@ class tcpControl():
             #print 'TCP-running...'
             #self.udpRx.settimeout(1)
             #try:
-            print 'hello, receiving data'
             msg= self.udpRx.recv(512) #512 is size of message received each loop.
             #print msg
             if new_msg:
