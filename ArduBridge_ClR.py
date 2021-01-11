@@ -21,10 +21,12 @@ This file is part of GSOF_ArduBridge.
 
 """
 Script to build an ArduBridge environment
-To customize the environment to your needs. You will need to change
-he parameters in the "PARAMETER BLOCK" in the __main__ section
+To customize the environment to your needs: You will need to change
+the parameters in the "PARAMETER BLOCK" in the __main__ section.
+Also, if PID/PUMPS/SPEC are set to True, please see
+repective instances to modify appropriate variables.
 """
-########## RUN CHIPVIEWER AND LLGUI AFTER RUNNING THIS FILE ##########
+########## RUN ANY GUI, AFTER RUNNING THIS FILE ##########
 #Basic modules to load
 import time
 import sys
@@ -32,9 +34,11 @@ from GSOF_ArduBridge import udpControl
 from GSOF_ArduBridge import ArduBridge
 from GSOF_ArduBridge import ElectrodeGpioStack
 from GSOF_ArduBridge import threadPID
-#from GSOF_ArduBridge import threadPID_KS as threadPID
 from GSOF_ArduBridge import UDP_Send
-import UDP_Send_objects
+#import Nemesys_Bridge
+import TCP_Send
+import threadPID_KS
+import threadSpec
 #from GSOF_ArduBridge import threadFLAME
 ##qmixsdk_dir = "C:/QmixSDK" #path to Qmix SDK
 #sys.path.append(qmixsdk_dir + "/lib/python")
@@ -64,19 +68,13 @@ def close():
         setup.stop()
     ardu.OpenClosePort(0)
     print 'Bye Bye...'
-'''
-def tempTC1047(pin=0, vcc=5.0):
-    b = ardu.an.analogRead(pin)
-    v = b*vcc/1024.0
-    T = 100*(v -0.5)
-'''
 
 if __name__ == "__main__":
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
     ########################################################################################
     user= 'Kenza Samlali'
     lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
-    port = 'COM20' # '/dev/cu.usbmodem14201' <--Change to the correct COM-Port to access the Arduino
+    port = '/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = False #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
@@ -88,7 +86,6 @@ if __name__ == "__main__":
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
     REMOTE_CTRL_PORT = PORT_BASE + 10 #Client, ArduBridge on port 7010
-    #deviceconfig="C:QmixSDK/config/NemesysSetup3syr" #--> change path to device configuration folder if needed
     #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
     ######################################################################################
     '''
@@ -101,7 +98,7 @@ if __name__ == "__main__":
     '''
     udpSendPid = UDP_Send.udpSend(nameID='UDP1', DesIP='127.0.0.1', DesPort=PORT_BASE +0)
     udpSendChip = UDP_Send.udpSend(nameID='UDP2', DesIP='127.0.0.1', DesPort=PORT_BASE +1)
-    tcpSendSpec = UDP_Send_objects.udpSend(nameID='TCP1', DesIP='127.0.0.1', DesPort=PORT_BASE +2)
+    tcpSendSpec = TCP_Send.tcpSend(nameID='TCP1', DesIP='127.0.0.1', DesPort=PORT_BASE +2)
     udpConsol = False
     if REMOTE_CTRL_PORT > 1:
         udpConsol = udpControl.udpControl(nameID='udpIDLE', RxPort=REMOTE_CTRL_PORT, callFunc=extEval)
@@ -117,7 +114,6 @@ if __name__ == "__main__":
     else:
         print 'Arduino OFF-LINE. Simulation mode'
     ardu.GetID()
-
     ExtGpio = ElectrodeGpioStack.ExtGpioStack(i2c=ardu.i2c, devList=STACK_BUILD, v=False)#True)
     ExtGpio.init()
     ExtGpio.init()
@@ -128,7 +124,7 @@ if __name__ == "__main__":
     '''
     print 'PID status: %s' %(PID)
     if PID == True:
-        threadPID = __import__('threadPID_KS') #delete when you place in ArduBridge. For now place thread in folder
+        #threadPID = __import__('threadPID_KS') #delete when you place in ArduBridge. For now place thread in folder
         PID = threadPID.ArduPidThread(bridge=ardu,
                                       nameID='PID', #proces name
                                       Period=0.5,   #Period-time of the control-loop. PID calculation cycle time in sec.
@@ -144,27 +140,24 @@ if __name__ == "__main__":
         PID.enIO(True) #PID.enOut = True
         ardu.gpio.pinMode(7,0) # Initialize pin to 0
         print 'type PID.start() to start the PID thread process\n'
-
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
     '''
     Setting up spectrometer thread and server
     '''
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
-        threadSpec = __import__('threadSpec') #delete when you place in ArduBridge. For now place thread in folder
-        Spec = threadSpec.Flame(nameID='FLAME', #proces name
-                                Period=1,   #Period-time of the control-loop.
-                                device= 'FLMS04421', # spectrometer serial number FLMS04421. If empty, first available.
-                                inttime=10000, #integration time
-                                autoexposure=False,
-                                autorepeat=False,
-                                autosave=False,
-                                dark_frames=1,
-                                enable_plot=True,
+        #threadSpec = __import__('threadSpec') # delete when you place in ArduBridge. For now place thread in folder
+        Spec = threadSpec.Flame(nameID='FLAME', # Thread proces name
+                                Period=0.1, # Period-time of the control-loop. Defines plotting speed.
+                                device= 'FLMS04421', # Spectrometer serial number FLMS04421. If empty, first available.
+                                autorepeat=False, # Auto repeat measurements
+                                autosave=False, # Enable Auto Save
+                                dark_frames=1, # The nr of dark frames
+                                enable_plot=True, # Enable plotting
                                 output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                                scan_frames=1,
-                                scan_time=100000 #integration time in microseconds
-                                )
+                                scan_frames=1, # Number of frames summed after which measurement resets.
+                                scan_time=10000, # Integration time in microseconds
+                                treshold = 8000) # Treshold peak intensity above which trigger goes.
         specViewer=tcpSendSpec
         Spec.addViewer('TCPspec',specViewer)
         print 'type Spec.start() to start the spectrometer thread process\n'
@@ -199,7 +192,7 @@ if __name__ == "__main__":
     '''
     print 'Pumps status: %s' %(PUMPS)
     if PUMPS==True:
-        Pumpsbridge= __import__('Nemesys_Bridge')  #--> change protocol file if needed
+        #Pumpsbridge= __import__('Nemesys_Bridge')  #--> change protocol file if needed
         Pumps=Pumpsbridge.Nem(
                 deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308", #change path to device configuration folder
                 syringe_diam=[7.29,3.26,3.26,3.26,3.26], #syringe diameter, in mm

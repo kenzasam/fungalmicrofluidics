@@ -127,6 +127,7 @@ class MainPanel(wx.Panel):
 
 
 class PumpPanel(wx.Panel):
+    """ panel class for Nemesys pump operation"""
     def __init__(self, parent, pumpnrs,udpSend):
         super(PumpPanel, self).__init__(parent, pumpnrs)
         self.udpSend=udpSend
@@ -302,6 +303,7 @@ class PumpPanel(wx.Panel):
         print 'pump changed'
 
 class OperationsPanel(wx.Panel):
+    """Panel class for user set functions for electrode actuation"""
     def __init__(self,parent,udpSend):
         super(OperationsPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
@@ -351,6 +353,8 @@ class OperationsPanel(wx.Panel):
             self.udpSend.Send(s)
 
 class IncubationPanel(wx.Panel):
+    """Panel class for setting incubation parameters (temperature, time, PID control)
+    and imaging pipeline"""
     def __init__(self, parent,udpSend):
         super(IncubationPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
@@ -439,16 +443,12 @@ class IncubationPanel(wx.Panel):
         return
 
 class SortingPanel(wx.Panel):
+    """ Panel class for droplet sorting: starting spectrometer, sorting electrode sequences"""
     def __init__(self,parent,udpSend):
         super(SortingPanel, self).__init__(parent)
-        #wx.Panel.__init__(self,parent,udpSend)
-        ########################################
-        #############FUNCTIONS#####sizer########
-        #######################################
-        self.udpSend=udpSend
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
-        #
+
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         srtSizer.AddSpacer(5)
@@ -589,10 +589,7 @@ class MenuBar(wx.MenuBar):
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
-
-
 if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
-
     def fileChooser():
         root = Tkinter.Tk()
         root.withdraw()
@@ -603,21 +600,18 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     print 'GUI: Protocol GUI Ver:%s'%(ver)
     print 'Copyright: Kenza Samlali, 2020'
     #Command line option parser
-
     parser = OptionParser()
     parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='Demoprotocol')
     parser.add_option('-u', '--port', dest='port', help='Remote port to send the commands', type='int', default=7010)
     parser.add_option('-i', '--ip', dest='ip', help='Remote ip to send the commands', type='string', default='127.0.0.1')
     (options, args) = parser.parse_args()
     path = os.path.split(options.prot)
-
     #file chooser opens if no other file was specified in the additional text file
     if path[1] == 'Demoprotocol':
         newPath = fileChooser()
         path = os.path.split(newPath)
     else:
         print 'Loading protocol specified in accompanying address file, which is in your folder.'
-
     #parser resumes
     lib = str(path[1])[:-3]
     path = path[0]

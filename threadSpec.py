@@ -15,9 +15,10 @@
     along with GSOF_ArduBridge.  If not, see <https://www.gnu.org/licenses/>.
 """
 """
-Server.
-Class collecting spectrum from Ocean Optics spectrometer in a thread.
-Based on and adapted from SpectrOMat, copyright Tobias Dusa.
+Flame Class, uses Seabreeze to collect spectrum from Ocean Optics spectrometer.
+Data collection is threaded.
+TCP Server. Data is sent to TCP client, SpecPlot (tcpControl).
+Based on and adapted from SpectrOMat, copyright Tobias Dusa. See:
 """
 
 
@@ -34,8 +35,8 @@ __status__ = "Production"
 import math, time
 import sys
 import numpy
+import scipy.signal as sps
 from GSOF_ArduBridge import threadBasic as BT
-from GSOF_ArduBridge import UDP_Send
 import seabreeze
 #seabreeze.use('pyseabreeze')
 import seabreeze.spectrometers as sb
@@ -52,7 +53,7 @@ except ImportError:
 # Plotting
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
-plot_animation= None
+plot_animation = None
 
 class SBSimulator:
     """SeaBreeze specrogrameter simulator class"""
@@ -83,14 +84,11 @@ class SBSimulator:
     def wavelengths(self):
         return(self._wavelengths)
 
-
 class Flame(BT.BasicThread):
     def __init__(self,
                 Period,
                 nameID,
                 device,
-                inttime,
-                autoexposure,
                 autorepeat,
                 autosave,
                 dark_frames,
@@ -98,25 +96,23 @@ class Flame(BT.BasicThread):
                 output_file,
                 scan_frames,
                 scan_time,
+                treshold,
                 viewer={}
                 ):
-        BT.BasicThread.__init__(self, nameID=nameID, Period = Period, viewer=viewer)
+        BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
         self.T0 = time.time()
         self.SPECstatus = False
-        self.init_device(device=device)
-        print("dev init")
+        self.init_device(device = device)
         self.init_variables(
-                           autoexposure=False,
-                           autorepeat=False,
-                           autosave=True,
-                           dark_frames=1,
-                           enable_plot=True,
-                           output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                           scan_frames=1,
-                           scan_time=100000)
-        print("var init")
-        #self.init_plot()
-        #print("plot init")
+                           autorepeat = autorepeat,
+                           autosave = autosave,
+                           dark_frames = dark_frames,
+                           enable_plot = enable_plot,
+                           output_file = output_file,
+                           scan_frames = scan_frames,
+                           scan_time = scan_time,
+                           treshold = treshold)
+        self.spec.integration_time_micros(self.scan_time)
 
     def init_device(self, device=''):
         #Initialize spectrometer device
@@ -125,7 +121,7 @@ class Flame(BT.BasicThread):
                 #print('allo')
                 #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
             print('No spec serial number listed. Picking first spec found.')
-            dev=list_devices()
+            dev = list_devices()
             print dev
             self.spec = Spectrometer(dev[0])
             """
@@ -145,150 +141,119 @@ class Flame(BT.BasicThread):
                     print(' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial)
                     index += 1
             if ('Y'.startswith(input('Simulate spectrometer device instead?  [Y/n] ').upper())):
-                self.spectrometer = SBSimulator()
+                self.spec = SBSimulator()
             else:
                 sys.exit(1)
-                #sys.exit(1)
-
         print(self.spec)
         self.wavelengths = self.spec.wavelengths()
         self.samplesize = len(self.wavelengths)
 
     def init_variables(self,
-                       autoexposure=False,
-                       autorepeat=False,
-                       autosave=False,
-                       dark_frames=1,
-                       enable_plot=True,
-                       output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                       scan_frames=1,
-                       scan_time=100000):
+                       autorepeat,
+                       autosave,
+                       dark_frames,
+                       enable_plot,
+                       output_file,
+                       scan_frames,
+                       scan_time,
+                       treshold
+                       ):
         """Initialize instance variables"""
-        self.run_measurement = False
-        self.have_darkness_correction = False
-        #self.button_startpause_texts = { True: 'Pause Measurement', False: 'Start Measurement' }
-        #self.button_stopdarkness_texts = { True: 'Stop Measurement', False: 'Get Darkness Correction' }
-        self.autoexposure = autoexposure
         self.autorepeat = autorepeat
-        self.autosave =autosave
+        self.autosave = autosave
         self.dark_frames = dark_frames
         self.enable_plot = enable_plot
         self.output_file = output_file
         self.scan_frames = scan_frames
         self.scan_time = scan_time
+        self.treshold = treshold
+        self.run_measurement = False
+        self.have_darkness_correction = False
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
-        #self.message = StringVar()
-        self.total_exposure = int(self.scan_frames) * int(self.scan_time)
+        #self.total_exposure = int(self.scan_frames) * int(self.scan_time)
         # Initialize variables
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
         self.data = [0.0]*(len(self.spec.wavelengths()))
-        self.client=False
-    '''
-    def init_plot(self):
-        """Initialize plotting subsystem"""
-        self.send_df(self.measurement,self.wavelengths, self.data)
-
-    '''
-    '''
-    def init_plot(self):
-        """Initialize plotting subsystem"""
-        # Plot setup
-        self.figure = plot.figure()
-        self.axes = self.figure.gca()
-        self.graph, = self.axes.plot(self.wavelengths, self.data)
-        self.figure.suptitle('No measurement taken so far.')
-        self.axes.set_xlabel('Wavelengths [nm]')
-        self.axes.set_ylabel('Intensity [count]')
-        #self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
-        #return self.graph
-
-    def update_plot(self, i):
-        if (self.measurement == self.scan_frames) or \
-           (enable_plot > 0):
-            self.graph.set_ydata(self.data)
-            self.axes.relim()
-            self.axes.autoscale_view(True, True, True)
-            print 'alolo'
-        #return self.graph, #KS
-
-    '''
+        self.client = False
 
     def start(self):
+        """Start the Threading process
+        """
         self.SPECstatus = True
         self.T0 = time.time()
-
         try:
-            self.viewer['TCPspec'].udpTx.listen(5) #stream 5 at a time
+            self.viewer['TCPspec'].tcpTx.listen(5) #stream 5 at a time
             print 'Listening for client...'
             while True:
                 print 'Please run spec viewer.'
-                self.client, addr = self.viewer['TCPspec'].udpTx.accept()
-                print 'Connected...'
-                print 'Starting...'
-                #T=BT.BasicThread(self,args=(c,a))
+                self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
+                print 'Connected and starting thread...'
                 BT.BasicThread.start(self)
-                print 'ello'
-                #T.start(self)
-
         except:
             print 'Something went wrong. Can not connect to client.'
-        #self.state = 'STBL'
-        #plot_animation= animation.FuncAnimation(self.figure, self.update_plot)
-        #print 'Starting...'
-        #BT.BasicThread.start(self) #Basicthread parent class start() runs the process(), every period time
-        #self.init.plot()
-        #plot.show()
 
     def stop(self):
+        """Stop the Threading process
+        """
         self.SPECstatus = False
         BT.BasicThread.stop(self)
 
-    def process(self): #, scan_frames, autosave, autorepeat
-            newData = list(map(lambda x,y:x-y, self.spec.intensities(), self.darkness_correction))
-            print 'New Data'
-            if (self.measurement == 0):
-                self.data = newData
-            else:
-                self.data = list(map(lambda x,y:x+y, self.data, newData))
+    def denoising(self,d):
+        return df
 
-            d={'Msr':self.measurement,'L':self.wavelengths,'Dat':self.data}
-            #self.send_df(d)
-            self.viewer['TCPspec'].Send(d,self.client)
-            print 'NewData sent to Client'
+    def peakfinding(self,x):
+        HEIGHT = self.treshold
+        PROM = None
+        W = None
+        WLEN = None
+        #-------------------
+        self.peaks = True
+        peaks, properties = sps.find_peaks(x,
+                                         height = HEIGHT,
+                                         prominence = PROM,
+                                         width = W,
+                                         wlen = WLEN)
+        return peaks
 
-            self.measurement += 1
-            #py3: title=time.strftime(self.timestamp, time.gmtime()) +' (sum of ' + str(self.measurement) + ' measurement(s)' +' with integration time ' + str(self.scan_time + ' us)'
-            #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
-            #plot.suptitle(title)
-            if ((self.measurement % 100) == 0):
-                print 'O', #py3: print ('O', end='', flush=True)
-            elif (self.measurement % 10) == 0:
-                print 'o', #py3: print('o', end='', flush=True)
-            else:
-                print '.',
-                #py3: print('.', end='', flush=True)
+    def process(self):
+        """This is invoked by run() of the Threading class. This process is repeated, with a Period.
+        """
+        #perform darkness Correction
+        newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
+        if (self.measurement == 0):
+            self.data = newData
+        else:
+            self.data = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
+        #peaks, properties = self.peakfinding(self.data)
+        #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
+        d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
+        #sending data dictionary to client, by TCP
+        self.send_df(d,self.client)
+        self.measurement += 1
+        if ((self.measurement % 100) == 0):
+            print 'O', #py3: print ('O', end='', flush=True)
+        elif (self.measurement % 10) == 0:
+            print 'o', #py3: print('o', end='', flush=True)
+        else:
+            print '.',
+            #py3: print('.', end='', flush=True)
+        if (self.scan_frames > 0):
+            if self.measurement % self.scan_frames == 0: # all frames are summed
+                if self.autosave != 0:
+                    #self.save()
+                    print 'cant save'
+                self.measurement = 0
+                if self.autorepeat == 0:
+                    self.run_measurement = False
+                    #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
+                    #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
+                    #self.message.set('Ready.')
 
-            if (self.scan_frames > 0):
-                if self.measurement % self.scan_frames == 0:
-                    #print time.strftime(self.timestamp, time.gmtime()), self.data
-                    if self.autosave != 0:
-                        #self.save()
-                        print 'cant save'
-                    self.measurement = 0
-                    if self.autorepeat == 0:
-                        self.run_measurement = False
-                        #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
-                        #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
-                        #self.message.set('Ready.')
-
-        #self.root.after(1, self.measure) #after 1 msec, run self.measure!
-        #thread with period = 1, run self.measure.
     def send_df(self,d,c):
-        '''
-        Function sending package to viewer. Viewer defined in ArduBridge.
-        '''
-        print 'sending...'
+        """Function to send data to TCP client
+        """
+        #print 'sending...'
         self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
 
     def teleUpdate(self,tele):
