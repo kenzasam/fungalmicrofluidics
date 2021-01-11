@@ -1,3 +1,4 @@
+#! python3
 # simple single image acquisition example with snap
 import time
 
