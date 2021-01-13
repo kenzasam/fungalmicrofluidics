@@ -68,7 +68,6 @@ class Spectogram(server.tcpControl):
         self.ydata = []
         self.xdata = []
         self.measurement = 0
-        self.peaks= np.array([])
         ###########
         self.received = False
         self.init_plot()
@@ -115,15 +114,15 @@ class Spectogram(server.tcpControl):
         """Object received from Server (tpControl, threadSpec)
         In this case, a dictionary d={'Msr':self.measurement,'Dat':self.data}"""
         self.received == True
-        print 'Received.'
+        print 'Received.',
         self.measurement=object['Msr']
         #self.scan_frames=object['Fr']
         self.ydata=object['Dat']
         self.xdata=object['L']
         #self.peaks=object['Peaks']
-        print 'Msrmt #'
-        print self.measurement
-        print self.ydata
+        #print 'Msrmt #'
+        #print self.measurement
+        #print self.ydata
 
 if __name__== "__main__":
     #\\\\\\\\\\\\\\\\USER SET VARIABLES\\\\\\\\\\\\\\\\\#

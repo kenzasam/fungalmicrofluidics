@@ -147,16 +147,16 @@ if __name__ == "__main__":
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
         #threadSpec = __import__('threadSpec') # delete when you place in ArduBridge. For now place thread in folder
-        Spec = threadSpec.Flame(nameID='FLAME', # Thread proces name
-                                Period=0.5, # Period-time of the control-loop. Defines plotting speed.
-                                device= 'FLMS04421', # Spectrometer serial number FLMS04421. If empty, first available.
-                                autorepeat=False, # Auto repeat measurements
-                                autosave=False, # Enable Auto Save
-                                dark_frames=1, # The nr of dark frames
-                                enable_plot=True, # Enable plotting
-                                output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                                scan_frames=1, # Number of frames averaged after which measurement resets.
-                                scan_time=10000, # Integration time in microseconds
+        Spec = threadSpec.Flame(nameID ='FLAME', # Thread proces name
+                                Period = 0, # Period-time of the control-loop. Defines plotting speed.
+                                device = 'FLMS04421', # Spectrometer serial number FLMS04421. If empty, first available.
+                                autorepeat = True, # Auto repeat measurements
+                                autosave = False, # Enable Auto Save
+                                dark_frames = 1, # The nr of dark frames
+                                enable_plot = True, # Enable plotting
+                                output_file ='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
+                                scan_frames = 1, # Number of frames averaged after which measurement resets.
+                                scan_time = 10000, # Integration time in microseconds
                                 treshold = 8000) # Treshold peak intensity above which trigger goes.
         specViewer=tcpSendSpec
         Spec.addViewer('TCPspec',specViewer)
