@@ -167,6 +167,7 @@ class Flame(BT.BasicThread):
         self.scan_frames = scan_frames
         self.scan_time = scan_time
         self.treshold = treshold
+        """Set remaining"""
         self.run_measurement = False
         self.have_darkness_correction = False
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
@@ -182,6 +183,7 @@ class Flame(BT.BasicThread):
         """
         self.SPECstatus = True
         self.T0 = time.time()
+        self.run_measurement = True
         try:
             self.viewer['TCPspec'].tcpTx.listen(5) #stream 5 at a time
             print 'Listening for client...'
@@ -190,6 +192,7 @@ class Flame(BT.BasicThread):
                 self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
                 print 'Connected and starting thread...'
                 BT.BasicThread.start(self)
+                #play()
         except:
             print 'Something went wrong. Can not connect to client.'
 
@@ -197,7 +200,98 @@ class Flame(BT.BasicThread):
         """Stop the Threading process
         """
         self.SPECstatus = False
+        self.run_measurement = False
         BT.BasicThread.stop(self)
+
+    def pause(self):
+        self.run_measurement = False
+
+    def play(self):
+        """Start the Threading process
+        """
+        self.run_measurement = True
+        BT.BasicThread.start(self)
+        
+    def background(self):
+        if self.run_measurement:
+            self.run_measurement = False
+            #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
+            #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
+            #self.message.set('Ready.')
+            print('Ready.')
+            self.measurement = 0
+        else:
+            newData = self.spec.intensities()
+            count = 1
+            #self.message.set('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames.get()))
+            #self.root.update()
+            #print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))
+            while count < int(self.dark_frames.get()):
+                newData = list(map(lambda x,y:x+y, self.spectrometer.intensities(), newData))
+                if (count % 100 == 0):
+                    print 'O',
+                elif (count % 10 == 0):
+                    print 'o',
+                else:
+                    print '.',
+                count += 1
+                #self.message.set('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames.get()))
+                #self.root.update()
+            self.darkness_correction = list(map(lambda x:x/count, newData))
+            self.have_darkness_correction = True # important for saving file
+            #self.axes.set_ylabel('Intensity [corrected count]')
+            #self.message.set(str(self.dark_frames.get()) + ' dark frames scanned. Ready.')
+            #print(str(self.dark_frames) + ' dark frames scanned. Ready.')
+            
+    def process(self):
+        """This is invoked by run() of the Threading class. This process is repeated, with a Period.
+        """
+        if self.run_measurement:
+            """Read NewData and perform darkness Correction"""
+            newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
+            if (self.measurement == 0):
+                self.data = newData
+            else:
+                self.data = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
+            #peaks, properties = self.peakfinding(self.data)
+            #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
+            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
+            """sending data dictionary to client, by TCP"""
+            self.send_df(d,self.client)
+            self.measurement += 1
+            if ((self.measurement % 100) == 0):
+                print 'O', #py3: print ('O', end='', flush=True)
+            elif (self.measurement % 10) == 0:
+                print 'o', #py3: print('o', end='', flush=True)
+            else:
+                print '.',
+                #py3: print('.', end='', flush=True)
+            if (self.scan_frames > 0):
+                if self.measurement % self.scan_frames == 0: # all frames are summed
+                    if self.autosave != 0:
+                        #self.save()
+                        print 'cant save'
+                    self.measurement = 0
+                    if self.autorepeat == 0:
+                        self.run_measurement = False
+                        #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
+                        #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
+                        #self.message.set('Ready.')
+
+    def send_df(self,d,c):
+        """Function to send data to TCP client
+        """
+        #print 'sending...'
+        self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
+
+    def teleUpdate(self,tele):
+            print str(tele)
+            
+class Processing:
+    def __init__(self,
+                 treshold):
+        self.treshold = treshold
+
 
     def denoising(self,d):
         return df
@@ -215,46 +309,3 @@ class Flame(BT.BasicThread):
                                          width = W,
                                          wlen = WLEN)
         return peaks
-
-    def process(self):
-        """This is invoked by run() of the Threading class. This process is repeated, with a Period.
-        """
-        #perform darkness Correction
-        newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
-        if (self.measurement == 0):
-            self.data = newData
-        else:
-            self.data = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
-        #peaks, properties = self.peakfinding(self.data)
-        #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
-        d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
-        #sending data dictionary to client, by TCP
-        self.send_df(d,self.client)
-        self.measurement += 1
-        if ((self.measurement % 100) == 0):
-            print 'O', #py3: print ('O', end='', flush=True)
-        elif (self.measurement % 10) == 0:
-            print 'o', #py3: print('o', end='', flush=True)
-        else:
-            print '.',
-            #py3: print('.', end='', flush=True)
-        if (self.scan_frames > 0):
-            if self.measurement % self.scan_frames == 0: # all frames are summed
-                if self.autosave != 0:
-                    #self.save()
-                    print 'cant save'
-                self.measurement = 0
-                if self.autorepeat == 0:
-                    self.run_measurement = False
-                    #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
-                    #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
-                    #self.message.set('Ready.')
-
-    def send_df(self,d,c):
-        """Function to send data to TCP client
-        """
-        #print 'sending...'
-        self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
-
-    def teleUpdate(self,tele):
-            print str(tele)

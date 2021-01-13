@@ -1,1 +1,1 @@
-"" "/Users/kenza/OneDrive - Concordia University - Canada/CASB-PhD/Gitbubble/fungalmicrofluidics_basement/SpecPlot.py"
+"C:\Python27\python.exe" "E:\KENZA Folder\PYTHON\fungalmicrofluidics\SpecPlot.py"
