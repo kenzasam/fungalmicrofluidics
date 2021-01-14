@@ -93,7 +93,7 @@ class tcpSend():
             This will  help us adjust to the buffer size. (See client)"""
             #print msg
             client.send(msg)
-            print 'Data sent to %s:%d\n'%(self.DesIP, self.DesPort)
+            #print 'Data sent to %s:%d\n'%(self.DesIP, self.DesPort)
             #self.udpTx.close()
         except socket.timeout:
             msg=''

@@ -379,7 +379,7 @@ class IncubationPanel(wx.Panel):
         self.pidBtn.Bind(wx.EVT_BUTTON, self.onPid)
         box3.Add(self.pidBtn, flag=wx.RIGHT, border=8)
         self.IncBtn=wx.Button( self, label='Start incubation', name='PID.start()', style=wx.BU_EXACTFIT)
-        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate(parent))
+        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
         box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         #Temperature
@@ -412,7 +412,7 @@ class IncubationPanel(wx.Panel):
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
 
-    def onIncubate(self,parent, event):
+    def onIncubate(self, parent, event):
         status= parent.PID_status(parent.menubar)
         if status != True:
             wx.MessageDialog(self, "Please first start the PID", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
@@ -459,6 +459,13 @@ class SortingPanel(wx.Panel):
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(10)
+        #spectrometer
+        box1=wx.BoxSizer(wx.HORIZONTAL)
+        # Start, Background
+        self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
+        self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStartSpec)
+        box1.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
+        #play, pause, save
         #Sort
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
