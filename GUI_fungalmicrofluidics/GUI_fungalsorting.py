@@ -41,13 +41,15 @@ Sortingpanel - Panel class to start sorting procedure
 
 class MainFrame(wx.Frame):
     '''Create MainFrame class.'''
-    def __init__(self, setup, port=-1, ip='127.0.0.1', columns=2):
+    def __init__(self, setup, chipViewer, tempViewer, specViewer, port=-1, ip='127.0.0.1', columns=2):
         super(MainFrame, self).__init__(None, wx.ID_ANY) #, size=(400,400)
         #panel=wx.Panel(self, wx.ID_ANY)
         '''PARAMETERS'''
         pumpnrs=5
         self.Title = 'Fungal Sorting hybrid microfluidics GUI'
-
+        self.cvwr  = chipViewer # Path to Chip Viewer file
+        self.tvwr = tempViewer # Path to PID control temperature plotting file
+        self.svwr = specViewer #Path to spectrum plotting file
         '''setup sending protocol for ArduBridge Shell.'''
         udpSend = False
         if port > 1:
@@ -57,15 +59,15 @@ class MainFrame(wx.Frame):
         self.setup=setup
 
         self.CreateStatusBar()
-        ico=wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
+        ico = wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
 
 
         '''Create and populate Panel.'''
-        panel=wx.Panel(self)
+        panel = wx.Panel(self)
         #
-        menubar=MenuBar(pumpnrs, udpSend)
+        menubar = MenuBar(pumpnrs, udpSend)
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteClosePort, menubar.arduItem2)
@@ -76,7 +78,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, menubar.onPIDstart, menubar.pidItem1)
         self.Bind(wx.EVT_MENU, menubar.onPIDpause, menubar.pidItem2)
         self.Bind(wx.EVT_MENU, menubar.onPIDstop, menubar.pidItem3)
-        Pumpnrs=list(range(pumpnrs))
+        Pumpnrs = list(range(pumpnrs))
         for i in Pumpnrs:
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
@@ -85,14 +87,14 @@ class MainFrame(wx.Frame):
         pumppanel = PumpPanel(panel, pumpnrs, udpSend)
         MAINbox.Add(pumppanel, 1, wx.EXPAND|wx.ALL, 2)
         #
-        operationspanel=OperationsPanel(panel, udpSend)
+        operationspanel = OperationsPanel(panel, self.cvwr, udpSend)
         MAINbox.Add(operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #
         #PID = self.PID_status(menubar)
-        incpanel=IncubationPanel(panel, udpSend)
+        incpanel = IncubationPanel(panel, self.tvwr, udpSend)
         MAINbox.Add(incpanel, 1, wx.EXPAND|wx.ALL, 2)
         #
-        sortingpanel=SortingPanel(panel, udpSend)
+        sortingpanel = SortingPanel(panel, self.svwr, udpSend)
         MAINbox.Add(sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         #
         self.SetMenuBar(menubar)
@@ -304,10 +306,10 @@ class PumpPanel(wx.Panel):
 
 class OperationsPanel(wx.Panel):
     """Panel class for user set functions for electrode actuation"""
-    def __init__(self,parent,udpSend):
+    def __init__(self,parent, viewer, udpSend):
         super(OperationsPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
-        self.udpSend=udpSend
+        self.vwr = viewer
         """Create and populate main sizer."""
         fnSizer = wx.BoxSizer(wx.VERTICAL)
         #
@@ -339,7 +341,7 @@ class OperationsPanel(wx.Panel):
         #self.SetBackgroundColour('#32a852')
 
     def onVwr(self, event):
-        dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat"'
+        dir=str(self.vwr)
         os.system(dir)
 
     def onSort(self, event):
@@ -355,10 +357,11 @@ class OperationsPanel(wx.Panel):
 class IncubationPanel(wx.Panel):
     """Panel class for setting incubation parameters (temperature, time, PID control)
     and imaging pipeline"""
-    def __init__(self, parent,udpSend):
+    def __init__(self, parent, viewer, udpSend):
         super(IncubationPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend=udpSend
+        self.vwr = viewer
         #self.PID_status=PID
         """Create and populate main sizer."""
         incSizer = wx.BoxSizer(wx.VERTICAL)
@@ -444,38 +447,72 @@ class IncubationPanel(wx.Panel):
 
 class SortingPanel(wx.Panel):
     """ Panel class for droplet sorting: starting spectrometer, sorting electrode sequences"""
-    def __init__(self,parent,udpSend):
+    def __init__(self, parent, viewer, udpSend):
         super(SortingPanel, self).__init__(parent)
+        self.vwr = viewer
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
-
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         srtSizer.AddSpacer(5)
-        titlebox  = wx.BoxSizer(wx.HORIZONTAL)
-        title = wx.StaticText(self, label='Droplet Sorting')
+        titlebox1  = wx.BoxSizer(wx.HORIZONTAL)
+        title1 = wx.StaticText(self, label='Droplet Sorting')
         font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
-        title.SetFont(font)
-        titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
-        srtSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
+        title1.SetFont(font)
+        titlebox1.Add(title1, flag=wx.ALIGN_LEFT, border=8)
+        srtSizer.Add(titlebox1, 0, wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(10)
         #spectrometer
-        box1=wx.BoxSizer(wx.HORIZONTAL)
         # Start, Background
-        self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
-        self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStartSpec)
-        box1.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
+        titlebox2  = wx.BoxSizer(wx.HORIZONTAL)
+        title2 = wx.StaticText(self, label='Spectrometer')
+        font2 = wx.Font(9,wx.DEFAULT,wx.NORMAL,wx.NORMAL)
+        title2.SetFont(font2)
+        titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
+        srtSizer.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.AddSpacer(5)
+        self.StartSpecBtn = wx.Button(self, label='Start', name='Sort()', size=(70,24)) #ADDED KS
+        self.StartSpecBtn.Bind(wx.EVT_BUTTON, self.onStartSpec)
+        self.BckgrBtn = wx.Button(self, label='Background', name='Sort()', size=(70,24)) #ADDED KS
+        self.BckgrBtn.Bind(wx.EVT_BUTTON, self.onBckgrSpec)
+        box1 = wx.BoxSizer(wx.HORIZONTAL)
+        box1.Add(self.StartSpecBtn, flag=wx.RIGHT, border=8)
+        box1.Add(self.BckgrBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         #play, pause, save
+        self.PlayBtn=wx.Button(self, label='Start', name='Sort()', size=(70,24))
+        bmp1 = wx.Bitmap('play.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
+        self.PlayBtn.SetBitmap(bmp1)
+        self.PlayBtn.Bind(wx.EVT_BUTTON, self.onPlaySpec)
+        self.PauseBtn=wx.Button(self, label='Background', name='Sort()', size=(70,24))
+        bmp2 = wx.Bitmap('pause.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
+        self.PauseBtn.SetBitmap(bmp2)
+        self.PauseBtn.Bind(wx.EVT_BUTTON, self.onPauseSpec)
+        self.StopBtn=wx.Button(self, label='Background', name='Sort()', size=(70,24))
+        bmp3 = wx.Bitmap('stop.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
+        self.StopBtn.SetBitmap(bmp3)
+        self.StopBtn.Bind(wx.EVT_BUTTON, self.onStopSpec)
+        box3=wx.BoxSizer(wx.HORIZONTAL)
+        box3.Add(self.PlayBtn, flag=wx.RIGHT, border=8)
+        box3.Add(self.PauseBtn, flag=wx.RIGHT, border=8)
+        box3.Add(self.StopBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         #Sort
-        box1=wx.BoxSizer(wx.HORIZONTAL)
+        titlebox3  = wx.BoxSizer(wx.HORIZONTAL)
+        title3 = wx.StaticText(self, label='Sorting')
+        title3.SetFont(font2)
+        titlebox3.Add(title3, flag=wx.ALIGN_LEFT, border=8)
+        srtSizer.Add(titlebox3, 0, wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.AddSpacer(5)
+        box2=wx.BoxSizer(wx.HORIZONTAL)
         self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
         self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStart)
-        box1.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
+        box2.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]')
-        box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box1.Add(self.entry1, proportion=1)
-        srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
+        box2.Add(self.entry1, proportion=1)
+        srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(10)
 
         self.SetSizer(srtSizer)
@@ -487,6 +524,36 @@ class SortingPanel(wx.Panel):
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         s = 'setup.Sorting(%d)'%(t)
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onBckgrSpec(self,event):
+        s = 'Spec.background()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onStartSpec(self,event):
+        s = 'Spec.start()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onPlaySpec(self,event):
+        s = 'Spec.play()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onPauseSpec(self,event):
+        s = 'Spec.pause()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onStopSpec(self,event):
+        s = 'Spec.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -609,16 +676,21 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     #Command line option parser
     parser = OptionParser()
     parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='Demoprotocol')
-    parser.add_option('-u', '--port', dest='port', help='Remote port to send the commands', type='int', default=7010)
-    parser.add_option('-i', '--ip', dest='ip', help='Remote ip to send the commands', type='string', default='127.0.0.1')
+    parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=7010)
+    parser.add_option('-i', '--ip', dest='ip', help='Remote ip (UDP client) to send the commands', type='string', default='127.0.0.1')
+    parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='None')
+    parser.add_option('-y', '--tempvwr', dest='tvwr', help='PIDViewer path', type='string', default='None')
+    parser.add_option('-z', '--specvwr', dest='svwr', help='SpecViewer path', type='string', default='None')
+
     (options, args) = parser.parse_args()
     path = os.path.split(options.prot)
     #file chooser opens if no other file was specified in the additional text file
     if path[1] == 'Demoprotocol':
+        print 'Loading protocol specified file chooser.'
         newPath = fileChooser()
         path = os.path.split(newPath)
     else:
-        print 'Loading protocol specified in accompanying address file, which is in your folder.'
+        print 'Loading protocol specified in accompanying address file.'
     #parser resumes
     lib = str(path[1])[:-3]
     path = path[0]
@@ -638,7 +710,7 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     #setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, magPin=0)
     #setup.enOut(True)
     app = wx.App(False)
-    frame = MainFrame(setup, ip=options.ip, port=options.port)
+    frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
     frame.Show()
 
     #inspection tool for GUI troubleshooting
