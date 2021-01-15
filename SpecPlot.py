@@ -114,7 +114,7 @@ class Spectogram(server.tcpControl):
         """Object received from Server (tpControl, threadSpec)
         In this case, a dictionary d={'Msr':self.measurement,'Dat':self.data}"""
         self.received == True
-        print 'Received.',
+        #print 'Received.',
         self.measurement=object['Msr']
         #self.scan_frames=object['Fr']
         self.ydata=object['Dat']

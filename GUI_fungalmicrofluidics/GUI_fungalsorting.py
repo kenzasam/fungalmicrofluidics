@@ -390,8 +390,8 @@ class IncubationPanel(wx.Panel):
         incSizer.AddSpacer(10)
         #pid
         box3=wx.BoxSizer(wx.HORIZONTAL)
-        self.pidBtn=wx.Button( self, label='Show PID control viewer', name='PID.start()',style=wx.BU_EXACTFIT)
-        self.pidBtn.Bind(wx.EVT_BUTTON, self.onPid)
+        self.pidBtn=wx.Button( self, label='Show live temperature plot', name='PID.start()',style=wx.BU_EXACTFIT)
+        self.pidBtn.Bind(wx.EVT_BUTTON, self.onVwr)
         box3.Add(self.pidBtn, flag=wx.RIGHT, border=8)
         self.IncBtn=wx.Button( self, label='Start incubation', name='PID.start()', style=wx.BU_EXACTFIT)
         self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
@@ -442,8 +442,9 @@ class IncubationPanel(wx.Panel):
             if self.udpSend != False:
                 self.udpSend.Send(s)
 
-    def onPid(self,event):
-        dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
+    def onVwr(self,event):
+        dir=str(self.vwr)
+        #dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
         os.system(dir)
         '''
         s = 'setup.PID.plot()'
@@ -456,12 +457,14 @@ class IncubationPanel(wx.Panel):
 
     def onImage(self, event):
         return
+    
 
 class SortingPanel(wx.Panel):
     """ Panel class for droplet sorting: starting spectrometer, sorting electrode sequences"""
     def __init__(self, parent, viewer, udpSend):
         super(SortingPanel, self).__init__(parent)
         self.vwr = viewer
+        self.udpSend=udpSend
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
@@ -483,11 +486,14 @@ class SortingPanel(wx.Panel):
         titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(5)
+        self.vwrBtn=wx.Button( self, label='Show live spectrum', name='specplot.py',style=wx.BU_EXACTFIT)
+        self.vwrBtn.Bind(wx.EVT_BUTTON, self.onVwr)
         self.StartSpecBtn = wx.Button(self, label='Start', name='Sort()', size=(70,24)) #ADDED KS
         self.StartSpecBtn.Bind(wx.EVT_BUTTON, self.onStartSpec)
         self.BckgrBtn = wx.Button(self, label='Background', name='Sort()', size=(70,24)) #ADDED KS
         self.BckgrBtn.Bind(wx.EVT_BUTTON, self.onBckgrSpec)
         box1 = wx.BoxSizer(wx.HORIZONTAL)
+        box1.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
         box1.Add(self.StartSpecBtn, flag=wx.RIGHT, border=8)
         box1.Add(self.BckgrBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
@@ -520,7 +526,7 @@ class SortingPanel(wx.Panel):
         self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
         self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStart)
         box2.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
-        self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]')
+        self.text1=wx.StaticText(self,  wx.ID_ANY, label='Treshold Intensity [counts]')
         box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box2.Add(self.entry1, proportion=1)
@@ -569,6 +575,10 @@ class SortingPanel(wx.Panel):
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+
+    def onVwr(self,event):
+        dir=str(self.vwr)
+        os.system(dir)
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""

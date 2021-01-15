@@ -82,26 +82,27 @@ class tcpControl():
         """Function to call external function, in client class."""
         if self.callFunc != False:
             self.callFunc(self,object)
-        print 'updated'
+        #print 'updated'
 
     def run(self):
         """Threading process"""
         """ adjust to https://stackoverflow.com/questions/60417767/tcp-lost-packet-python """
         global HEADERSIZE
         global SIZE
-        print 'here again'
+        #print 'here again'
         while True:
             self.running = True
+            print 'TCP (%s) - receiving...'%(self.nameID)
             msglen= self.tcpRx.recv(HEADERSIZE).decode('utf-8')
             if len(msglen):
                 msglen=int(msglen)
-                print 'full message length: %d' %(msglen)
+                #print 'full message length: %d' %(msglen)
                 full_msg = b''
                 while True: #loop forever
                     msg = self.tcpRx.recv(min(SIZE, msglen-len(full_msg)))
                     full_msg += msg
                     if len(full_msg) == msglen:
-                        print "Full msg recvd"
+                        #print "Full msg recvd"
                         break
                 msg_obj = full_msg
                 try:
@@ -115,7 +116,7 @@ class tcpControl():
             full_msg=b''
         """
         self.running = False
-        print 'TCP-stopped...'
+        print 'TCP (%s) - stopped receiving...'%(self.nameID)
 
 
     """
