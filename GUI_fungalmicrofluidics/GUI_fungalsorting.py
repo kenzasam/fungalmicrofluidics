@@ -1,12 +1,33 @@
-### SHIH Microfluidics lab, 2019
-### GUI to be used with ArduBridge and Protocol file
-###
-### On-Demand Channel operations, Single-Cell GUI, with Cetoni Nemesys low-pressure syringe pump integration
-### by Kenza Samlali
-### Sequence selector class by Laura Lecrerc's LLGUI
+"""
+This file is part of GSOF_ArduBridge.
+
+    GSOF_ArduBridge is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GSOF_ArduBridge is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GSOF_ArduBridge.  If not, see <https://www.gnu.org/licenses/>.
+"""
+"""
+SHIH Microfluidics lab, 2021
+GUI to be used with GSOF_ArduBridge Ardubrige and Protocol file
+
+A GUI to operate a microfluidic system: On-Demand electrode operations (see GSOF_Ardubridge), Nemesys low-pressure syringe pump (Cetoni GmBh) operation,
+FLAME spectrometer (Ocean Optics) operation, TEC/Peltier operation with PID temperature control.
+
+Credits:
+Code written by Kenza Samlali
+shih.ico: Steve C.C. SHIH
+pause.png, play.png, stop.png: Freepik (CC license)
 #-------------------------------------------------------------------
 ## >>> VERSIONS <<< ##
-# v 0.1.0 - copy from Laura, adding extra function buildButtons
+# v 0.1.0 - copy from Laura (LLGUI, ArduBridge, GPLv3), adding extra function buildButtons
 # v 1.0.0 - Droplet Generation buttons and functions, Droplet operations buttons and FUNCTIONS
 # v 1.1.0 - Bug Fixes (error window popups when buttons pressed, integrating KeepAll in KeepAllBut)
 # v 2.0.0 - Nemesys integration
@@ -14,9 +35,7 @@
 # v 2.2.0 - Add up to 5 pumps
 # v 3.0.0 - Reorganized code architecture, split up in classes
 #-------------------------------------------------------------------
-#-------------------------------------------------------------------
-#-------------------------------------------------------------------
-
+"""
 
 
 import wx
@@ -57,16 +76,12 @@ class MainFrame(wx.Frame):
 
         '''setting up wx Main Frame window.'''
         self.setup=setup
-
         self.CreateStatusBar()
         ico = wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
-
-
         '''Create and populate Panel.'''
-        panel = wx.Panel(self)
-        #
+        #panel = wx.Panel(self)
         menubar = MenuBar(pumpnrs, udpSend)
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
@@ -82,26 +97,25 @@ class MainFrame(wx.Frame):
         for i in Pumpnrs:
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
-        #
         MAINbox = wx.BoxSizer(wx.VERTICAL)
-        pumppanel = PumpPanel(panel, pumpnrs, udpSend)
-        MAINbox.Add(pumppanel, 1, wx.EXPAND|wx.ALL, 2)
-        #
-        operationspanel = OperationsPanel(panel, self.cvwr, udpSend)
-        MAINbox.Add(operationspanel, 1, wx.EXPAND|wx.ALL, 2)
-        #
+        #pumppanel = PumpPanel(panel, pumpnrs, udpSend)
+        self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
+        MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
+        #operationspanel = OperationsPanel(panel, self.cvwr, udpSend)
+        self.operationspanel = OperationsPanel(self, self.cvwr, udpSend)
+        MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
-        incpanel = IncubationPanel(panel, self.tvwr, udpSend)
-        MAINbox.Add(incpanel, 1, wx.EXPAND|wx.ALL, 2)
-        #
-        sortingpanel = SortingPanel(panel, self.svwr, udpSend)
-        MAINbox.Add(sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
-        #
+        #incpanel = IncubationPanel(panel, self.tvwr, udpSend)
+        self.incpanel = IncubationPanel(self, self.tvwr, udpSend)
+        MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
+        #sortingpanel = SortingPanel(panel, self.svwr, udpSend)
+        self.sortingpanel = SortingPanel(self, self.svwr, udpSend)
+        MAINbox.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         self.SetMenuBar(menubar)
         #
-        panel.SetSizerAndFit(MAINbox)
+        self.SetSizerAndFit(MAINbox)
+        #panel.SetSizerAndFit(MAINbox)
         #self.Centre()
-
 
     def on_quit_click(self, event):
         """Handle close event."""
@@ -125,9 +139,6 @@ class MainPanel(wx.Panel):
         sizer.Add(cmd_quit)
         self.SetSizer(sizer)
 """
-
-
-
 class PumpPanel(wx.Panel):
     """ panel class for Nemesys pump operation"""
     def __init__(self, parent, pumpnrs,udpSend):
@@ -148,20 +159,18 @@ class PumpPanel(wx.Panel):
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         NemSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         NemSizer.AddSpacer(10)
-
-
         #Entry of Oil consant flow rate
         boxNem3=wx.BoxSizer(wx.HORIZONTAL)
         flrt3=wx.StaticText(self,  wx.ID_ANY, label='Oil [uL/s]')
         boxNem3.Add(flrt3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         entryflrt3=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
         boxNem3.Add(entryflrt3, proportion=0.5, border=8)
-        textPump=wx.StaticText(self,  wx.ID_ANY, label='Pump')
-        boxNem3.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        textPump3=wx.StaticText(self, wx.ID_ANY, label='Pump')
+        boxNem3.Add(textPump3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         combo3 = wx.ComboBox(self, value=choices[0], choices=choices)
         combo3.Bind(wx.EVT_COMBOBOX, self.onCombo)
         boxNem3.Add(combo3, 0, wx.ALIGN_RIGHT)
-        Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
         boxNem3.Add(Btn3, 0, wx.ALIGN_RIGHT)
         ##Entry of Flowrate continuous aqueous
@@ -170,11 +179,12 @@ class PumpPanel(wx.Panel):
         boxNem4.Add(flrt4, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         entryflrt4=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
         boxNem4.Add(entryflrt4, proportion=0.5, border=8)
-        boxNem4.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        textPump4=wx.StaticText(self, wx.ID_ANY, label='Pump')
+        boxNem4.Add(textPump4, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         combo4 = wx.ComboBox(self, value=choices[0], choices=choices)
         combo4.Bind(wx.EVT_COMBOBOX, self.onCombo)
         boxNem4.Add(combo4, 0, wx.ALIGN_RIGHT)
-        Btn4=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn4=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn4.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
         boxNem4.Add(Btn4, 0, wx.ALIGN_RIGHT)
         #Entry of OTHER flow rate
@@ -183,11 +193,12 @@ class PumpPanel(wx.Panel):
         boxNem0.Add(flrt0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         entryflrt0=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
         boxNem0.Add(entryflrt0, proportion=0.5, border=8)
-        boxNem0.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        textPump0=wx.StaticText(self, wx.ID_ANY, label='Pump')
+        boxNem0.Add(textPump0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         combo0 = wx.ComboBox(self, value=choices[0], choices=choices)
         combo0.Bind(wx.EVT_COMBOBOX, self.onCombo)
         boxNem0.Add(combo0, 0, wx.ALIGN_RIGHT)
-        Btn0=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn0=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn0.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem0.Add(Btn0, 0, wx.ALIGN_RIGHT)
         # pumpnrs  == 4:
@@ -196,25 +207,26 @@ class PumpPanel(wx.Panel):
         boxNem1.Add(flrt1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         entryflrt1=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
         boxNem1.Add(entryflrt1, proportion=0.5, border=8)
-        boxNem1.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        textPump1=wx.StaticText(self, wx.ID_ANY, label='Pump')
+        boxNem1.Add(textPump1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         combo1 = wx.ComboBox(self , value=choices[0], choices=choices)
         combo1.Bind(wx.EVT_COMBOBOX, self.onCombo)
         boxNem1.Add(combo1, 0, wx.ALIGN_RIGHT)
-        Btn1=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn1=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn1.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem1.Add(Btn1, 0, wx.ALIGN_RIGHT)
         # pumpnrs == 5:
         boxNem2=wx.BoxSizer(wx.HORIZONTAL)
-        #flrt2=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNem2.Add(flrt1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        flrt2=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
+        boxNem2.Add(flrt2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         entryflrt2=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
         boxNem2.Add(entryflrt2, proportion=0.5, border=8)
-        #self.text5Pump=wx.StaticText(self,  wx.ID_ANY, label='Pump ')
-        boxNem2.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        textPump2=wx.StaticText(self, wx.ID_ANY, label='Pump')
+        boxNem2.Add(textPump2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         combo2 = wx.ComboBox(self, value=choices[0], choices=choices)
         combo2.Bind(wx.EVT_COMBOBOX, self.onCombo)
         boxNem2.Add(combo2, 0, wx.ALIGN_RIGHT)
-        Btn2=wx.ToggleButton( self, label='Start', name='', size=(50,24)) #ADDED KS
+        Btn2=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn2.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem2.Add(Btn2, 0, wx.ALIGN_RIGHT)
         #
@@ -480,15 +492,15 @@ class SortingPanel(wx.Panel):
         box1.Add(self.BckgrBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         #play, pause, save
-        self.PlayBtn=wx.Button(self, label='Start', name='Sort()', size=(70,24))
+        self.PlayBtn=wx.Button(self, name='start()')
         bmp1 = wx.Bitmap('play.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
         self.PlayBtn.SetBitmap(bmp1)
         self.PlayBtn.Bind(wx.EVT_BUTTON, self.onPlaySpec)
-        self.PauseBtn=wx.Button(self, label='Background', name='Sort()', size=(70,24))
+        self.PauseBtn=wx.Button(self, name='pause()')
         bmp2 = wx.Bitmap('pause.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
         self.PauseBtn.SetBitmap(bmp2)
         self.PauseBtn.Bind(wx.EVT_BUTTON, self.onPauseSpec)
-        self.StopBtn=wx.Button(self, label='Background', name='Sort()', size=(70,24))
+        self.StopBtn=wx.Button(self, name='Sort()')
         bmp3 = wx.Bitmap('stop.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
         self.StopBtn.SetBitmap(bmp3)
         self.StopBtn.Bind(wx.EVT_BUTTON, self.onStopSpec)
