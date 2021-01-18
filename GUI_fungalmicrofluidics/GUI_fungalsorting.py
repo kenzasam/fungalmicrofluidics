@@ -93,6 +93,9 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, menubar.onPIDstart, menubar.pidItem1)
         self.Bind(wx.EVT_MENU, menubar.onPIDpause, menubar.pidItem2)
         self.Bind(wx.EVT_MENU, menubar.onPIDstop, menubar.pidItem3)
+        self.Bind(wx.EVT_MENU, menubar.onPIDVwr, menubar.pidItem4)
+        self.Bind(wx.EVT_MENU, menubar.onStartSpec, menubar.specItem1)
+        self.Bind(wx.EVT_MENU, menubar.onSpecVwr, menubar.specItem2)
         Pumpnrs = list(range(pumpnrs))
         for i in Pumpnrs:
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
@@ -149,8 +152,6 @@ class PumpPanel(wx.Panel):
         choices=[str(i) for i in Pumpnrs]
         NemSizer = wx.BoxSizer(wx.VERTICAL)
         #
-        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        NemSizer.Add(line, 0, wx.ALL|wx.EXPAND, 2 )
         NemSizer.AddSpacer(5)
         titlebox = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Pumps')
@@ -325,8 +326,6 @@ class OperationsPanel(wx.Panel):
         """Create and populate main sizer."""
         fnSizer = wx.BoxSizer(wx.VERTICAL)
         #
-        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        fnSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         fnSizer.AddSpacer(5)
         titlebox  = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Electrode Functions')
@@ -372,14 +371,12 @@ class IncubationPanel(wx.Panel):
     def __init__(self, parent, viewer, udpSend):
         super(IncubationPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
-        self.udpSend=udpSend
+        self.udpSend = udpSend
         self.vwr = viewer
         #self.PID_status=PID
         """Create and populate main sizer."""
         incSizer = wx.BoxSizer(wx.VERTICAL)
         #
-        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        incSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         incSizer.AddSpacer(5)
         titlebox  = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Droplet Incubation')
@@ -388,15 +385,6 @@ class IncubationPanel(wx.Panel):
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         incSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         incSizer.AddSpacer(10)
-        #pid
-        box3=wx.BoxSizer(wx.HORIZONTAL)
-        self.pidBtn=wx.Button( self, label='Show live temperature plot', name='PID.start()',style=wx.BU_EXACTFIT)
-        self.pidBtn.Bind(wx.EVT_BUTTON, self.onVwr)
-        box3.Add(self.pidBtn, flag=wx.RIGHT, border=8)
-        self.IncBtn=wx.Button( self, label='Start incubation', name='PID.start()', style=wx.BU_EXACTFIT)
-        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
-        box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
-        incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         #Temperature
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='Temperature [C]:')
@@ -411,8 +399,16 @@ class IncubationPanel(wx.Panel):
         self.entry2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box2.Add(self.entry2, proportion=1)
         incSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
+        #incubate
+        box3=wx.BoxSizer(wx.HORIZONTAL)
+        self.IncBtn=wx.Button( self, label='Start incubation', name='', style=wx.BU_EXACTFIT)
+        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
+        box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
+        incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         #spacer
-        incSizer.AddSpacer(10)
+        #incSizer.AddSpacer(10)
+        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+        incSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         #imaging pipeline
         box4=wx.BoxSizer(wx.HORIZONTAL)
         self.imgsetupBtn=wx.Button( self, label='Set up imaging pipeline ...', name='PID.start()', style=wx.BU_EXACTFIT)
@@ -436,28 +432,17 @@ class IncubationPanel(wx.Panel):
                 temp=int(float(self.entry1.GetValue()))
                 t=int(float(self.entry2.GetValue()))
             except:
-                wx.MessageDialog(self, "Enter a valid temperature", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-            s = 'setup.incubation(0.5,%d,%d)'%(temp,t)
+                wx.MessageDialog(self, "Enter a valid temperature and time", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+            s = 'setup.incubation(0.5, %d, %d)'%(temp,t)
             pyperclip.copy(s)
             if self.udpSend != False:
                 self.udpSend.Send(s)
 
-    def onVwr(self,event):
-        dir=str(self.vwr)
-        #dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
-        os.system(dir)
-        '''
-        s = 'setup.PID.plot()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
-        '''
     def onImgsetup(self, event):
         return
 
     def onImage(self, event):
         return
-    
 
 class SortingPanel(wx.Panel):
     """ Panel class for droplet sorting: starting spectrometer, sorting electrode sequences"""
@@ -467,8 +452,6 @@ class SortingPanel(wx.Panel):
         self.udpSend=udpSend
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
-        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         srtSizer.AddSpacer(5)
         titlebox1  = wx.BoxSizer(wx.HORIZONTAL)
         title1 = wx.StaticText(self, label='Droplet Sorting')
@@ -480,21 +463,16 @@ class SortingPanel(wx.Panel):
         #spectrometer
         # Start, Background
         titlebox2  = wx.BoxSizer(wx.HORIZONTAL)
-        title2 = wx.StaticText(self, label='Spectrometer')
+        title2 = wx.StaticText(self, label='Spectral Measurement')
         font2 = wx.Font(9,wx.DEFAULT,wx.NORMAL,wx.NORMAL)
         title2.SetFont(font2)
         titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(5)
-        self.vwrBtn=wx.Button( self, label='Show live spectrum', name='specplot.py',style=wx.BU_EXACTFIT)
-        self.vwrBtn.Bind(wx.EVT_BUTTON, self.onVwr)
-        self.StartSpecBtn = wx.Button(self, label='Start', name='Sort()', size=(70,24)) #ADDED KS
-        self.StartSpecBtn.Bind(wx.EVT_BUTTON, self.onStartSpec)
         self.BckgrBtn = wx.Button(self, label='Background', name='Sort()', size=(70,24)) #ADDED KS
         self.BckgrBtn.Bind(wx.EVT_BUTTON, self.onBckgrSpec)
         box1 = wx.BoxSizer(wx.HORIZONTAL)
         box1.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
-        box1.Add(self.StartSpecBtn, flag=wx.RIGHT, border=8)
         box1.Add(self.BckgrBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         #play, pause, save
@@ -506,14 +484,13 @@ class SortingPanel(wx.Panel):
         bmp2 = wx.Bitmap('pause.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
         self.PauseBtn.SetBitmap(bmp2)
         self.PauseBtn.Bind(wx.EVT_BUTTON, self.onPauseSpec)
-        self.StopBtn=wx.Button(self, name='Sort()')
-        bmp3 = wx.Bitmap('stop.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
-        self.StopBtn.SetBitmap(bmp3)
-        self.StopBtn.Bind(wx.EVT_BUTTON, self.onStopSpec)
-        box3=wx.BoxSizer(wx.HORIZONTAL)
+        self.SaveBtn=wx.Button(self, label='Save Data', name='save()')
+        #bmp2 = wx.Bitmap('pause.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
+        #self.PauseBtn.SetBitmap(bmp2)
+        self.SaveBtn.Bind(wx.EVT_BUTTON, self.onSaveSpec)
         box3.Add(self.PlayBtn, flag=wx.RIGHT, border=8)
         box3.Add(self.PauseBtn, flag=wx.RIGHT, border=8)
-        box3.Add(self.StopBtn, flag=wx.RIGHT, border=8)
+        box3.Add(self.SaveBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         #Sort
         titlebox3  = wx.BoxSizer(wx.HORIZONTAL)
@@ -525,14 +502,13 @@ class SortingPanel(wx.Panel):
         box2=wx.BoxSizer(wx.HORIZONTAL)
         self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
         self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStart)
-        box2.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='Treshold Intensity [counts]')
-        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box2.Add(self.entry1, proportion=1)
+        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        box2.Add(self.entry1, proportion=1, border=8)
+        box2.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(10)
-
         self.SetSizer(srtSizer)
         #self.SetBackgroundColour('#f2dd88')
 
@@ -548,12 +524,6 @@ class SortingPanel(wx.Panel):
 
     def onBckgrSpec(self,event):
         s = 'Spec.background()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
-
-    def onStartSpec(self,event):
-        s = 'Spec.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -579,6 +549,9 @@ class SortingPanel(wx.Panel):
     def onVwr(self,event):
         dir=str(self.vwr)
         os.system(dir)
+
+    def onSaveSpec(self,event):
+        print('Data Saved')
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
@@ -613,17 +586,26 @@ class MenuBar(wx.MenuBar):
         nemMenu.Append(wx.ID_ANY, 'Calibrate', calibrateMenu)
         self.Append(nemMenu, 'Nemesys')
         pidMenu = wx.Menu()
-        self.pidItem1 = pidMenu.Append(wx.ID_ANY, 'Open PID', 'PID.start()')
-        self.pidItem2 = pidMenu.Append(wx.ID_ANY, 'Pause PID', 'PID.pause()')
-        self.pidItem3 = pidMenu.Append(wx.ID_ANY, 'Stop PID', 'PID.stop()')
+        self.pidItem1 = pidMenu.Append(wx.ID_ANY, 'Open PID', 'Pid.start()')
+        self.pidItem2 = pidMenu.Append(wx.ID_ANY, 'Pause PID', 'Pid.pause()')
+        self.pidItem3 = pidMenu.Append(wx.ID_ANY, 'Close PID', 'Pid.stop()')
+        self.pidItem4 = pidMenu.Append(wx.ID_ANY, 'View Live Temperature Plot', 'www')
         self.Append(pidMenu, 'PID')
+        specMenu = wx.Menu()
+        self.specItem1 = specMenu.Append(wx.ID_ANY, 'Open Spec', 'Spec.start()')
+        self.specItem2 = specMenu.Append(wx.ID_ANY, 'Close Spec', 'PID.pause()')
+        self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', 'PID.stop()')
+        self.Append(specMenu, 'Spectrometer')
+
     def onQuit(self,event):
         self.Close()
+
     def onCloseArdu(self,event):
         s= 'close()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+
     def onCloseNem(self,event):
         s= 'Pumps.bus.close()'
         self.setup.pumpsObjList[pumpID]
@@ -635,55 +617,85 @@ class MenuBar(wx.MenuBar):
             pyperclip.copy(f)
             if self.udpSend != False:
                 self.udpSend.Send(f)
+
     def onOpenNem(self,event):
         s= 'Pumps.bus.open()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+
     def onStopOnePump(self,event):
         item=self.GetMenuBar().FindItemById(event.GetId())
         s = 'Pumps.pump_stop(setup.nem.pumpID(%s))' %(str(item.GetText()))
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+
     def onStopPumps(self,event):
         s= 'Pumps.pump_stop_all()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+
     def onCalibratePump(self,event):
         item=self.GetMenuBar().FindItemById(event.GetId())
         s = 'Pumps.pump_calibration(setup.nem.pumpID(%s))' %(str(item.GetText()))
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+
     def onRemoteOpenPort(self, event):
         s = 'ardu.OpenClosePort(1)'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
+
     def onRemoteClosePort(self, event):
         s = 'ardu.OpenClosePort(0)'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
+
     def onPIDstart(self, event):
         self.PID=True
-        s = 'PID.start()'
+        s = 'Pid.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
+
     def onPIDpause(self, event):
-        s = 'PID.pause()'
+        s = 'Pid.pause()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
+
     def onPIDstop(self, event):
         self.PID=False
-        s = 'PID.stop()'
+        s = 'Pid.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
+
+    def onPIDVwr(self,event):
+        dir=str(self.vwr)
+        #dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
+        os.system(dir)
+        '''
+        s = 'setup.PID.plot()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+        '''
+
+    def onStartSpec(self, event):
+        self.Spec=True
+        s = 'Spec.start()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+                self.udpSend.Send(s)
+
+    def onSpecVwr(self,event):
+        print('got it')
 
 if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     def fileChooser():

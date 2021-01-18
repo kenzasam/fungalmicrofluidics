@@ -66,6 +66,8 @@ class Spectogram(server.tcpControl):
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
         #init VARIABLES#
         self.ydata = []
+        self.ydata2 = []
+        self.ydata3 = []
         self.xdata = []
         self.measurement = 0
         ###########
@@ -79,6 +81,8 @@ class Spectogram(server.tcpControl):
         self.axes = self.figure.gca()
         #self.graph, = self.axes.plot(self.wavelengths, self.data)
         self.graph, = self.axes.plot([], [])
+        self.graph2, = self.axes.plot([], [], 'r')
+        self.line, = self.axes.plot([], [] ,'r+')
         self.figure.suptitle('No measurement taken so far.')
         self.axes.set_xlabel('Wavelengths [nm]')
         self.axes.set_ylabel('Intensity [count]')
@@ -101,14 +105,23 @@ class Spectogram(server.tcpControl):
           (self.enable_plot > 0):
            title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
            plot.suptitle(title)
-           self.graph.set_data(self.xdata,self.ydata)
-           #print 'peaks:'
-           #print self.peaks
-           #plot.plot(self.peaks,self.xdata[self.peaks], 'r+')
+           self.graph.set_data(self.xdata, self.ydata)
            #self.graph.set_ydata(self.ydata)
+
+           #plot peaks
+           ind = [i for i, item in enumerate(self.ydata) if item in self.ydata2]
+           peakwvl = [self.xdata[i] for i in ind]
+           self.graph2.set_data(peakwvl, self.ydata2)
+           for i,j in zip(xtemp, self.ydata2):
+               self.graph2.annotate(str(j),xy=(i,j+0.5))
+           print(peakwvl)
+           #plot treshold
+           #self.line.set_data(self.xdata, self.ydata3)
+
            self.axes.relim()
            self.axes.autoscale_view(True, True, True)
-           return self.graph,
+           #return self.graph,
+           return (self.graph, self.graph2, self.line)
 
     def decodingPayload(self, object):
         """Object received from Server (tpControl, threadSpec)
@@ -119,6 +132,10 @@ class Spectogram(server.tcpControl):
         #self.scan_frames=object['Fr']
         self.ydata=object['Dat']
         self.xdata=object['L']
+        if 'Peaks' in object:
+            self.ydata2=object['Peaks']
+        if 'Treshold' in object:
+            self.ydata3=object['Treshold']
         #self.peaks=object['Peaks']
         #print 'Msrmt #'
         #print self.measurement

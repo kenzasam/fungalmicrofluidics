@@ -45,17 +45,17 @@ class ArduPidThread(BT.BasicThread):
         """
         #super(StoppableThread, self).__init__()
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
-        self.ardu = bridge   #The Arduino-Bridge object
-        self.fbPin = fbPin   #save the pin# that should be used
-        self.outPin = outPin #save the pin# that should be used
-        self.dirPin = dirPin #save the pin# that should be used
-        self.ct = 25.0       #Init value of target value
+        self.ardu = bridge   # The Arduino-Bridge object
+        self.fbPin = fbPin   # save the pin# that should be used
+        self.outPin = outPin # save the pin# that should be used
+        self.dirPin = dirPin # save the pin# that should be used
+        self.ct = 25.0       # Init value of target value
         self.ct_now = self.ct
-        self.RC_div_DT = 10.0 #Period #Exponential pulse-shaping coef'
+        self.RC_div_DT = 10.0 # Exponential pulse-shaping coef'
         self.PID = PidAlgorithm.PidAlgorithm( P=1, I=0, D=0)
-        self.PID.outMax = 100   #Maximum output value
-        self.PID.outMin = -100  #Minimum output value
-        self.PIDstatus = False  #init
+        self.PID.outMax = 100   # Maximum output value
+        self.PID.outMin = -100  # Minimum output value
+        self.PIDstatus = False  # init
         if self.ardu:
             self.ardu.gpio.pinMode(self.dirPin, 0) #Set the pins direction to output
         self.enOut = False #enable sending output, ct, control target temperature
@@ -64,7 +64,8 @@ class ArduPidThread(BT.BasicThread):
         #Coefficients for linear approximation temperature calculation
         self.a = -0.7
         self.b = -1010.0
-
+        """ HARDWARE dependent variables
+        """
         #Coefficients for Steinhart temperature calculation
         self.RTDstd = 10000  #Amphenol  MA300 thermistor, resistance at 25C
         self.Tstd = 25.0 # Standard temperature at which thermistor resistance RTDstd is true

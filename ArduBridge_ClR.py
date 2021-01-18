@@ -59,7 +59,7 @@ def close():
         if PUMPS != False:
             setup.nem.bus.stop()
             print 'Nemesys Bus closed...'
-        if PID != False & PID.PIDstatus != False:
+        if PID != False & Pid.PIDstatus != False:
             PID.stop()
             print 'PID thread stopped...'
         if SPEC != False & Spec.SPECstatus != False:
@@ -79,10 +79,10 @@ if __name__ == "__main__":
     ONLINE = False #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
-    PUMPS= False #<-- True when user wants to use Nemesys pump through python.
-    SPECGUI = False #<-- True when user wants to use a spectrometer GUI .
-    SPEC= True #<-- True when user wants to use a spectrometer thread.
-    GUI=False #<-- True for running GUI through serial
+    PUMPS = False #<-- True when user wants to use Nemesys pump through python.
+    SPEC = True #<-- True when user wants to use a spectrometer thread.
+    SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
+    GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
     REMOTE_CTRL_PORT = PORT_BASE + 10 #Client, ArduBridge on port 7010
@@ -124,20 +124,22 @@ if __name__ == "__main__":
     '''
     print 'PID status: %s' %(PID)
     if PID == True:
-        #threadPID = __import__('threadPID_KS') #delete when you place in ArduBridge. For now place thread in folder
-        PID = threadPID.ArduPidThread(bridge=ardu,
+        ### ###
+        Pid = threadPID_KS.ArduPidThread(bridge=ardu,
                                       nameID='PID', #proces name
                                       Period=0.5,   #Period-time of the control-loop. PID calculation cycle time in sec.
                                       fbPin=1,      #The analog pin (Ardu) of the temp sensor.
                                       outPin=10,    #The output pin  of the driver (Ardu connection).
                                       dirPin=7      #The direction pin for the driver (Ardu connection).
                                       )
-        PID.PID.Kp = 30 # proportional control of PID
-        PID.PID.Ki = 1.2 # integral of PID
-        PID.PID.Kd = 0.0 # rate of change of PID (derivative)
+        Pid.PID.Kp = 30 # proportional control of PID
+        Pid.PID.Ki = 1.2 # integral of PID
+        Pid.PID.Kd = 0.0 # rate of change of PID (derivative)
+        Pid.RC_div_DT = 10.0 # time constant, determining how fast you reach settle point
+        ### ^^^ ^^^ ^^^ ###
         pidViewer=udpSendPid.Send
-        PID.addViewer('UDPpid',pidViewer) #'UDP',udpSendPid1.Send)
-        PID.enIO(True) #PID.enOut = True
+        Pid.addViewer('UDPpid',pidViewer) #'UDP',udpSendPid1.Send)
+        Pid.enIO(True) #PID.enOut = True
         ardu.gpio.pinMode(7,0) # Initialize pin to 0
         print 'type PID.start() to start the PID thread process\n'
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
@@ -156,36 +158,28 @@ if __name__ == "__main__":
                                 enable_plot = True, # Enable plotting
                                 output_file ='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
                                 scan_frames = 1, # Number of frames averaged after which measurement resets.
-                                scan_time = 10000, # Integration time in microseconds
-                                treshold = 8000) # Treshold peak intensity above which trigger goes.
+                                scan_time = 100000, # Integration time in microseconds
+                                )
         specViewer=tcpSendSpec
         Spec.addViewer('TCPspec',specViewer)
-        print 'type Spec.start() to start the spectrometer thread process\n'
+        print 'Type Spec.start() to start the spectrometer thread process\n'
     else:
-        Spec=None
+        Spec = None
+
     '''
-    Start spectrometer bridge
+    Use spectrometer signal processing library
+    '''
+    print 'Spectrometer Signal Processing status: %s' %(SPECSP)
+    if SPECSP == True:
+        SpecSP = threadSpec.Processing (treshold = 8000, # Treshold peak intensity above which trigger goes.
+                                        PeakProminence = None,
+                                        PeakWidth = None,
+                                        PeakWlen = None)
+        Spec.SPS = SpecSP
 
-    print 'Spectrometer GUI status: %s' %(SPECGUI)
-    if SPECGUI == True:
-        SpecBridge = __import__('FLAME_bridge') #delete when you place in ArduBridge. For now place thread in folder
-        specGui = SpecBridge.SBGUI(device= 'FLMS04421', # spectrometer serial number FLMS04421. If empty, first available.
-                                      inttime=100000, #integration time in
-                                      autoexposure=False,
-                                      autorepeat=False,
-                                      autosave=True,
-                                      dark_frames=1,
-                                      enable_plot=True,
-                                      output_file='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                                      scan_frames=1,
-                                      scan_time=100000 #integration time in microseconds
-                                      )
-        specGui.start()
-
-        print 'Spectrometer started'
+        print 'Spectrometer signal processing library initiated'
     else:
-        specGUI=None
-    '''
+        SpecSP = None
 
     '''
     Setting up Nemesys syringe pump bridge
