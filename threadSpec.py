@@ -23,7 +23,6 @@ Based on and adapted from SpectrOMat, copyright Tobias Dusa. See:
 
 
 __version__ = "1.0.0"
-
 __author__ = "Kenza Samlali"
 __copyright__ = "Copyright 2020"
 __credits__ = [""]

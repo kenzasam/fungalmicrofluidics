@@ -126,6 +126,7 @@ class Setup():
         else:
             self.PID = PID
             print "ok."
+
     def init_elecs(self,gpio, ExtGpio,chipViewer):
         """
         Initializing electrode sequences.
