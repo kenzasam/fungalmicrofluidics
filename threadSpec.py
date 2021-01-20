@@ -33,7 +33,7 @@ __status__ = "Production"
 
 import math, time
 import sys
-import numpy
+import numpy as np
 import scipy.signal as sps
 from GSOF_ArduBridge import threadBasic as BT
 import seabreeze
@@ -60,7 +60,7 @@ class SBSimulator:
                  integration_time_micros=100000,
                  minimum_integration_time_micros = 8000,
                  wavelengths=list(range(2048)),
-                 generator=numpy.random.normal,
+                 generator=np.random.normal,
                  histogram=True):
         self._integration_time_micros = integration_time_micros
         self.minimum_integration_time_micros = minimum_integration_time_micros
@@ -76,7 +76,7 @@ class SBSimulator:
     def intensities(self):
         time.sleep(self._integration_time_micros / 1000000)
         if self.histogram:
-            return(numpy.histogram(self.generator(size=self.samplesize), bins=self.samplesize)[0])
+            return(np.histogram(self.generator(size=self.samplesize), bins=self.samplesize)[0])
         else:
             return(self.generator(size=self.samplesize))
 
@@ -95,7 +95,6 @@ class Flame(BT.BasicThread):
                 output_file,
                 scan_frames,
                 scan_time,
-                treshold,
                 viewer={}
                 ):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
@@ -109,8 +108,7 @@ class Flame(BT.BasicThread):
                            enable_plot = enable_plot,
                            output_file = output_file,
                            scan_frames = scan_frames,
-                           scan_time = scan_time,
-                           treshold = treshold)
+                           scan_time = scan_time)
         self.spec.integration_time_micros(self.scan_time)
 
     def init_device(self, device=''):
@@ -154,8 +152,7 @@ class Flame(BT.BasicThread):
                        enable_plot,
                        output_file,
                        scan_frames,
-                       scan_time,
-                       treshold
+                       scan_time
                        ):
         """Initialize instance variables"""
         self.autorepeat = autorepeat
@@ -165,7 +162,6 @@ class Flame(BT.BasicThread):
         self.output_file = output_file
         self.scan_frames = scan_frames
         self.scan_time = scan_time
-        self.treshold = treshold
         """Set remaining"""
         self.run_measurement = False
         self.enable = False
@@ -176,7 +172,8 @@ class Flame(BT.BasicThread):
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
         self.data = [0.0]*(len(self.spec.wavelengths()))
-        self.client = False
+        self.client = False # TCP client, the Specplot.py
+        self.SPS = None #Signal processing class instance set from Ardubridge
 
     def start(self):
         """Start the Threading process
@@ -187,16 +184,17 @@ class Flame(BT.BasicThread):
         self.enable=True
         #self.run_measurement = True
         try:
+            print('Listening for client...')
             self.viewer['TCPspec'].tcpTx.listen(5) #stream 5 at a time
-            self.teleUpdate('Listening for client...')
-            while True:
-                self.teleUpdate('Please run spec viewer.')
-                self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
-                self.teleUpdate('Connected and starting thread...')
-                BT.BasicThread.start(self)
-                #play()
+            #while True:
+            print('Please run spec viewer. Accepting connection ...')
+            self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
+            print('Connected and starting thread...')
+            BT.BasicThread.start(self)
+            print('%s: Started ON line'%(self.name))
+            #play()
         except:
-            self.teleUpdate('Something went wrong. Can not connect to client.')
+            print('Something went wrong. Can not connect to client.')
 
     def stop(self):
         """Stop the Threading process
@@ -217,6 +215,7 @@ class Flame(BT.BasicThread):
         #self.run_measurement = True
         self.enable=True
         BT.BasicThread.start(self)
+        print('%s: Started ON line'%(self.name))
 
     def run(self):
         """
@@ -247,7 +246,7 @@ class Flame(BT.BasicThread):
             else:
                 self.lock.release()
         self.enable = False
-        self.teleUpdate('%s: Terminated\n'%(self.name))
+        print('%s: Terminated\n'%(self.name))
 
     def process(self):
         """This is invoked by run() of the Threading class. This process is repeated, with a Period.
@@ -263,15 +262,18 @@ class Flame(BT.BasicThread):
         #peaks, properties = self.peakfinding(self.data)
         #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
+        if self.SPS != None:
+            print('EEEHAFHIAFHIHFV')
+            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':self.SPS.peaks, 'Treshold':self.SPS.treshold}
         """sending data dictionary to client, by TCP"""
-        self.send_df(d,self.client)
+        self.send_df(d, self.client)
         self.measurement += 1
         if ((self.measurement % 100) == 0):
-            print 'O', #py3: print ('O', end='', flush=True)
+            print('O'), #py3: print ('O', end='', flush=True)
         elif (self.measurement % 10) == 0:
-            print 'o', #py3: print('o', end='', flush=True)
+            print('o'), #py3: print('o', end='', flush=True)
         else:
-            print '.',
+            print('.'),
             #py3: print('.', end='', flush=True)
         if (self.scan_frames > 0):
             if self.measurement % self.scan_frames == 0: # all frames are summed
@@ -292,7 +294,7 @@ class Flame(BT.BasicThread):
             #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
             #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
             #self.message.set('Ready.')
-            self.teleUpdate('Ready.')
+            #self.teleUpdate('Ready.')
             self.measurement = 0
         else:
             newData = self.spec.intensities()
@@ -303,11 +305,11 @@ class Flame(BT.BasicThread):
             while count < int(self.dark_frames.get()):
                 newData = list(map(lambda x,y:x+y, self.spectrometer.intensities(), newData))
                 if (count % 100 == 0):
-                    print 'O',
+                    print('O'),
                 elif (count % 10 == 0):
-                    print 'o',
+                    print('o'),
                 else:
-                    print '.',
+                    print('.'),
                 count += 1
                 #self.message.set('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames.get()))
                 #self.root.update()
@@ -323,27 +325,27 @@ class Flame(BT.BasicThread):
         #print 'sending...'
         self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
 
-    def teleUpdate(self, tele):
-            print(str(tele))
+
 class Processing:
     def __init__(self,
-                 treshold):
+                 treshold,
+                 PeakProminence,
+                 PeakWidth,
+                 PeakWlen):
         self.treshold = treshold
         self.peaks= np.array([])
+        self.prom = PeakProminence
+        self.width = PeakWidth
+        self.wlen = PeakWlen
 
     def denoising(self,d):
         return df
 
-    def peakfinding(self,x):
-        HEIGHT = self.treshold
-        PROM = None
-        W = None
-        WLEN = None
-        #-------------------
+    def peakfinding(self, x):
         self.peaks = True
-        peaks, properties = sps.find_peaks(x,
-                                         height = HEIGHT,
-                                         prominence = PROM,
-                                         width = W,
-                                         wlen = WLEN)
+        peaks, properties = sps.find_peaks(x ,
+                                         height = self.treshold,
+                                         prominence = self.prom,
+                                         width = self.width,
+                                         wlen = self.wlen)
         return peaks
