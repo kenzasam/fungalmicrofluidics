@@ -40,9 +40,9 @@ import matplotlib.pyplot as plot
 plot_animation= None
 # TCP client
 import socket
-import tcpControl as server
+import tcpControl as client
 
-class Spectogram(server.tcpControl):
+class Spectogram(client.tcpControl):
     def __init__(self,
                 nameID,
                 DesIP,
@@ -52,10 +52,10 @@ class Spectogram(server.tcpControl):
                 scan_frames,
                 scan_time
                 ):
-        """Initialize TCP server"""
+        """Initialize TCP client"""
         if RxPort > 1:
             print 'Initiating client.'
-            server.tcpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
+            client.tcpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
             print 'Remote-Consol-Active on port %s\n'%(str(RxPort))
         """Initialize instance variables"""
         #self.run_measurement = False
@@ -124,7 +124,7 @@ class Spectogram(server.tcpControl):
            return (self.graph, self.graph2, self.line)
 
     def decodingPayload(self, object):
-        """Object received from Server (tpControl, threadSpec)
+        """Object received from Server (tcpSend, threadSpec)
         In this case, a dictionary d={'Msr':self.measurement,'Dat':self.data}"""
         self.received == True
         #print 'Received.',
@@ -167,8 +167,8 @@ if __name__== "__main__":
     #ag=Spectogram(TCP=udpConsol, enable_plot=True, scan_frames=scan_frames, measurement=measurement, scan_time=scan_time)
     #ag=Spectogram(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=Spectogram.decodingPayload,enable_plot=True, scan_frames=scan_frames, scan_time=scan_time) # , measurement=measurement
 
-    """Start server thread"""
-    server.tcpControl.start(ag)
+    """Start client thread"""
+    client.tcpControl.start(ag)
 
     """Create a FuncAnimation object to make the animation. The arguments are:
            ag.figure: the current active figure

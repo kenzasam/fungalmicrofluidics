@@ -172,7 +172,7 @@ class Flame(BT.BasicThread):
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
         self.data = [0.0]*(len(self.spec.wavelengths()))
-        self.client = False # TCP client, the Specplot.py
+        self.client = None # TCP client, the Specplot.py
         self.SPS = None #Signal processing class instance set from Ardubridge
 
     def start(self):

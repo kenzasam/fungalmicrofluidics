@@ -36,8 +36,6 @@ pause.png, play.png, stop.png: Freepik (CC license)
 # v 3.0.0 - Reorganized code architecture, split up in classes
 #-------------------------------------------------------------------
 """
-
-
 import wx
 import wx.lib.inspection
 import os, sys
@@ -45,7 +43,7 @@ import pyperclip
 import Tkinter, tkFileDialog
 from optparse import OptionParser
 from GSOF_ArduBridge import UDP_Send
-
+import subprocess
 '''
 CODE STRUCTURE
 ------------------
@@ -82,7 +80,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
         '''Create and populate Panel.'''
         #panel = wx.Panel(self)
-        menubar = MenuBar(pumpnrs, udpSend)
+        menubar = MenuBar(pumpnrs, self.tvwr, self.svwr, udpSend)
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteClosePort, menubar.arduItem2)
@@ -109,10 +107,10 @@ class MainFrame(wx.Frame):
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
         #incpanel = IncubationPanel(panel, self.tvwr, udpSend)
-        self.incpanel = IncubationPanel(self, self.tvwr, udpSend)
+        self.incpanel = IncubationPanel(self, udpSend)
         MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
         #sortingpanel = SortingPanel(panel, self.svwr, udpSend)
-        self.sortingpanel = SortingPanel(self, self.svwr, udpSend)
+        self.sortingpanel = SortingPanel(self, udpSend)
         MAINbox.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         self.SetMenuBar(menubar)
         #
@@ -319,10 +317,10 @@ class PumpPanel(wx.Panel):
 
 class OperationsPanel(wx.Panel):
     """Panel class for user set functions for electrode actuation"""
-    def __init__(self,parent, viewer, udpSend):
+    def __init__(self, parent, viewer, udpSend):
         super(OperationsPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
-        self.vwr = viewer
+        self.cvwr = viewer
         """Create and populate main sizer."""
         fnSizer = wx.BoxSizer(wx.VERTICAL)
         #
@@ -352,8 +350,8 @@ class OperationsPanel(wx.Panel):
         #self.SetBackgroundColour('#32a852')
 
     def onVwr(self, event):
-        dir=str(self.vwr)
-        os.system(dir)
+        cmd = [str(self.cvwr)]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onSort(self, event):
         try:
@@ -368,11 +366,10 @@ class OperationsPanel(wx.Panel):
 class IncubationPanel(wx.Panel):
     """Panel class for setting incubation parameters (temperature, time, PID control)
     and imaging pipeline"""
-    def __init__(self, parent, viewer, udpSend):
+    def __init__(self, parent, udpSend):
         super(IncubationPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend = udpSend
-        self.vwr = viewer
         #self.PID_status=PID
         """Create and populate main sizer."""
         incSizer = wx.BoxSizer(wx.VERTICAL)
@@ -446,9 +443,8 @@ class IncubationPanel(wx.Panel):
 
 class SortingPanel(wx.Panel):
     """ Panel class for droplet sorting: starting spectrometer, sorting electrode sequences"""
-    def __init__(self, parent, viewer, udpSend):
+    def __init__(self, parent, udpSend):
         super(SortingPanel, self).__init__(parent)
-        self.vwr = viewer
         self.udpSend=udpSend
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
@@ -472,7 +468,6 @@ class SortingPanel(wx.Panel):
         self.BckgrBtn = wx.Button(self, label='Background', name='Sort()', size=(70,24)) #ADDED KS
         self.BckgrBtn.Bind(wx.EVT_BUTTON, self.onBckgrSpec)
         box1 = wx.BoxSizer(wx.HORIZONTAL)
-        box1.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
         box1.Add(self.BckgrBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         #play, pause, save
@@ -488,6 +483,7 @@ class SortingPanel(wx.Panel):
         #bmp2 = wx.Bitmap('pause.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
         #self.PauseBtn.SetBitmap(bmp2)
         self.SaveBtn.Bind(wx.EVT_BUTTON, self.onSaveSpec)
+        box3 = wx.BoxSizer(wx.HORIZONTAL)
         box3.Add(self.PlayBtn, flag=wx.RIGHT, border=8)
         box3.Add(self.PauseBtn, flag=wx.RIGHT, border=8)
         box3.Add(self.SaveBtn, flag=wx.RIGHT, border=8)
@@ -546,21 +542,18 @@ class SortingPanel(wx.Panel):
         if self.udpSend != False:
             self.udpSend.Send(s)
 
-    def onVwr(self,event):
-        dir=str(self.vwr)
-        os.system(dir)
-
     def onSaveSpec(self,event):
         print('Data Saved')
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
-    def __init__(self, pumpnrs, udpSend):
+    def __init__(self, pumpnrs, tviewer, sviewer, udpSend):
         wx.MenuBar.__init__(self)
-        self.pumpnrs=pumpnrs
-        self.udpSend=udpSend
-        self.PID= False
-
+        self.pumpnrs = pumpnrs
+        self.udpSend = udpSend
+        self.tvwr = tviewer
+        self.svwr = sviewer
+        self.PID = False
         Pumpnrs=list(range(self.pumpnrs))
         fileMenu = wx.Menu()
         self.fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
@@ -670,16 +663,17 @@ class MenuBar(wx.MenuBar):
                 self.udpSend.Send(s)
 
     def onPIDstop(self, event):
-        self.PID=False
+        self.PID = False
         s = 'Pid.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
     def onPIDVwr(self,event):
-        dir=str(self.vwr)
+        cmd = [str(self.tvwr)]
         #dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
-        os.system(dir)
+        #os.system(dir)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         '''
         s = 'setup.PID.plot()'
         pyperclip.copy(s)
@@ -688,14 +682,15 @@ class MenuBar(wx.MenuBar):
         '''
 
     def onStartSpec(self, event):
-        self.Spec=True
+        self.Spec = True
         s = 'Spec.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
-    def onSpecVwr(self,event):
-        print('got it')
+    def onSpecVwr(self, event):
+        cmd = [str(self.tvwr)]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     def fileChooser():
@@ -712,9 +707,9 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='Demoprotocol')
     parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=7010)
     parser.add_option('-i', '--ip', dest='ip', help='Remote ip (UDP client) to send the commands', type='string', default='127.0.0.1')
-    parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='None')
-    parser.add_option('-y', '--tempvwr', dest='tvwr', help='PIDViewer path', type='string', default='None')
-    parser.add_option('-z', '--specvwr', dest='svwr', help='SpecViewer path', type='string', default='None')
+    parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat')
+    parser.add_option('-y', '--tempvwr', dest='tvwr', help='PIDViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat')
+    parser.add_option('-z', '--specvwr', dest='svwr', help='SpecViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxSpecViewer_fungalmicrofluidics.bat')
 
     (options, args) = parser.parse_args()
     path = os.path.split(options.prot)

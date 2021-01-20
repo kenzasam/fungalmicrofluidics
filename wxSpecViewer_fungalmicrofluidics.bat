@@ -1,1 +1,5 @@
-"C:\Python27\python.exe" "E:\KENZA Folder\PYTHON\fungalmicrofluidics\SpecPlot.py"
+@echo off
+set VAR_1=7002
+set VAR_2='127.0.0.1'
+set VAR_3=True
+python .\SpecPlot.py -i %VAR_1% -c %VAR_2% -p %VAR_3% 
