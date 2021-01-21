@@ -263,7 +263,6 @@ class Flame(BT.BasicThread):
         #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         if self.SPS != None:
-            print('EEEHAFHIAFHIHFV')
             d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':self.SPS.peaks, 'Treshold':self.SPS.treshold}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
@@ -333,17 +332,32 @@ class Processing:
                  PeakWidth,
                  PeakWlen):
         self.treshold = treshold
-        self.peaks= np.array([])
+        self.peaks= False #np.array([])
+        self.denoise = False
         self.prom = PeakProminence
         self.width = PeakWidth
         self.wlen = PeakWlen
 
-    def denoising(self,d):
-        return df
+    def denoising(self, type,  y):
+        self.denoise = True
+        if type == BW:
+            # BW, Buterworth filter
+            N  = 3 # Filter polynomial order
+            Wn = 0.1 # Cutoff frequency
+            B, A = sps.butter(N, Wn, output='ba')
+            yf = sps.filtfilt(B, A, y)
+        if type == SG:
+            # SG, Savitzky-Golay filter
+            W = 5 # wl window size
+            P = 3 # Flter polynomial order
+            yf = sps.savgol_filter(y, 51, 3)
+        else:
+            print('Type needs to be BW or SG')
+        return yf
 
-    def peakfinding(self, x):
+    def peakfinding(self, treshold, y):
         self.peaks = True
-        peaks, properties = sps.find_peaks(x ,
+        peaks, properties = sps.find_peaks(y ,
                                          height = self.treshold,
                                          prominence = self.prom,
                                          width = self.width,
