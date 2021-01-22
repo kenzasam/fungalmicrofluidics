@@ -1,24 +1,34 @@
-# Hybrid Microfluidics Software Package
+# Fungal Microfluidics Software Package
+# V 1.1 (Win 7/8/10, Python 2.7)
 # Quick Start Package
 
-*by Kenza Samlali, 2019*
+*by Kenza Samlali, 2021*
 
 ## Contributions and license
 
 This program is released under license GNU GPL v3.
 
 All Python dependencies were written by Guy Soffer (GSOF_ArduBridge).
+
 ArduBridge, protocol file and ChipViewer are part of the [GSOF_ArduBridge package](), and were edited by Kenza Samlali.
+
 GUI was written by Kenza Samlali, inspired by Laura Leclerc's LL_GUI.
-Syringe pump integration was written by Kenza Samlali.
+
+Syringe pump and Spectrometry integration were written by Kenza Samlali.
+
+
+Other dependencies:
+
 Syringe pump python dependencies are not published here, and can be found [here](https://github.com/psyfood/pyqmix), under GPL v3. The Cetoni QmixSDK with Pump DLL library can be acquired through CETONI.
+
+All other dependencies can be installed thorugh pip, see requirements.txt
 
 ## 1. About the content
 
-* ArduBridge.py: The main python file.
-* Protocol.py: User dependent file. This file contains specific sequences of electrode actuation, functions and code that is related to one specific user or chip. It also includes a syringe pump class.
-* wxChipViewer.bat and .cfg: The ChipViewer is a graphical user interface that shows electrode actuation on a map, and allows users to turn single electrodes on and off.
-* Hybrid_GUI: A graphical user interface for operating a single-cell encapsulating hybrid microfluidic device.
+* ArduBridge.py: The main thread python file.
+* Protocol.py: User dependent file. This file contains specific sequences of electrode actuation, functions and code that is related to one specific user or chip.
+* chip.cfg: Chip configuration file indicating the position and wiring of electrodes.
+* GUI: A graphical user interface for operating a single-cell encapsulating hybrid microfluidic device.
 * requirements.txt: All dependencies to be installed with pip
 
 ## 2. User Guide
@@ -46,12 +56,14 @@ All the rest this software does, is giving biologists an easy entry to write scr
 
 ### How or when to edit the software
 
-* **Each time you redesign your chip or experiment:**   
+* **Each time you redesign your chip:**   
 Edit the Protocol file, to include your sequences and functions.   
-Edit the cfg file with your electrode configuration.   
+Edit the cfg file with your electrode configuration.
+
 
 * **Each time you run an experiment:**   
 Edit the ArduBridge file, depending on what hardware and protocol file you intend to use, and whether you want to work in simulation mode or not.  
+Edit the Viewer .bat files, with correct arguments.
 
 ### How to run and use the software
 
