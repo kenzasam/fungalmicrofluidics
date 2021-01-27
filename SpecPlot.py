@@ -16,7 +16,7 @@
 """
 """
 Plotting of incoming data from spectrometer, using matplotlib animation.
-TCP Client.
+Uses TCP Client.
 TCP server (ThreadSpec, TCP_Send) sends data (dataframe) to this client.
 """
 
@@ -37,7 +37,7 @@ import sys
 import numpy as np
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
-plot_animation= None
+plot_animation = None
 # TCP client
 import socket
 import tcpControl as client
@@ -49,9 +49,9 @@ class Spectogram(client.tcpControl):
                 RxPort,
                 callFunc,
                 enable_plot,
-                enable_proc,
-                scan_frames,
-                scan_time
+                enable_proc
+                #scan_frames,
+                #scan_time
                 ):
         """Initialize TCP client"""
         if RxPort > 1:
@@ -63,8 +63,8 @@ class Spectogram(client.tcpControl):
         self.enable_plot = enable_plot
         self.enable_proc = enable_proc
         #self.output_file = output_file
-        self.scan_frames = scan_frames
-        self.scan_time = scan_time
+        #self.scan_frames = scan_frames
+        #self.scan_time = scan_time
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
         #init VARIABLES#
         self.ydata = []
@@ -79,18 +79,27 @@ class Spectogram(client.tcpControl):
     def init_plot(self):
         """Initialize plotting subsystem"""
         # Plot setup
-        self.figure = plot.figure()
-        self.axes = self.figure.gca()
-        #self.graph, = self.axes.plot(self.wavelengths, self.data)
-        self.graph, = self.axes.plot([], [])
-        #if self.enable_proc == True:
-        ax1 = self.figure.add_subplot(1, 2, 1)
-        #self.graph2, = self.axes.plot([], [], 'r')
-        #self.line, = self.axes.plot([], [] ,'r+')
-        #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
+        #self.figure = plot.figure()
+        #self.axes = self.figure.gca()
+        #self.graph, = self.axes.plot([], [])
+        self.figure, (self.ax1, self.ax2) = plot.subplots(2, sharex='col', sharey='row')
+        self.line1, = self.ax1.plot([], [])
+        self.graph = self.line1
+        if self.enable_proc == True:
+            self.line2, = self.ax2.plot([], [], 'r+')
+            #self.graph3 = self.axes[1].plot([], [], 'bo')
+            #self.graph2, = self.axes.plot([], [], 'r')
+            self.line3, = self.ax2.axhline(y=0, xmin=0, xmax=1, linewidth=3, color='r')
+            #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
+            self.graph=[self.line1, self.line2, self.line3]
         self.figure.suptitle('No measurement taken so far.')
-        self.axes.set_xlabel('Wavelengths [nm]')
-        self.axes.set_ylabel('Intensity [count]')
+        for ax in [self.ax1, self.ax2]:
+            ax.set_ylim(0, 10000)
+            ax.set_xlim(0, 1200)
+            #ax.grid()
+        self.ax1.set_xlabel('Wavelengths [nm]')
+        self.ax1.set_ylabel('Intensity [count]')
+        
 
     def animate(self,i): #,frame
        #object=self.TCP.run()#(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload)
@@ -106,14 +115,18 @@ class Spectogram(client.tcpControl):
            self.graph.set_data(self.xdata,self.ydata)
            #return self.init()
        '''
-       if (self.measurement == self.scan_frames) or \
-          (self.enable_plot > 0):
-           title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
-           plot.suptitle(title)
-           self.graph.set_data(self.xdata, self.ydata)
+       if (self.enable_plot > 0): #(self.measurement == self.scan_frames) or \
+           title='%s Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
+           #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
+           self.figure.suptitle(title)
+           #plot.suptitle(title)
+           self.line1.set_data(self.xdata, self.ydata)
+           #self.graph.set_data(self.xdata, self.ydata)
            #self.graph.set_ydata(self.ydata)
            if self.enable_proc == True:
-               #plot peaks
+               #denoised
+               self.line2.set_data(self.xdata2, self.ydata2)
+               #peaks
                """
                ind = [i for i, item in enumerate(self.ydata) if item in self.ydata2]
                peakwvl = [self.xdata[i] for i in ind]
@@ -122,12 +135,11 @@ class Spectogram(client.tcpControl):
                    self.graph2.annotate(str(j),xy=(i,j+0.5))
                print(peakwvl)
                """
-               #plot treshold
-               #self.line.set_data(self.xdata, self.ydata3)
-               self.axes.axhline(y=self.ydata3, xmin=0, xmax=1)
-           self.axes.relim()
-           self.axes.autoscale_view(True, True, True)
-           #return self.graph,
+               #treshold
+               self.line3.set_ydata(self.ydata3)
+           self.ax1.relim()
+           self.ax1.autoscale_view(True, True, True)
+           return self.graph
            #return (self.graph, self.graph2, self.line)
 
     def decodingPayload(self, object):
@@ -165,14 +177,15 @@ if __name__== "__main__":
     parser = OptionParser()
     parser.add_option('-i', '--ip', dest='ip', help='Client IP address', type='string', default=IP)
     parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=CLIENT_PORT)
-    parser.add_option('-t', '--scantime', dest='scantime', help='Integration time of spectrometer. See ArduBridge', type='int', default=SCANTIME)
-    parser.add_option('-f', '--frames', dest='frames', help='Number of scan frames to sum for each experiment. See ArduBridge', type='int', default=SCANFRAMES)
+    #parser.add_option('-t', '--scantime', dest='scantime', help='Integration time of spectrometer. See ArduBridge', type='int', default=SCANTIME)
+    #parser.add_option('-f', '--frames', dest='frames', help='Number of scan frames to sum for each experiment. See ArduBridge', type='int', default=SCANFRAMES)
     parser.add_option('-p', '--plot', dest='plot', help='Enable plotting', type='int', default=PLOT_EN)
     parser.add_option('-s', '--sproc', dest='proc', help='Enable signal processing', type='int', default=PROC_EN)
     (options, args) = parser.parse_args()
 
     """Spectogram class Instance"""
-    ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, enable_proc=options.proc, scan_frames=options.frames, scan_time=options.scantime)
+    ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, enable_proc=options.proc)
+    #ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, enable_proc=options.proc, scan_frames=options.frames, scan_time=options.scantime)
     #ag=Spectogram(TCP=udpConsol, enable_plot=True, scan_frames=scan_frames, measurement=measurement, scan_time=scan_time)
     #ag=Spectogram(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=Spectogram.decodingPayload,enable_plot=True, scan_frames=scan_frames, scan_time=scan_time) # , measurement=measurement
 
