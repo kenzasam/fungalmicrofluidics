@@ -69,7 +69,7 @@ class Spectogram(client.tcpControl):
         #init VARIABLES#
         self.ydata = []
         self.ydata2 = []
-        self.ydata3 = []
+        self.ydata3 = 0 # treshoold. See decoding.
         self.xdata = []
         self.measurement = 0
         ###########
@@ -86,12 +86,12 @@ class Spectogram(client.tcpControl):
         self.line1, = self.ax1.plot([], [])
         self.graph = self.line1
         if self.enable_proc == True:
-            self.line2, = self.ax2.plot([], [], 'r+')
+            self.line2, = self.ax2.plot([], [], 'b')
             #self.graph3 = self.axes[1].plot([], [], 'bo')
             #self.graph2, = self.axes.plot([], [], 'r')
-            self.line3, = self.ax2.axhline(y=self.ydata3, xmin=0, xmax=1, linewidth=3, color='r')
+            self.line3 = self.ax2.axhline(y=self.ydata3, linewidth=3, color='r')
             #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
-            self.graph,= [self.line1, self.line2, self.line3]
+            self.graph= [self.line1, self.line2, self.line3]
         self.figure.suptitle('No measurement taken so far.')
         for ax in [self.ax1, self.ax2]:
             ax.set_ylim(0, 10000)
@@ -125,7 +125,7 @@ class Spectogram(client.tcpControl):
            #self.graph.set_ydata(self.ydata)
            if self.enable_proc == True:
                #denoised
-               self.line2.set_data(self.xdata2, self.ydata2)
+               self.line2.set_data(self.xdata, self.ydata2)
                #peaks
                """
                ind = [i for i, item in enumerate(self.ydata) if item in self.ydata2]
@@ -139,7 +139,7 @@ class Spectogram(client.tcpControl):
                self.line3.set_ydata(self.ydata3)
            self.ax1.relim()
            self.ax1.autoscale_view(True, True, True)
-           return self.graph,
+           return self.graph
            #return (self.graph, self.graph2, self.line)
 
     def decodingPayload(self, object):
@@ -149,12 +149,14 @@ class Spectogram(client.tcpControl):
         #print 'Received.',
         self.measurement=object['Msr']
         #self.scan_frames=object['Fr']
-        self.ydata=object['Dat']
-        self.xdata=object['L']
-        if 'Peaks' in object:
-            self.ydata2=object['Peaks']
+        self.ydata = object['Dat']
+        self.xdata = object['L']
+        #if 'Peaks' in object:
+        #    self.ydata2 = object['Peaks']
         if 'Treshold' in object:
-            self.ydata3=object['Treshold']
+            self.ydata3 = object['Treshold']
+        if 'DatDn' in object:
+            self.ydata2 = object['DatDn']
         #self.peaks=object['Peaks']
         #print 'Msrmt #'
         #print self.measurement

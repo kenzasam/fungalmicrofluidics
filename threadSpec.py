@@ -142,8 +142,6 @@ class Flame(BT.BasicThread):
             else:
                 sys.exit(1)
         print(self.spec)
-        self.wavelengths = self.spec.wavelengths()
-        self.samplesize = len(self.wavelengths)
 
     def init_variables(self,
                        autorepeat,
@@ -171,6 +169,9 @@ class Flame(BT.BasicThread):
         # Initialize variables
         self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
+        self.rawwavelengths = self.spec.wavelengths()[:2]
+        self.wavelengths = self.rawwavelengths[2:]
+        self.samplesize = len(self.wavelengths)
         self.data = [0.0]*(len(self.spec.wavelengths()))
         self.client = None # TCP client, the Specplot.py
         self.SPS = None #Signal processing class instance set from Ardubridge
@@ -256,14 +257,16 @@ class Flame(BT.BasicThread):
         """Read NewData and perform darkness Correction"""
         newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
         if (self.measurement == 0):
-            self.data = newData
+            self.data = newData[2:]
         else:
-            self.data = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
+            sumdata = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
+            self.data = sumdata[2:]
         #peaks, properties = self.peakfinding(self.data)
         #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         if self.SPS != None:
-            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':self.SPS.peaks, 'Treshold':self.SPS.treshold}
+            dndata=self.SPS.denoising(self.data)
+            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':self.SPS.peaks, 'Treshold':self.SPS.treshold , 'DatDn':dndata}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
@@ -330,23 +333,26 @@ class Processing:
                  treshold,
                  PeakProminence,
                  PeakWidth,
-                 PeakWlen):
+                 PeakWlen,
+                 DenoiseType):
         self.treshold = treshold
         self.peaks= False #np.array([])
         self.denoise = False
         self.prom = PeakProminence
         self.width = PeakWidth
         self.wlen = PeakWlen
+        self.type = DenoiseType
+        #self.dndata = []
 
-    def denoising(self, type,  y):
+    def denoising(self, y):
         self.denoise = True
-        if type == BW:
+        if self.type == 'BW':
             # BW, Buterworth filter
             N  = 3 # Filter polynomial order
             Wn = 0.1 # Cutoff frequency
             B, A = sps.butter(N, Wn, output='ba')
             yf = sps.filtfilt(B, A, y)
-        if type == SG:
+        if self.type == 'SG':
             # SG, Savitzky-Golay filter
             W = 5 # wl window size
             P = 3 # Flter polynomial order
