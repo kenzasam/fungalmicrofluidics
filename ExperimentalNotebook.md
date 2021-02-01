@@ -1,3 +1,37 @@
+# Mon, DD YYYY 
+
+**Experiment details**
+**Notes**
+**To Do**
+
+# Jan, 28 2020 
+
+**Experiment details**
+Sorting of water in oil droplets. New elec config, fab on January 24th.
+
+
+**Notes**
+DESIGN 1
+Sine, 10kHz, 400mVpp: Bottom electrode (37) can be left on without problem, turn 38 on when sorting.
+
+Chip1
+sin AkHz B mVpp
+with B range 200mVpp - 800 mVpp
+and A range 2kHz - 15 kHz
+flowrates in ul/s:
+dropgen oil:0.0025
+dropgen h20:0.002
+spacer oil: 0.015
+
+Chip2
+sin 10kHz 500mVpp
+dropgen oil:0.0025
+dropgen h20:0.002
+spacer oil: 0.015
+(bridge)
+**To Do**
+
+
 # Jan, 16 2020
 
 **Experiment details**

@@ -89,9 +89,9 @@ class Spectogram(client.tcpControl):
             self.line2, = self.ax2.plot([], [], 'r+')
             #self.graph3 = self.axes[1].plot([], [], 'bo')
             #self.graph2, = self.axes.plot([], [], 'r')
-            self.line3, = self.ax2.axhline(y=0, xmin=0, xmax=1, linewidth=3, color='r')
+            self.line3, = self.ax2.axhline(y=self.ydata3, xmin=0, xmax=1, linewidth=3, color='r')
             #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
-            self.graph=[self.line1, self.line2, self.line3]
+            self.graph,= [self.line1, self.line2, self.line3]
         self.figure.suptitle('No measurement taken so far.')
         for ax in [self.ax1, self.ax2]:
             ax.set_ylim(0, 10000)
@@ -135,11 +135,11 @@ class Spectogram(client.tcpControl):
                    self.graph2.annotate(str(j),xy=(i,j+0.5))
                print(peakwvl)
                """
-               #treshold
+               #treshold https://www.python-course.eu/matplotlib_subplots.php
                self.line3.set_ydata(self.ydata3)
            self.ax1.relim()
            self.ax1.autoscale_view(True, True, True)
-           return self.graph
+           return self.graph,
            #return (self.graph, self.graph2, self.line)
 
     def decodingPayload(self, object):
@@ -163,7 +163,7 @@ class Spectogram(client.tcpControl):
 if __name__== "__main__":
     #\\\\\\\\\\\\\\\\USER SET VARIABLES\\\\\\\\\\\\\\\\\#
     PLOT_EN = True # Allow plotting
-    PROC_EN = False
+    PROC_EN = True # Allow plotting
     CLIENT_PORT = 7002 # Client port to which udpSend package is sent. See ArduBridge.
     IP = '127.0.0.1' # Client ip adress to which udpSend package is sent. See ArduBridge.
     SCANTIME = 1000 # The integration time in us.
