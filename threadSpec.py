@@ -263,8 +263,6 @@ class Flame(BT.BasicThread):
             self.data = sumdata[2:]
         #peaks, properties = self.peakfinding(self.data)
         #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
-        print 'wvl len %d' %(len(self.wavelengths))
-        print 'data length %d' %(len(self.data))
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         if self.SPS != None:
             #dndata=self.SPS.denoising(self.data)

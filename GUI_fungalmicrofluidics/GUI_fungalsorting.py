@@ -500,6 +500,8 @@ class SortingPanel(wx.Panel):
         self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStart)
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='Treshold Intensity [counts]')
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
+        self.SetSortBtn=wx.Button( self, label='Set', name='Set()', size=(70,24)) #ADDED KS
+        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSet)
         box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         box2.Add(self.entry1, proportion=1, border=8)
         box2.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
@@ -509,11 +511,17 @@ class SortingPanel(wx.Panel):
         #self.SetBackgroundColour('#f2dd88')
 
     def onStart(self, event):
+        s = 'setup.Sorting(%d)'%(t)
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onSet(self, event):
         try:
             t=int(float(self.entry1.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.Sorting(%d)'%(t)
+        s = 'specSP.treshold=(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)

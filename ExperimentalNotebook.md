@@ -1,10 +1,41 @@
 # Mon, DD YYYY 
 
 **Experiment details**
+
 **Notes**
+
 **To Do**
 
-# Jan, 28 2020 
+# Feb, 02 2021
+
+**Experiment details**
+- Probing.
+- Resorufin sorter experiment: resorufin 10ng/L (10x dilutioon from stock) in plastic syringe. 530nm excitation through new 100um fiber. Emission detection with 200um fiber, directly to spec. Python module. 250mVpp.
+
+**Notes**
+- probing
+```python
+import numpy as np
+import pandas as pd
+Probing = {
+    "preampmVpp": [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 900, 1100, 1300, 1600]
+    "Vrms": [17.4, 21.3, 25, 28.7, 32.6, 36.5, 40.3, 44.3, 48.3, 52.1, 56.1, 60.1, 64, 72, 87.5, 103, 124]
+}
+```
+
+- Resorufin sorter
+    - Do NOT use the damn plastic syringe anymore. unreliable florates....
+    - fiber 100um is more stable and does not break. However, with full set up (elecs and all) eaily slides too deep. need to print new holder, once final electrodes have been chosen. Or, just stick with what you got.
+    - Need to make sure the peak detection works, graphs rescale,
+
+**To Do**
+- [ ] redesign holder
+- [ ] new syringe
+- [X] rescaling graph
+- [ ] integration time resetting
+
+
+# Jan, 28 2021 
 
 **Experiment details**
 Sorting of water in oil droplets. New elec config, fab on January 24th.
@@ -32,7 +63,7 @@ spacer oil: 0.015
 **To Do**
 
 
-# Jan, 16 2020
+# Jan, 16 2021
 
 **Experiment details**
 

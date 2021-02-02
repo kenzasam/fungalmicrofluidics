@@ -93,10 +93,12 @@ class Spectogram(client.tcpControl):
             #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
             self.graph= [self.line1, self.line2, self.line3]
         self.figure.suptitle('No measurement taken so far.')
+        '''
         for ax in [self.ax1, self.ax2]:
             ax.set_ylim(0, 10000)
             ax.set_xlim(200, 1000)
             #ax.grid()
+        '''
         self.ax1.set_xlabel('Wavelengths [nm]')
         self.ax1.set_ylabel('Intensity [count]')
         
