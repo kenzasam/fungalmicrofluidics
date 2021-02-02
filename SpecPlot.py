@@ -95,7 +95,7 @@ class Spectogram(client.tcpControl):
         self.figure.suptitle('No measurement taken so far.')
         for ax in [self.ax1, self.ax2]:
             ax.set_ylim(0, 10000)
-            ax.set_xlim(0, 1200)
+            ax.set_xlim(200, 1000)
             #ax.grid()
         self.ax1.set_xlabel('Wavelengths [nm]')
         self.ax1.set_ylabel('Intensity [count]')
@@ -116,7 +116,7 @@ class Spectogram(client.tcpControl):
            #return self.init()
        '''
        if (self.enable_plot > 0): #(self.measurement == self.scan_frames) or \
-           title='%s Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
+           title = '%s Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
            #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
            self.figure.suptitle(title)
            #plot.suptitle(title)
@@ -137,8 +137,11 @@ class Spectogram(client.tcpControl):
                """
                #treshold https://www.python-course.eu/matplotlib_subplots.php
                self.line3.set_ydata(self.ydata3)
-           self.ax1.relim()
-           self.ax1.autoscale_view(True, True, True)
+           for ax in [self.ax1, self.ax2]:
+               ax.relim()
+               ax.autoscale_view(True, True, True)
+           #self.ax1.relim()
+           #self.ax1.autoscale_view(True, True, True)
            return self.graph
            #return (self.graph, self.graph2, self.line)
 

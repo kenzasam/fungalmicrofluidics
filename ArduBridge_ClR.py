@@ -186,9 +186,9 @@ if __name__ == "__main__":
     Setting up Nemesys syringe pump bridge
     '''
     print 'Pumps status: %s' %(PUMPS)
-    if PUMPS==True:
+    if PUMPS == True:
         #Pumpsbridge= __import__('Nemesys_Bridge')  #--> change protocol file if needed
-        Pumps=Pumpsbridge.Nem(
+        Pumps = Pumpsbridge.Nem(
                 deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308", #change path to device configuration folder
                 syringe_diam=[7.29,3.26,3.26,3.26,3.26], #syringe diameter, in mm
                 syringe_stroke=[59,40,40,40,40] #syringe stroke length, in mm
@@ -196,7 +196,7 @@ if __name__ == "__main__":
         #nem=nemesysprot.nemesys(cfg=deviceconfig)
         print 'Syringe pumps ready...'
     else:
-        Pumps=None
+        Pumps = None
 
     '''
     Start printouts

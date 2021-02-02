@@ -167,12 +167,12 @@ class Flame(BT.BasicThread):
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
         #self.total_exposure = int(self.scan_frames) * int(self.scan_time)
         # Initialize variables
-        self.darkness_correction = [0.0]*(len(self.spec.wavelengths()))
         self.measurement = 0
-        self.rawwavelengths = self.spec.wavelengths()[:2]
+        self.rawwavelengths = self.spec.wavelengths()
         self.wavelengths = self.rawwavelengths[2:]
         self.samplesize = len(self.wavelengths)
-        self.data = [0.0]*(len(self.spec.wavelengths()))
+        self.darkness_correction = [0.0]*(len(self.rawwavelengths))
+        self.data = [0.0]*(self.samplesize)
         self.client = None # TCP client, the Specplot.py
         self.SPS = None #Signal processing class instance set from Ardubridge
 
@@ -263,9 +263,12 @@ class Flame(BT.BasicThread):
             self.data = sumdata[2:]
         #peaks, properties = self.peakfinding(self.data)
         #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
+        print 'wvl len %d' %(len(self.wavelengths))
+        print 'data length %d' %(len(self.data))
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         if self.SPS != None:
-            dndata=self.SPS.denoising(self.data)
+            #dndata=self.SPS.denoising(self.data)
+            dndata=self.data
             d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':self.SPS.peaks, 'Treshold':self.SPS.treshold , 'DatDn':dndata}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
@@ -305,7 +308,7 @@ class Flame(BT.BasicThread):
             #self.root.update()
             #print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))
             while count < int(self.dark_frames.get()):
-                newData = list(map(lambda x,y:x+y, self.spectrometer.intensities(), newData))
+                newData = list(map(lambda x,y:x+y, self.spec.intensities(), newData))
                 if (count % 100 == 0):
                     print('O'),
                 elif (count % 10 == 0):
