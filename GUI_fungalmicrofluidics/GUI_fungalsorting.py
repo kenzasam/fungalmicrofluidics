@@ -480,33 +480,43 @@ class SortingPanel(wx.Panel):
         self.PauseBtn.SetBitmap(bmp2)
         self.PauseBtn.Bind(wx.EVT_BUTTON, self.onPauseSpec)
         self.SaveBtn=wx.Button(self, label='Save Data', name='save()')
-        #bmp2 = wx.Bitmap('pause.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
-        #self.PauseBtn.SetBitmap(bmp2)
         self.SaveBtn.Bind(wx.EVT_BUTTON, self.onSaveSpec)
         box3 = wx.BoxSizer(wx.HORIZONTAL)
         box3.Add(self.PlayBtn, flag=wx.RIGHT, border=8)
         box3.Add(self.PauseBtn, flag=wx.RIGHT, border=8)
         box3.Add(self.SaveBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.AddSpacer(5)
+        box2=wx.BoxSizer(wx.HORIZONTAL)
+        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Treshold Intensity [counts]')
+        self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
+        self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(70,24))
+        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetTres)
+        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        box2.Add(self.entry1, proportion=1, border=8)
+        box2.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
+        box4=wx.BoxSizer(wx.HORIZONTAL)
+        self.text2 = wx.StaticText(self,  wx.ID_ANY, label='Integration time [msec]')
+        self.entry2 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
+        self.SetInttBtn = wx.Button( self, label='Set', name='Set()', size=(70,24))
+        self.SetInttBtn.Bind(wx.EVT_BUTTON, self.onSetIntt)
+        box4.Add(self.text2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        box4.Add(self.entry2, proportion=1, border=8)
+        box4.Add(self.SetInttBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.AddSpacer(10)
         #Sort
         titlebox3  = wx.BoxSizer(wx.HORIZONTAL)
         title3 = wx.StaticText(self, label='Sorting')
         title3.SetFont(font2)
         titlebox3.Add(title3, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox3, 0, wx.ALIGN_CENTER_VERTICAL)
-        srtSizer.AddSpacer(5)
-        box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
-        self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStart)
-        self.text1=wx.StaticText(self,  wx.ID_ANY, label='Treshold Intensity [counts]')
-        self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        self.SetSortBtn=wx.Button( self, label='Set', name='Set()', size=(70,24)) #ADDED KS
-        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSet)
-        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        box2.Add(self.entry1, proportion=1, border=8)
-        box2.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
-        srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
-        srtSizer.AddSpacer(10)
+        self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(70,24))
+        self.StartSortBtn.Bind(wx.EVT_BUTTON, self.toggledbutton, self.onStart)
+        box5 = wx.BoxSizer(wx.HORIZONTAL)
+        box5.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box5, flag=wx.ALIGN_CENTER_VERTICAL)
         self.SetSizer(srtSizer)
         #self.SetBackgroundColour('#f2dd88')
 
@@ -515,13 +525,33 @@ class SortingPanel(wx.Panel):
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+            
+    def toggledbutton(self, event):
+        # Active State
+        if self.button.GetValue() == True:
+            self.button.SetLabel('Stop')
+            self.button.SetBackgroundColour(250,128,114)
+        # Inactive State
+        if self.button.GetValue() == False:
+            self.button.SetLabel('Start')
+            self.button.SetBackgroundColour(152,251,152)
 
-    def onSet(self, event):
+    def onSetTres(self, event):
         try:
             t=int(float(self.entry1.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         s = 'specSP.treshold=(%d)'%(t)
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onSetIntt(self, event):
+        try:
+            t=int(float(self.entry2.GetValue()))
+        except:
+            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        s = 'specSP.scan_time=(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
