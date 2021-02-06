@@ -337,13 +337,15 @@ class OperationsPanel(wx.Panel):
         fnSizer.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
         #sorting
         box1=wx.BoxSizer(wx.HORIZONTAL)
-        self.SortBtn=wx.Button( self, label='Sort', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn=wx.Button( self, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
         self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
         box1.Add(self.SortBtn, flag=wx.RIGHT, border=8)
+        '''
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]  ')
         box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box1.Add(self.entry1, proportion=1)
+        '''
         fnSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         fnSizer.AddSpacer(5)
         self.SetSizer(fnSizer)
@@ -354,11 +356,7 @@ class OperationsPanel(wx.Panel):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onSort(self, event):
-        try:
-            t=int(float(self.entry1.GetValue()))
-        except:
-            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.Sorting(%d)'%(t)
+        s = 'setup.sortseq(1)'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -416,7 +414,6 @@ class IncubationPanel(wx.Panel):
         box4.Add(self.ImgBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
         incSizer.AddSpacer(5)
-
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
 
@@ -427,10 +424,11 @@ class IncubationPanel(wx.Panel):
         else:
             try:
                 temp=int(float(self.entry1.GetValue()))
-                t=int(float(self.entry2.GetValue()))
+                time=int(float(self.entry2.GetValue()))
+                RC=0.5
             except:
                 wx.MessageDialog(self, "Enter a valid temperature and time", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-            s = 'setup.incubation(0.5, %d, %d)'%(temp,t)
+            s = 'setup.incubation(%d, %d, %d)'%(RC, temp,time)
             pyperclip.copy(s)
             if self.udpSend != False:
                 self.udpSend.Send(s)

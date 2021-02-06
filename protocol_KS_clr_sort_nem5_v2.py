@@ -152,7 +152,7 @@ class Setup():
         seqCategory = 'Sorting'  #<-- EDIT THIS
         seqName = 'S2'  #<-- EDIT THIS
         seqDesc = ''  #<-- EDIT THIS
-        b=[[42,78,41,100,40,75,39,97,38,72,94,37]]
+        b=[[]]
         seqList = b # <-- Electrodes 1 and 2 actuated at same time. 3 actuated after 1 and 2.
         seqOnTime= 0.7 # <-- How long is the electrode actuated [Sec]
         seqPeriod= 1 # <-- Keep this at least 0.2 seconds above onTime [Sec]
@@ -163,7 +163,7 @@ class Setup():
         seqCategory = 'Sorting'  #<-- EDIT THIS
         seqName = 'S3'  #<-- EDIT THIS
         seqDesc = ''  #<-- EDIT THIS
-        b=[[42,78,41,100,40,75,39,97,38,72,94,37]]
+        b=[[]]
         seqList = b # <-- Electrodes 1 and 2 actuated at same time. 3 actuated after 1 and 2.
         seqOnTime= 0.7 # <-- How long is the electrode actuated [Sec]
         seqPeriod= 1 # <-- Keep this at least 0.2 seconds above onTime [Sec]
@@ -243,50 +243,13 @@ class Setup():
             self.nem.pump_calibration(self.nem.pumpID(i))
             self.nem.pump_aspirate(self.nem.pumpID(i), v)
 
-    ####### droplet generation ###############
-    def DropGen(self,n=1,t=0,pumpID=0):
-        '''
-        # n is amount of repeats (drops)
-        # t is wait time (d*Period, seconds),
-        # flrt is the flowrate
-        # and pumpID is the pump from which dispensing happens
-        if type(t)==float:
-            print "time needs to be an integer"
-            return
-        print "making %d droplets" %(n)
-        print "waiting %d seconds between droplets" %(t)
-        #totalvolume=self.DropletVolume*n #calculate totalvolume loss
-        #print "total volume loss [uL]: " ,totalvolume
-        if self.DropletVolume < 0.0009: #self.dropletvolume you give as par on top
-           DropletVolume=0.0008
-           print "droplet volume is smaller than 0.001. "
-        else:
-           DropletVolume= self.DropletVolume
-        #Calculate the flowrate by which aq flow needs to resuply 1 droplet
-        #  this is the total volume of one drop
-        #  devided by time in sec it takes to make 1 drop
-        droptime = len(self.seq['DropGenL'].elecList) * self.seq['DropGenL'].Period # is an integer
-        print 'time requiered to make 1 drop: %d sec' %(droptime)
-        dropflowrate = DropletVolume / droptime #is a float
-        if dropflowrate < 0.0006:
-            dropflowrate=0.0006
-        #Loop: (resupply one drop with Nem, Actuate and wait) x n times
-        for i in range(n):
-          self.nem.pump_dispense(self.nem.pumpID(pumpID), DropletVolume, dropflowrate) #dispense totalvolume
-          print "resupplying w Nemesys done"
-          DropGenLSeq = self.DropGenLSeq +[110]*t
-          self.seq['DropGenL'].elecList = DropGenLSeq
-          self.seq['DropGenL'].start(1)
-          print "making drop %d" %(i+1)
-          #while bt.BasicThread.isAlive()):
-          time.sleep(droptime)
-        print "....................."
-        '''
-    ####### droplet operations ##############
-    def sort(self,nr):
+
+    ####### sorting ##############
+    def sortseq(self,nr):
         self.seq['S%d'%(nr)].start(1)
         print "....................."
 
+    ####### incubating ##############
     def incubation(self,RC=0.5,T=37,t=30):
     	self.PID.start()
         self.PID.RC_div_DT=RC
