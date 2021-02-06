@@ -511,14 +511,14 @@ class SortingPanel(wx.Panel):
         titlebox3.Add(title3, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox3, 0, wx.ALIGN_CENTER_VERTICAL)
         self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(70,24))
-        self.StartSortBtn.Bind(wx.EVT_BUTTON, self.toggledbutton, self.onStart)
+        self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
         box5 = wx.BoxSizer(wx.HORIZONTAL)
         box5.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box5, flag=wx.ALIGN_CENTER_VERTICAL)
         self.SetSizer(srtSizer)
         #self.SetBackgroundColour('#f2dd88')
 
-    def onStart(self, event):
+    def onStart(self):
         s = 'setup.Sorting(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -527,6 +527,7 @@ class SortingPanel(wx.Panel):
     def toggledbutton(self, event):
         # Active State
         if self.button.GetValue() == True:
+            self.onStart()
             self.button.SetLabel('Stop')
             self.button.SetBackgroundColour(250,128,114)
         # Inactive State
@@ -539,7 +540,7 @@ class SortingPanel(wx.Panel):
             t=int(float(self.entry1.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'specSP.treshold=(%d)'%(t)
+        s = 'specSP.treshold=%d'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -549,7 +550,7 @@ class SortingPanel(wx.Panel):
             t=int(float(self.entry2.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'specSP.scan_time=(%d)'%(t)
+        s = 'specSP.scan_time=%d'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
