@@ -329,13 +329,15 @@ class Flame(BT.BasicThread):
         self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
 
 
-class Processing:
+class Processing(BT.BasicThread):
     def __init__(self,
                  treshold,
                  PeakProminence,
                  PeakWidth,
                  PeakWlen,
                  DenoiseType):
+        BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
+        self.T0 = time.time()
         self.treshold = treshold
         self.peaks= False #np.array([])
         self.denoise = False
@@ -370,3 +372,15 @@ class Processing:
                                          width = self.width,
                                          wlen = self.wlen)
         return peaks
+
+    def start(self):
+        print('Starting thread...')
+        BT.BasicThread.start(self)
+        print('%s: Started ON line'%(self.name))
+
+    def process(self):
+        peakfinding()
+        if peaks > treshold:
+            wait
+            sort
+
