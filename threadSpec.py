@@ -345,6 +345,7 @@ class Processing(BT.BasicThread):
         self.width = PeakWidth
         self.wlen = PeakWlen
         self.type = DenoiseType
+        self.erm = False
         #self.dndata = []
 
     def denoising(self, y):
@@ -364,9 +365,16 @@ class Processing(BT.BasicThread):
             print('Type needs to be BW or SG')
         return yf
 
-    def peakfinding(self, treshold, y):
+    def findallpeaks(self, y):
         self.peaks = True
-        peaks, properties = sps.find_peaks(y ,
+        peaks, properties = sps.find_peaks(y,
+                                         prominence = self.prom,
+                                         width = self.width,
+                                         wlen = self.wlen)
+        return peaks
+    def findpeaks(self, y):
+        self.peaks = True
+        peaks, properties = sps.find_peaks(y,
                                          height = self.treshold,
                                          prominence = self.prom,
                                          width = self.width,
@@ -379,8 +387,16 @@ class Processing(BT.BasicThread):
         print('%s: Started ON line'%(self.name))
 
     def process(self):
-        peakfinding()
-        if peaks > treshold:
-            wait
-            sort
+        self.erm=False
+        peaks = findpeaks(self.data) #data (spectrometer y-axis data, intensities) should be global variable so it's accessible between threads!!
+        if len(peaks) > 0:
+            self.erm=True
+    """
+    def stop():
+    def pause():
+    def play():
+    """
+            
+
+            
 

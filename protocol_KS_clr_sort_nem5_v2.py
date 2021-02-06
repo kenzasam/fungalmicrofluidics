@@ -248,6 +248,7 @@ class Setup():
     def sortseq(self,nr):
         self.seq['S%d'%(nr)].start(1)
         print "....................."
+    
 
     ####### incubating ##############
     def incubation(self,RC=0.5,T=37,t=30):
@@ -259,6 +260,19 @@ class Setup():
         self.PID.stop()
         print "....................."
 
+    def sortingthingy(self):
+        #check if Spec process is running
+
+        wait=20
+        #start SpecSP process
+        self.specsp.start()
+        #check if peak above treshold was detected
+        if specsp.erm == True:
+            time.sleep(wait)
+            print('WE GOT ONE, HURRAY')
+            self.sortseq(1)
+    
+
     def tempfeedbackstream(self,t, T, step=1):
         pad_str = ' ' * len('%d' % step)
         fbT= self.PID.getFeedback()
@@ -267,3 +281,4 @@ class Setup():
             sys.stdout.flush()
             time.sleep(step)
             print 'Done incubating for %d sec at %d C!' % ( t, T)
+    
