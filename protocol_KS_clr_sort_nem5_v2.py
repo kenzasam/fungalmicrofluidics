@@ -71,7 +71,7 @@ class Protocol(bt.BasicThread):
 Start of setup class
 """
 class Setup():
-    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, PID):
+    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, SpecSP, PID):
         '''
         # >>>>>>> SETUP SPECIFIC PARAMETERS BLOCK <<<<<<< #
         deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308" #--> change path to device configuration folder
@@ -82,11 +82,11 @@ class Setup():
         '''
 
         self.init_pumps(Pumps=Pumps)
-        self.init_spec(Spec=Spec)
+        self.init_spec(Spec=Spec, SpecSP=SpecSP)
         self.init_incubation(PID=PID)
         self.init_elecs(gpio=gpio,ExtGpio = ExtGpio, chipViewer = chipViewer)
 
-    def init_spec(self, Spec):
+    def init_spec(self, Spec, SpecSP):
         """
         Initializing spectrometer thread.
         """
@@ -98,6 +98,14 @@ class Setup():
             #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.spec=Spec
+            print "ok."
+
+        if (SpecSP is None):
+            print "Spectrometer signal processing thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol."
+            #sys.exit(1)
+            #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
+        else:
+            self.specsp=SpecSP
             print "ok."
 
     def init_pumps(self, Pumps):
@@ -246,12 +254,17 @@ class Setup():
 
     ####### sorting ##############
     def sortseq(self,nr):
+        '''Function defining a sorting electrode sequence '''
         self.seq['S%d'%(nr)].start(1)
         print "....................."
     
 
     ####### incubating ##############
     def incubation(self,RC=0.5,T=37,t=30):
+        '''Function to start the PID process, set it to a certain temperature,
+         and leave it running for a specific amount of time.
+        Printout of measured temperatures.
+        '''
     	self.PID.start()
         self.PID.RC_div_DT=RC
     	self.PID.ctrl(T)
@@ -261,18 +274,23 @@ class Setup():
         print "....................."
 
     def sortingthingy(self):
+        '''Function to start the spectrometer signal processing class (peak detection)
+        and actuating electrode pattern for sorting, after 'wait' seconds 
+        '''
+        t_wait=200
         #check if Spec process is running
-
-        wait=20
-        #start SpecSP process
-        self.specsp.start()
-        #check if peak above treshold was detected
-        if specsp.erm == True:
-            time.sleep(wait)
-            print('WE GOT ONE, HURRAY')
-            self.sortseq(1)
-    
-
+        if self.spec.SPECstatus == True:
+            #start SpecSP process
+            self.specsp.start()
+            #check if peak above treshold was detected
+            if self.specsp.erm == True:
+                time.sleep(t_wait)
+                print('!!!....Droplet > Treshold intensity detected....!!!')
+                self.sortseq(1)
+        else:
+            print ('Spectrometer thread needs to be started first. Spec.start()')
+            return
+        
     def tempfeedbackstream(self,t, T, step=1):
         pad_str = ' ' * len('%d' % step)
         fbT= self.PID.getFeedback()

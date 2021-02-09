@@ -150,7 +150,7 @@ if __name__ == "__main__":
     if SPEC == True:
         #threadSpec = __import__('threadSpec') # delete when you place in ArduBridge. For now place thread in folder
         Spec = threadSpec.Flame(nameID ='FLAME', # Thread proces name
-                                Period = 0, # Period-time of the control-loop. Defines plotting speed.
+                                Period = 0, # Period-time of the control-loop. Defines plotting speed. 
                                 device = 'FLMS04421', # Spectrometer serial number FLMS04421. If empty, first available.
                                 autorepeat = True, # Auto repeat measurements
                                 autosave = False, # Enable Auto Save
@@ -171,13 +171,15 @@ if __name__ == "__main__":
     '''
     print 'Spectrometer Signal Processing status: %s' %(SPECSP)
     if SPEC and SPECSP == True:
-        SpecSP = threadSpec.Processing (treshold = 8000, # Treshold peak intensity above which trigger goes.
+        SpecSP = threadSpec.Processing (Period = 0 , # Period-time of the control-loop. Defines plotting speed.
+                                        nameID = 'Auto Sort',
+                                        treshold = 8000, # Treshold peak intensity above which trigger goes.
                                         PeakProminence = None,
                                         PeakWidth = None,
                                         PeakWlen = None, 
                                         DenoiseType = 'BW') # BW, Buterworth filter
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
-
+        SpecSP.spec = Spec
         print 'Spectrometer signal processing library initiated. Access by typing "SpecSP."'
     else:
         SpecSP = None
@@ -218,7 +220,7 @@ if __name__ == "__main__":
       print 'status: %s' %(SPEC)
 
     print 'Loading protocol: %s' %(lib)
-    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, PID=PID)
+    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=PID)
 
     #SETUP= False
     #print 'setup wrongsihsoihs'

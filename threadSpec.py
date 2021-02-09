@@ -24,7 +24,7 @@ Based on and adapted from SpectrOMat, copyright Tobias Dusa. See:
 
 __version__ = "1.0.0"
 __author__ = "Kenza Samlali"
-__copyright__ = "Copyright 2020"
+__copyright__ = "Copyright 2019-2020"
 __credits__ = [""]
 __license__ = "GPL-3.0-or-later"
 __maintainer__ = ""
@@ -249,25 +249,36 @@ class Flame(BT.BasicThread):
         self.enable = False
         print('%s: Terminated\n'%(self.name))
 
+    def draft_data(self):
+        with open('YData-20210208-T18h32m07s.dat' , 'r') as f:
+            for line in f:
+                num=line
+        return num
+
     def process(self):
         """This is invoked by run() of the Threading class. This process is repeated, with a Period.
         BT.basicthread overwrite: Spectrometer data reading and sending to client.
         """
         #if self.run_measurement:
         """Read NewData and perform darkness Correction"""
-        newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
-        if (self.measurement == 0):
-            self.data = newData[2:]
+        simul = True
+        if simul == True:
+            self.data = self.draft_data()
+            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         else:
-            sumdata = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
-            self.data = sumdata[2:]
-        #peaks, properties = self.peakfinding(self.data)
-        #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
-        d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
-        if self.SPS != None:
-            #dndata=self.SPS.denoising(self.data)
-            dndata=self.data
-            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':self.SPS.peaks, 'Treshold':self.SPS.treshold , 'DatDn':dndata}
+            newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
+            if (self.measurement == 0):
+                self.data = newData[2:]
+            else:
+                sumdata = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
+                self.data = sumdata[2:]
+            #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
+            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
+            if self.SPS != None:
+                #dndata = self.SPS.denoising(self.data)
+                peaks = self.SPS.findallpeaks(self.data)
+                dndata = self.data
+                d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks, 'Treshold':self.SPS.treshold , 'DatDn':dndata}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
@@ -281,7 +292,7 @@ class Flame(BT.BasicThread):
         if (self.scan_frames > 0):
             if self.measurement % self.scan_frames == 0: # all frames are summed
                 if self.autosave != 0:
-                    #self.save()
+                    self.save()
                     print('Saving failed')
                 self.measurement = 0
                 if self.autorepeat == 0:
@@ -322,6 +333,36 @@ class Flame(BT.BasicThread):
             #self.message.set(str(self.dark_frames.get()) + ' dark frames scanned. Ready.')
             #print(str(self.dark_frames) + ' dark frames scanned. Ready.')
 
+    def save(self):
+        #try:
+        #filename = 'Snapshot-%s.dat' %(time.strftime(self.timestamp, time.gmtime()))
+        filename = time.strftime('Snapshot-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+        with open(filename, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
+            f.write('# FLAME spectrum data format')
+            f.write('\n# Time of snapshot: ' + time.strftime(self.timestamp, time.gmtime()))
+            f.write('\n# Number of frames accumulated: ' + str(self.measurement))
+            f.write('\n# Scan time per exposure [us]: ' + str(self.scan_time))
+            '''
+            if self.have_darkness_correction:
+                f.write('\n# Number of dark frames accumulated: ' + str(self.dark_frames.get()))
+                f.write('\n# Wavelength [nm], dark frame correction data [averaged count]:\n# ')
+                f.write('\n# '.join(map(lambda x,y:str(x)+', '+str(y), self.spec.wavelengths(), self.darkness_correction)))
+                f.write('\n# Wavelength [nm], Intensity [corrected count]:\n')
+            else:
+                f.write('\n# Number of dark frames accumulated: None.')
+                f.write('\n# Wavelength [nm], Intensity [count]:\n')
+            f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), self.spec.wavelengths(), self.data)) + '\n')
+            '''
+            f.write('\n# Wavelength [nm], Intensity [count]:\n')
+            f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), self.wavelengths, self.data)) + '\n')
+            #f.write('\n# Dataframe sent over TCP: ' + d
+        filename2 = time.strftime('YData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+        with open(filename2, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
+            f.write(str(self.data))
+        print('Data saved to ' + filename)
+        #except:
+        #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
+
     def send_df(self,d,c):
         """Function to send data to TCP client
         """
@@ -331,12 +372,14 @@ class Flame(BT.BasicThread):
 
 class Processing(BT.BasicThread):
     def __init__(self,
+                 Period,
+                 nameID,
                  treshold,
                  PeakProminence,
                  PeakWidth,
                  PeakWlen,
                  DenoiseType):
-        BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
+        BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer={})
         self.T0 = time.time()
         self.treshold = treshold
         self.peaks= False #np.array([])
@@ -347,6 +390,7 @@ class Processing(BT.BasicThread):
         self.type = DenoiseType
         self.erm = False
         #self.dndata = []
+        self.spec= None # Instance set by ardubridge
 
     def denoising(self, y):
         self.denoise = True
@@ -367,19 +411,27 @@ class Processing(BT.BasicThread):
 
     def findallpeaks(self, y):
         self.peaks = True
-        peaks, properties = sps.find_peaks(y,
+        arr = np.asarray(y)
+        peaks, properties = sps.find_peaks(arr,
+                                         height = 100,
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
-        return peaks
+        peak_ht = properties['peak_heights']
+        peak_wl = arr[peaks]
+        return peak_wl
+
     def findpeaks(self, y):
         self.peaks = True
-        peaks, properties = sps.find_peaks(y,
+        arr = np.asarray(y)
+        peaks, properties = sps.find_peaks(arr,
                                          height = self.treshold,
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
-        return peaks
+        peak_ht = properties['peak_heights']
+        peak_wl = arr[peaks]
+        return peak_wl
 
     def start(self):
         print('Starting thread...')
@@ -388,7 +440,7 @@ class Processing(BT.BasicThread):
 
     def process(self):
         self.erm=False
-        peaks = findpeaks(self.data) #data (spectrometer y-axis data, intensities) should be global variable so it's accessible between threads!!
+        peaks = findpeaks(self.spec.data) #data (spectrometer y-axis data, intensities) should be global variable so it's accessible between threads!!
         if len(peaks) > 0:
             self.erm=True
     """
