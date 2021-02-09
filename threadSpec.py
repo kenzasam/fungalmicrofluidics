@@ -253,7 +253,8 @@ class Flame(BT.BasicThread):
         with open('YData-20210208-T18h32m07s.dat' , 'r') as f:
             for line in f:
                 num=line
-        return num
+                a = np.fromstring(num[1:-1], sep=',') #, dtype=np.float
+        return a
 
     def process(self):
         """This is invoked by run() of the Threading class. This process is repeated, with a Period.
@@ -261,7 +262,7 @@ class Flame(BT.BasicThread):
         """
         #if self.run_measurement:
         """Read NewData and perform darkness Correction"""
-        simul = True
+        simul = False
         if simul == True:
             self.data = self.draft_data()
             d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
@@ -375,6 +376,7 @@ class Processing(BT.BasicThread):
                  Period,
                  nameID,
                  treshold,
+                 noise,
                  PeakProminence,
                  PeakWidth,
                  PeakWlen,
@@ -384,6 +386,7 @@ class Processing(BT.BasicThread):
         self.treshold = treshold
         self.peaks= False #np.array([])
         self.denoise = False
+        self.noise = noise
         self.prom = PeakProminence
         self.width = PeakWidth
         self.wlen = PeakWlen
@@ -413,25 +416,25 @@ class Processing(BT.BasicThread):
         self.peaks = True
         arr = np.asarray(y)
         peaks, properties = sps.find_peaks(arr,
-                                         height = 100,
+                                         height = self.noise,
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
-        peak_ht = properties['peak_heights']
-        peak_wl = arr[peaks]
-        return peak_wl
+        #peak_ht = properties['peak_heights']
+        peak_int = arr[peaks] #peaks is an index
+        return peak_int
 
     def findpeaks(self, y):
         self.peaks = True
-        arr = np.asarray(y)
+        arr =  np.asarray(y)
         peaks, properties = sps.find_peaks(arr,
                                          height = self.treshold,
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
-        peak_ht = properties['peak_heights']
-        peak_wl = arr[peaks]
-        return peak_wl
+        #peak_ht = properties['peak_heights']
+        peak_int = arr[peaks]
+        return peak_int
 
     def start(self):
         print('Starting thread...')
@@ -440,7 +443,7 @@ class Processing(BT.BasicThread):
 
     def process(self):
         self.erm=False
-        peaks = findpeaks(self.spec.data) #data (spectrometer y-axis data, intensities) should be global variable so it's accessible between threads!!
+        peaks = self.findpeaks(self.spec.data) #data (spectrometer y-axis data, intensities) should be global variable so it's accessible between threads!!
         if len(peaks) > 0:
             self.erm=True
     """

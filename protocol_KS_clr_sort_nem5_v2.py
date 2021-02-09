@@ -273,11 +273,11 @@ class Setup():
         self.PID.stop()
         print "....................."
 
-    def sortingthingy(self):
+    def sortingthingy(self, t):
         '''Function to start the spectrometer signal processing class (peak detection)
         and actuating electrode pattern for sorting, after 'wait' seconds 
         '''
-        t_wait=200
+        t_wait=t #seconds
         #check if Spec process is running
         if self.spec.SPECstatus == True:
             #start SpecSP process

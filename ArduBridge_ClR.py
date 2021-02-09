@@ -174,10 +174,11 @@ if __name__ == "__main__":
         SpecSP = threadSpec.Processing (Period = 0 , # Period-time of the control-loop. Defines plotting speed.
                                         nameID = 'Auto Sort',
                                         treshold = 8000, # Treshold peak intensity above which trigger goes.
+                                        noise = 2500, # background noise level.
                                         PeakProminence = None,
-                                        PeakWidth = None,
+                                        PeakWidth = [10,200], # [min,max] width of the peak in nm
                                         PeakWlen = None, 
-                                        DenoiseType = 'BW') # BW, Buterworth filter
+                                        DenoiseType = 'BW') # BW, Butterworth filter
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
         SpecSP.spec = Spec
         print 'Spectrometer signal processing library initiated. Access by typing "SpecSP."'

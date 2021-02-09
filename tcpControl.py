@@ -89,10 +89,10 @@ class tcpControl():
         """ adjust to https://stackoverflow.com/questions/60417767/tcp-lost-packet-python """
         global HEADERSIZE
         global SIZE
-        #print 'here again'
+        print 'TCP (%s) - receiving...'%(self.nameID)
         while True:
             self.running = True
-            print 'TCP (%s) - receiving...'%(self.nameID)
+            print '.',
             msglen= self.tcpRx.recv(HEADERSIZE).decode('utf-8')
             if len(msglen):
                 msglen=int(msglen)

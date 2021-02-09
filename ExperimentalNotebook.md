@@ -6,6 +6,44 @@
 
 **To Do**
 
+# Feb, 09 2021
+
+**Experiment details**
+Remote experiment with spectrometer. Using saved data from live experiment, to detect peaks. See code below.
+
+**Notes**
+Code that can be used in interactive IDLE, to tune the peak finding function.
+
+```python
+
+Spec.start()
+Spec.pause()
+Spec.autorepeat=False
+
+nnn = Spec.draft_data()
+SpecSP.findallpeaks(nnn)
+
+SpecSP.width=[10,500]
+SpecSP.treshold=8000
+
+nono = SpecSP.findpeaks(nnn)
+nono
+ind = [i for i, item in enumerate(nnn) if item in nono]
+peakwvl = [Spec.wavelengths[i] for i in ind]
+peakwvl
+```
+Tuning went well, detected two peaks, one around 521nm (15500 intensity), one at 591nm (9000 intensity) with above settings. Shouldn't that be 230nm though?
+
+Implemented the code for this in ThreadSpec.py and Specplot.py. Peak detection works, Plotting does not work.
+
+**To Do**
+- [] test elec sequence through GUI
+- [] change period and ontime of elec sequence, tune. GUI?
+- [] test GUI
+- [] test autonomous sorting thread
+- [] plot peaks and annotate with wavelength
+- [] denoised spectrum
+
 # Feb, 02 2021
 
 **Experiment details**
@@ -38,7 +76,7 @@ plt.show()
 
 **To Do**
 - [ ] redesign holder
-- [ ] new syringe
+- [x] new syringe
 - [X] rescaling graph
 - [ ] integration time resetting
 
@@ -86,7 +124,7 @@ Operating flame with ArduBridge lib threadSpec and specplot.
 - final flowrates: : 0.001uL/s and oil 0.005uL/s
 
 **To Do**
-- send from Threadspec the int time to Specplot, whenever it is changed
-- call Thorlabs, figure out the right fibers for filter setup.
-- new bridge, flat cut
+- [] send from Threadspec the int time to Specplot, whenever it is changed
+- [x] call Thorlabs, figure out the right fibers for filter setup.
+- [] new bridge, flat cut
 Xled is 565nm, grenn: 590nm and 530nm.... Look for new led module
