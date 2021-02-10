@@ -262,24 +262,27 @@ class Flame(BT.BasicThread):
         """
         #if self.run_measurement:
         """Read NewData and perform darkness Correction"""
+        '''
+        #couple of lines to test experimental data
         simul = False
         if simul == True:
             self.data = self.draft_data()
             d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         else:
-            newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
-            if (self.measurement == 0):
-                self.data = newData[2:]
-            else:
-                sumdata = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
-                self.data = sumdata[2:]
-            #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
-            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
-            if self.SPS != None:
-                #dndata = self.SPS.denoising(self.data)
-                peaks = self.SPS.findallpeaks(self.data)
-                dndata = self.data
-                d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks, 'Treshold':self.SPS.treshold , 'DatDn':dndata}
+        '''
+        newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
+        if (self.measurement == 0):
+            self.data = newData[2:]
+        else:
+            sumdata = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
+            self.data = sumdata[2:]
+        #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
+        d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
+        if self.SPS != None:
+            #dndata = self.SPS.denoising(self.data)
+            peaks = self.SPS.findallpeaks(self.data)
+            dndata = self.data
+            d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks, 'Treshold':self.SPS.treshold , 'DatDn':dndata}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
