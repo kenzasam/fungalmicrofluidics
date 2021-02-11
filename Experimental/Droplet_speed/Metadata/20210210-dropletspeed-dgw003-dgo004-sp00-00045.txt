@@ -1,0 +1,926 @@
+Key	Value
+ BitsPerPixel	16
+ DimensionOrder	XYCZT
+ IsInterleaved	false
+ IsRGB	false
+ LittleEndian	true
+ PixelType	uint16
+ Series 0 Name	20210210-dropletspeed-dgw003-dgo004-sp00-00041.cxd
+ SizeC	1
+ SizeT	60
+ SizeX	2048
+ SizeY	2048
+ SizeZ	1
+Binning	1
+Bit Depth	16-Bit
+Camera Name	C11440-42U S/N: 102024
+Camera Size	2048x2048
+Camera Type	D_CAM
+Capture Region	(X0=0, Y0=0, Width=2048, Height=2048)
+Field 1 Binning	1.0
+Field 1 Capture_Depth	16.0
+Field 1 Image_Depth	16.0
+Field 1 Image_Height	2048.0
+Field 1 Image_Width	2048.0
+Field 1 Time_From_Last	0.0
+Field 1 Time_From_Start	0.0
+Field 1 i_Image1 Binning	1.0
+Field 1 i_Image1 Capture_Depth	16.0
+Field 1 i_Image1 Image_Depth	16.0
+Field 1 i_Image1 Image_Exposure1	0.003021
+Field 1 i_Image1 Image_Height	2048.0
+Field 1 i_Image1 Image_Width	2048.0
+Field 1 i_Image1 Image_eCoeff1	0.48
+Field 1 i_Image1 Image_eOffset1	100.0
+Field 10 Binning	1.0
+Field 10 Capture_Depth	16.0
+Field 10 Image_Depth	16.0
+Field 10 Image_Height	2048.0
+Field 10 Image_Width	2048.0
+Field 10 Time_From_Last	0.03332600000000002
+Field 10 Time_From_Start	0.299931
+Field 10 i_Image1 Binning	1.0
+Field 10 i_Image1 Capture_Depth	16.0
+Field 10 i_Image1 Image_Depth	16.0
+Field 10 i_Image1 Image_Exposure1	0.003021
+Field 10 i_Image1 Image_Height	2048.0
+Field 10 i_Image1 Image_Width	2048.0
+Field 10 i_Image1 Image_eCoeff1	0.48
+Field 10 i_Image1 Image_eOffset1	100.0
+Field 11 Binning	1.0
+Field 11 Capture_Depth	16.0
+Field 11 Image_Depth	16.0
+Field 11 Image_Height	2048.0
+Field 11 Image_Width	2048.0
+Field 11 Time_From_Last	0.03332599999999997
+Field 11 Time_From_Start	0.33325699999999997
+Field 11 i_Image1 Binning	1.0
+Field 11 i_Image1 Capture_Depth	16.0
+Field 11 i_Image1 Image_Depth	16.0
+Field 11 i_Image1 Image_Exposure1	0.003021
+Field 11 i_Image1 Image_Height	2048.0
+Field 11 i_Image1 Image_Width	2048.0
+Field 11 i_Image1 Image_eCoeff1	0.48
+Field 11 i_Image1 Image_eOffset1	100.0
+Field 12 Binning	1.0
+Field 12 Capture_Depth	16.0
+Field 12 Image_Depth	16.0
+Field 12 Image_Height	2048.0
+Field 12 Image_Width	2048.0
+Field 12 Time_From_Last	0.03332600000000002
+Field 12 Time_From_Start	0.366583
+Field 12 i_Image1 Binning	1.0
+Field 12 i_Image1 Capture_Depth	16.0
+Field 12 i_Image1 Image_Depth	16.0
+Field 12 i_Image1 Image_Exposure1	0.003021
+Field 12 i_Image1 Image_Height	2048.0
+Field 12 i_Image1 Image_Width	2048.0
+Field 12 i_Image1 Image_eCoeff1	0.48
+Field 12 i_Image1 Image_eOffset1	100.0
+Field 13 Binning	1.0
+Field 13 Capture_Depth	16.0
+Field 13 Image_Depth	16.0
+Field 13 Image_Height	2048.0
+Field 13 Image_Width	2048.0
+Field 13 Time_From_Last	0.03332500000000005
+Field 13 Time_From_Start	0.39990800000000004
+Field 13 i_Image1 Binning	1.0
+Field 13 i_Image1 Capture_Depth	16.0
+Field 13 i_Image1 Image_Depth	16.0
+Field 13 i_Image1 Image_Exposure1	0.003021
+Field 13 i_Image1 Image_Height	2048.0
+Field 13 i_Image1 Image_Width	2048.0
+Field 13 i_Image1 Image_eCoeff1	0.48
+Field 13 i_Image1 Image_eOffset1	100.0
+Field 14 Binning	1.0
+Field 14 Capture_Depth	16.0
+Field 14 Image_Depth	16.0
+Field 14 Image_Height	2048.0
+Field 14 Image_Width	2048.0
+Field 14 Time_From_Last	0.03332599999999997
+Field 14 Time_From_Start	0.433234
+Field 14 i_Image1 Binning	1.0
+Field 14 i_Image1 Capture_Depth	16.0
+Field 14 i_Image1 Image_Depth	16.0
+Field 14 i_Image1 Image_Exposure1	0.003021
+Field 14 i_Image1 Image_Height	2048.0
+Field 14 i_Image1 Image_Width	2048.0
+Field 14 i_Image1 Image_eCoeff1	0.48
+Field 14 i_Image1 Image_eOffset1	100.0
+Field 15 Binning	1.0
+Field 15 Capture_Depth	16.0
+Field 15 Image_Depth	16.0
+Field 15 Image_Height	2048.0
+Field 15 Image_Width	2048.0
+Field 15 Time_From_Last	0.03332599999999997
+Field 15 Time_From_Start	0.46656
+Field 15 i_Image1 Binning	1.0
+Field 15 i_Image1 Capture_Depth	16.0
+Field 15 i_Image1 Image_Depth	16.0
+Field 15 i_Image1 Image_Exposure1	0.003021
+Field 15 i_Image1 Image_Height	2048.0
+Field 15 i_Image1 Image_Width	2048.0
+Field 15 i_Image1 Image_eCoeff1	0.48
+Field 15 i_Image1 Image_eOffset1	100.0
+Field 16 Binning	1.0
+Field 16 Capture_Depth	16.0
+Field 16 Image_Depth	16.0
+Field 16 Image_Height	2048.0
+Field 16 Image_Width	2048.0
+Field 16 Time_From_Last	0.03332500000000005
+Field 16 Time_From_Start	0.499885
+Field 16 i_Image1 Binning	1.0
+Field 16 i_Image1 Capture_Depth	16.0
+Field 16 i_Image1 Image_Depth	16.0
+Field 16 i_Image1 Image_Exposure1	0.003021
+Field 16 i_Image1 Image_Height	2048.0
+Field 16 i_Image1 Image_Width	2048.0
+Field 16 i_Image1 Image_eCoeff1	0.48
+Field 16 i_Image1 Image_eOffset1	100.0
+Field 17 Binning	1.0
+Field 17 Capture_Depth	16.0
+Field 17 Image_Depth	16.0
+Field 17 Image_Height	2048.0
+Field 17 Image_Width	2048.0
+Field 17 Time_From_Last	0.03332600000000008
+Field 17 Time_From_Start	0.5332110000000001
+Field 17 i_Image1 Binning	1.0
+Field 17 i_Image1 Capture_Depth	16.0
+Field 17 i_Image1 Image_Depth	16.0
+Field 17 i_Image1 Image_Exposure1	0.003021
+Field 17 i_Image1 Image_Height	2048.0
+Field 17 i_Image1 Image_Width	2048.0
+Field 17 i_Image1 Image_eCoeff1	0.48
+Field 17 i_Image1 Image_eOffset1	100.0
+Field 18 Binning	1.0
+Field 18 Capture_Depth	16.0
+Field 18 Image_Depth	16.0
+Field 18 Image_Height	2048.0
+Field 18 Image_Width	2048.0
+Field 18 Time_From_Last	0.03332599999999997
+Field 18 Time_From_Start	0.5665370000000001
+Field 18 i_Image1 Binning	1.0
+Field 18 i_Image1 Capture_Depth	16.0
+Field 18 i_Image1 Image_Depth	16.0
+Field 18 i_Image1 Image_Exposure1	0.003021
+Field 18 i_Image1 Image_Height	2048.0
+Field 18 i_Image1 Image_Width	2048.0
+Field 18 i_Image1 Image_eCoeff1	0.48
+Field 18 i_Image1 Image_eOffset1	100.0
+Field 19 Binning	1.0
+Field 19 Capture_Depth	16.0
+Field 19 Image_Depth	16.0
+Field 19 Image_Height	2048.0
+Field 19 Image_Width	2048.0
+Field 19 Time_From_Last	0.03332599999999997
+Field 19 Time_From_Start	0.599863
+Field 19 i_Image1 Binning	1.0
+Field 19 i_Image1 Capture_Depth	16.0
+Field 19 i_Image1 Image_Depth	16.0
+Field 19 i_Image1 Image_Exposure1	0.003021
+Field 19 i_Image1 Image_Height	2048.0
+Field 19 i_Image1 Image_Width	2048.0
+Field 19 i_Image1 Image_eCoeff1	0.48
+Field 19 i_Image1 Image_eOffset1	100.0
+Field 2 Binning	1.0
+Field 2 Capture_Depth	16.0
+Field 2 Image_Depth	16.0
+Field 2 Image_Height	2048.0
+Field 2 Image_Width	2048.0
+Field 2 Time_From_Last	0.033325
+Field 2 Time_From_Start	0.033325
+Field 2 i_Image1 Binning	1.0
+Field 2 i_Image1 Capture_Depth	16.0
+Field 2 i_Image1 Image_Depth	16.0
+Field 2 i_Image1 Image_Exposure1	0.003021
+Field 2 i_Image1 Image_Height	2048.0
+Field 2 i_Image1 Image_Width	2048.0
+Field 2 i_Image1 Image_eCoeff1	0.48
+Field 2 i_Image1 Image_eOffset1	100.0
+Field 20 Binning	1.0
+Field 20 Capture_Depth	16.0
+Field 20 Image_Depth	16.0
+Field 20 Image_Height	2048.0
+Field 20 Image_Width	2048.0
+Field 20 Time_From_Last	0.03332500000000005
+Field 20 Time_From_Start	0.6331880000000001
+Field 20 i_Image1 Binning	1.0
+Field 20 i_Image1 Capture_Depth	16.0
+Field 20 i_Image1 Image_Depth	16.0
+Field 20 i_Image1 Image_Exposure1	0.003021
+Field 20 i_Image1 Image_Height	2048.0
+Field 20 i_Image1 Image_Width	2048.0
+Field 20 i_Image1 Image_eCoeff1	0.48
+Field 20 i_Image1 Image_eOffset1	100.0
+Field 21 Binning	1.0
+Field 21 Capture_Depth	16.0
+Field 21 Image_Depth	16.0
+Field 21 Image_Height	2048.0
+Field 21 Image_Width	2048.0
+Field 21 Time_From_Last	0.03332599999999997
+Field 21 Time_From_Start	0.666514
+Field 21 i_Image1 Binning	1.0
+Field 21 i_Image1 Capture_Depth	16.0
+Field 21 i_Image1 Image_Depth	16.0
+Field 21 i_Image1 Image_Exposure1	0.003021
+Field 21 i_Image1 Image_Height	2048.0
+Field 21 i_Image1 Image_Width	2048.0
+Field 21 i_Image1 Image_eCoeff1	0.48
+Field 21 i_Image1 Image_eOffset1	100.0
+Field 22 Binning	1.0
+Field 22 Capture_Depth	16.0
+Field 22 Image_Depth	16.0
+Field 22 Image_Height	2048.0
+Field 22 Image_Width	2048.0
+Field 22 Time_From_Last	0.03332599999999997
+Field 22 Time_From_Start	0.69984
+Field 22 i_Image1 Binning	1.0
+Field 22 i_Image1 Capture_Depth	16.0
+Field 22 i_Image1 Image_Depth	16.0
+Field 22 i_Image1 Image_Exposure1	0.003021
+Field 22 i_Image1 Image_Height	2048.0
+Field 22 i_Image1 Image_Width	2048.0
+Field 22 i_Image1 Image_eCoeff1	0.48
+Field 22 i_Image1 Image_eOffset1	100.0
+Field 23 Binning	1.0
+Field 23 Capture_Depth	16.0
+Field 23 Image_Depth	16.0
+Field 23 Image_Height	2048.0
+Field 23 Image_Width	2048.0
+Field 23 Time_From_Last	0.03332500000000005
+Field 23 Time_From_Start	0.7331650000000001
+Field 23 i_Image1 Binning	1.0
+Field 23 i_Image1 Capture_Depth	16.0
+Field 23 i_Image1 Image_Depth	16.0
+Field 23 i_Image1 Image_Exposure1	0.003021
+Field 23 i_Image1 Image_Height	2048.0
+Field 23 i_Image1 Image_Width	2048.0
+Field 23 i_Image1 Image_eCoeff1	0.48
+Field 23 i_Image1 Image_eOffset1	100.0
+Field 24 Binning	1.0
+Field 24 Capture_Depth	16.0
+Field 24 Image_Depth	16.0
+Field 24 Image_Height	2048.0
+Field 24 Image_Width	2048.0
+Field 24 Time_From_Last	0.03332599999999997
+Field 24 Time_From_Start	0.766491
+Field 24 i_Image1 Binning	1.0
+Field 24 i_Image1 Capture_Depth	16.0
+Field 24 i_Image1 Image_Depth	16.0
+Field 24 i_Image1 Image_Exposure1	0.003021
+Field 24 i_Image1 Image_Height	2048.0
+Field 24 i_Image1 Image_Width	2048.0
+Field 24 i_Image1 Image_eCoeff1	0.48
+Field 24 i_Image1 Image_eOffset1	100.0
+Field 25 Binning	1.0
+Field 25 Capture_Depth	16.0
+Field 25 Image_Depth	16.0
+Field 25 Image_Height	2048.0
+Field 25 Image_Width	2048.0
+Field 25 Time_From_Last	0.03332599999999997
+Field 25 Time_From_Start	0.799817
+Field 25 i_Image1 Binning	1.0
+Field 25 i_Image1 Capture_Depth	16.0
+Field 25 i_Image1 Image_Depth	16.0
+Field 25 i_Image1 Image_Exposure1	0.003021
+Field 25 i_Image1 Image_Height	2048.0
+Field 25 i_Image1 Image_Width	2048.0
+Field 25 i_Image1 Image_eCoeff1	0.48
+Field 25 i_Image1 Image_eOffset1	100.0
+Field 26 Binning	1.0
+Field 26 Capture_Depth	16.0
+Field 26 Image_Depth	16.0
+Field 26 Image_Height	2048.0
+Field 26 Image_Width	2048.0
+Field 26 Time_From_Last	0.03332599999999997
+Field 26 Time_From_Start	0.833143
+Field 26 i_Image1 Binning	1.0
+Field 26 i_Image1 Capture_Depth	16.0
+Field 26 i_Image1 Image_Depth	16.0
+Field 26 i_Image1 Image_Exposure1	0.003021
+Field 26 i_Image1 Image_Height	2048.0
+Field 26 i_Image1 Image_Width	2048.0
+Field 26 i_Image1 Image_eCoeff1	0.48
+Field 26 i_Image1 Image_eOffset1	100.0
+Field 27 Binning	1.0
+Field 27 Capture_Depth	16.0
+Field 27 Image_Depth	16.0
+Field 27 Image_Height	2048.0
+Field 27 Image_Width	2048.0
+Field 27 Time_From_Last	0.03332500000000005
+Field 27 Time_From_Start	0.866468
+Field 27 i_Image1 Binning	1.0
+Field 27 i_Image1 Capture_Depth	16.0
+Field 27 i_Image1 Image_Depth	16.0
+Field 27 i_Image1 Image_Exposure1	0.003021
+Field 27 i_Image1 Image_Height	2048.0
+Field 27 i_Image1 Image_Width	2048.0
+Field 27 i_Image1 Image_eCoeff1	0.48
+Field 27 i_Image1 Image_eOffset1	100.0
+Field 28 Binning	1.0
+Field 28 Capture_Depth	16.0
+Field 28 Image_Depth	16.0
+Field 28 Image_Height	2048.0
+Field 28 Image_Width	2048.0
+Field 28 Time_From_Last	0.03332599999999997
+Field 28 Time_From_Start	0.899794
+Field 28 i_Image1 Binning	1.0
+Field 28 i_Image1 Capture_Depth	16.0
+Field 28 i_Image1 Image_Depth	16.0
+Field 28 i_Image1 Image_Exposure1	0.003021
+Field 28 i_Image1 Image_Height	2048.0
+Field 28 i_Image1 Image_Width	2048.0
+Field 28 i_Image1 Image_eCoeff1	0.48
+Field 28 i_Image1 Image_eOffset1	100.0
+Field 29 Binning	1.0
+Field 29 Capture_Depth	16.0
+Field 29 Image_Depth	16.0
+Field 29 Image_Height	2048.0
+Field 29 Image_Width	2048.0
+Field 29 Time_From_Last	0.03332599999999997
+Field 29 Time_From_Start	0.93312
+Field 29 i_Image1 Binning	1.0
+Field 29 i_Image1 Capture_Depth	16.0
+Field 29 i_Image1 Image_Depth	16.0
+Field 29 i_Image1 Image_Exposure1	0.003021
+Field 29 i_Image1 Image_Height	2048.0
+Field 29 i_Image1 Image_Width	2048.0
+Field 29 i_Image1 Image_eCoeff1	0.48
+Field 29 i_Image1 Image_eOffset1	100.0
+Field 3 Binning	1.0
+Field 3 Capture_Depth	16.0
+Field 3 Image_Depth	16.0
+Field 3 Image_Height	2048.0
+Field 3 Image_Width	2048.0
+Field 3 Time_From_Last	0.033326
+Field 3 Time_From_Start	0.066651
+Field 3 i_Image1 Binning	1.0
+Field 3 i_Image1 Capture_Depth	16.0
+Field 3 i_Image1 Image_Depth	16.0
+Field 3 i_Image1 Image_Exposure1	0.003021
+Field 3 i_Image1 Image_Height	2048.0
+Field 3 i_Image1 Image_Width	2048.0
+Field 3 i_Image1 Image_eCoeff1	0.48
+Field 3 i_Image1 Image_eOffset1	100.0
+Field 30 Binning	1.0
+Field 30 Capture_Depth	16.0
+Field 30 Image_Depth	16.0
+Field 30 Image_Height	2048.0
+Field 30 Image_Width	2048.0
+Field 30 Time_From_Last	0.03332500000000005
+Field 30 Time_From_Start	0.966445
+Field 30 i_Image1 Binning	1.0
+Field 30 i_Image1 Capture_Depth	16.0
+Field 30 i_Image1 Image_Depth	16.0
+Field 30 i_Image1 Image_Exposure1	0.003021
+Field 30 i_Image1 Image_Height	2048.0
+Field 30 i_Image1 Image_Width	2048.0
+Field 30 i_Image1 Image_eCoeff1	0.48
+Field 30 i_Image1 Image_eOffset1	100.0
+Field 31 Binning	1.0
+Field 31 Capture_Depth	16.0
+Field 31 Image_Depth	16.0
+Field 31 Image_Height	2048.0
+Field 31 Image_Width	2048.0
+Field 31 Time_From_Last	0.03332599999999997
+Field 31 Time_From_Start	0.999771
+Field 31 i_Image1 Binning	1.0
+Field 31 i_Image1 Capture_Depth	16.0
+Field 31 i_Image1 Image_Depth	16.0
+Field 31 i_Image1 Image_Exposure1	0.003021
+Field 31 i_Image1 Image_Height	2048.0
+Field 31 i_Image1 Image_Width	2048.0
+Field 31 i_Image1 Image_eCoeff1	0.48
+Field 31 i_Image1 Image_eOffset1	100.0
+Field 32 Binning	1.0
+Field 32 Capture_Depth	16.0
+Field 32 Image_Depth	16.0
+Field 32 Image_Height	2048.0
+Field 32 Image_Width	2048.0
+Field 32 Time_From_Last	0.03332599999999997
+Field 32 Time_From_Start	1.033097
+Field 32 i_Image1 Binning	1.0
+Field 32 i_Image1 Capture_Depth	16.0
+Field 32 i_Image1 Image_Depth	16.0
+Field 32 i_Image1 Image_Exposure1	0.003021
+Field 32 i_Image1 Image_Height	2048.0
+Field 32 i_Image1 Image_Width	2048.0
+Field 32 i_Image1 Image_eCoeff1	0.48
+Field 32 i_Image1 Image_eOffset1	100.0
+Field 33 Binning	1.0
+Field 33 Capture_Depth	16.0
+Field 33 Image_Depth	16.0
+Field 33 Image_Height	2048.0
+Field 33 Image_Width	2048.0
+Field 33 Time_From_Last	0.03332599999999997
+Field 33 Time_From_Start	1.066423
+Field 33 i_Image1 Binning	1.0
+Field 33 i_Image1 Capture_Depth	16.0
+Field 33 i_Image1 Image_Depth	16.0
+Field 33 i_Image1 Image_Exposure1	0.003021
+Field 33 i_Image1 Image_Height	2048.0
+Field 33 i_Image1 Image_Width	2048.0
+Field 33 i_Image1 Image_eCoeff1	0.48
+Field 33 i_Image1 Image_eOffset1	100.0
+Field 34 Binning	1.0
+Field 34 Capture_Depth	16.0
+Field 34 Image_Depth	16.0
+Field 34 Image_Height	2048.0
+Field 34 Image_Width	2048.0
+Field 34 Time_From_Last	0.03332500000000005
+Field 34 Time_From_Start	1.099748
+Field 34 i_Image1 Binning	1.0
+Field 34 i_Image1 Capture_Depth	16.0
+Field 34 i_Image1 Image_Depth	16.0
+Field 34 i_Image1 Image_Exposure1	0.003021
+Field 34 i_Image1 Image_Height	2048.0
+Field 34 i_Image1 Image_Width	2048.0
+Field 34 i_Image1 Image_eCoeff1	0.48
+Field 34 i_Image1 Image_eOffset1	100.0
+Field 35 Binning	1.0
+Field 35 Capture_Depth	16.0
+Field 35 Image_Depth	16.0
+Field 35 Image_Height	2048.0
+Field 35 Image_Width	2048.0
+Field 35 Time_From_Last	0.03332599999999997
+Field 35 Time_From_Start	1.133074
+Field 35 i_Image1 Binning	1.0
+Field 35 i_Image1 Capture_Depth	16.0
+Field 35 i_Image1 Image_Depth	16.0
+Field 35 i_Image1 Image_Exposure1	0.003021
+Field 35 i_Image1 Image_Height	2048.0
+Field 35 i_Image1 Image_Width	2048.0
+Field 35 i_Image1 Image_eCoeff1	0.48
+Field 35 i_Image1 Image_eOffset1	100.0
+Field 36 Binning	1.0
+Field 36 Capture_Depth	16.0
+Field 36 Image_Depth	16.0
+Field 36 Image_Height	2048.0
+Field 36 Image_Width	2048.0
+Field 36 Time_From_Last	0.03332599999999997
+Field 36 Time_From_Start	1.1663999999999999
+Field 36 i_Image1 Binning	1.0
+Field 36 i_Image1 Capture_Depth	16.0
+Field 36 i_Image1 Image_Depth	16.0
+Field 36 i_Image1 Image_Exposure1	0.003021
+Field 36 i_Image1 Image_Height	2048.0
+Field 36 i_Image1 Image_Width	2048.0
+Field 36 i_Image1 Image_eCoeff1	0.48
+Field 36 i_Image1 Image_eOffset1	100.0
+Field 37 Binning	1.0
+Field 37 Capture_Depth	16.0
+Field 37 Image_Depth	16.0
+Field 37 Image_Height	2048.0
+Field 37 Image_Width	2048.0
+Field 37 Time_From_Last	0.03332500000000005
+Field 37 Time_From_Start	1.199725
+Field 37 i_Image1 Binning	1.0
+Field 37 i_Image1 Capture_Depth	16.0
+Field 37 i_Image1 Image_Depth	16.0
+Field 37 i_Image1 Image_Exposure1	0.003021
+Field 37 i_Image1 Image_Height	2048.0
+Field 37 i_Image1 Image_Width	2048.0
+Field 37 i_Image1 Image_eCoeff1	0.48
+Field 37 i_Image1 Image_eOffset1	100.0
+Field 38 Binning	1.0
+Field 38 Capture_Depth	16.0
+Field 38 Image_Depth	16.0
+Field 38 Image_Height	2048.0
+Field 38 Image_Width	2048.0
+Field 38 Time_From_Last	0.03332599999999997
+Field 38 Time_From_Start	1.233051
+Field 38 i_Image1 Binning	1.0
+Field 38 i_Image1 Capture_Depth	16.0
+Field 38 i_Image1 Image_Depth	16.0
+Field 38 i_Image1 Image_Exposure1	0.003021
+Field 38 i_Image1 Image_Height	2048.0
+Field 38 i_Image1 Image_Width	2048.0
+Field 38 i_Image1 Image_eCoeff1	0.48
+Field 38 i_Image1 Image_eOffset1	100.0
+Field 39 Binning	1.0
+Field 39 Capture_Depth	16.0
+Field 39 Image_Depth	16.0
+Field 39 Image_Height	2048.0
+Field 39 Image_Width	2048.0
+Field 39 Time_From_Last	0.03332599999999997
+Field 39 Time_From_Start	1.2663769999999999
+Field 39 i_Image1 Binning	1.0
+Field 39 i_Image1 Capture_Depth	16.0
+Field 39 i_Image1 Image_Depth	16.0
+Field 39 i_Image1 Image_Exposure1	0.003021
+Field 39 i_Image1 Image_Height	2048.0
+Field 39 i_Image1 Image_Width	2048.0
+Field 39 i_Image1 Image_eCoeff1	0.48
+Field 39 i_Image1 Image_eOffset1	100.0
+Field 4 Binning	1.0
+Field 4 Capture_Depth	16.0
+Field 4 Image_Depth	16.0
+Field 4 Image_Height	2048.0
+Field 4 Image_Width	2048.0
+Field 4 Time_From_Last	0.033325999999999995
+Field 4 Time_From_Start	0.099977
+Field 4 i_Image1 Binning	1.0
+Field 4 i_Image1 Capture_Depth	16.0
+Field 4 i_Image1 Image_Depth	16.0
+Field 4 i_Image1 Image_Exposure1	0.003021
+Field 4 i_Image1 Image_Height	2048.0
+Field 4 i_Image1 Image_Width	2048.0
+Field 4 i_Image1 Image_eCoeff1	0.48
+Field 4 i_Image1 Image_eOffset1	100.0
+Field 40 Binning	1.0
+Field 40 Capture_Depth	16.0
+Field 40 Image_Depth	16.0
+Field 40 Image_Height	2048.0
+Field 40 Image_Width	2048.0
+Field 40 Time_From_Last	0.03332600000000019
+Field 40 Time_From_Start	1.299703
+Field 40 i_Image1 Binning	1.0
+Field 40 i_Image1 Capture_Depth	16.0
+Field 40 i_Image1 Image_Depth	16.0
+Field 40 i_Image1 Image_Exposure1	0.003021
+Field 40 i_Image1 Image_Height	2048.0
+Field 40 i_Image1 Image_Width	2048.0
+Field 40 i_Image1 Image_eCoeff1	0.48
+Field 40 i_Image1 Image_eOffset1	100.0
+Field 41 Binning	1.0
+Field 41 Capture_Depth	16.0
+Field 41 Image_Depth	16.0
+Field 41 Image_Height	2048.0
+Field 41 Image_Width	2048.0
+Field 41 Time_From_Last	0.03332500000000005
+Field 41 Time_From_Start	1.333028
+Field 41 i_Image1 Binning	1.0
+Field 41 i_Image1 Capture_Depth	16.0
+Field 41 i_Image1 Image_Depth	16.0
+Field 41 i_Image1 Image_Exposure1	0.003021
+Field 41 i_Image1 Image_Height	2048.0
+Field 41 i_Image1 Image_Width	2048.0
+Field 41 i_Image1 Image_eCoeff1	0.48
+Field 41 i_Image1 Image_eOffset1	100.0
+Field 42 Binning	1.0
+Field 42 Capture_Depth	16.0
+Field 42 Image_Depth	16.0
+Field 42 Image_Height	2048.0
+Field 42 Image_Width	2048.0
+Field 42 Time_From_Last	0.033325999999999745
+Field 42 Time_From_Start	1.3663539999999998
+Field 42 i_Image1 Binning	1.0
+Field 42 i_Image1 Capture_Depth	16.0
+Field 42 i_Image1 Image_Depth	16.0
+Field 42 i_Image1 Image_Exposure1	0.003021
+Field 42 i_Image1 Image_Height	2048.0
+Field 42 i_Image1 Image_Width	2048.0
+Field 42 i_Image1 Image_eCoeff1	0.48
+Field 42 i_Image1 Image_eOffset1	100.0
+Field 43 Binning	1.0
+Field 43 Capture_Depth	16.0
+Field 43 Image_Depth	16.0
+Field 43 Image_Height	2048.0
+Field 43 Image_Width	2048.0
+Field 43 Time_From_Last	0.03332600000000019
+Field 43 Time_From_Start	1.39968
+Field 43 i_Image1 Binning	1.0
+Field 43 i_Image1 Capture_Depth	16.0
+Field 43 i_Image1 Image_Depth	16.0
+Field 43 i_Image1 Image_Exposure1	0.003021
+Field 43 i_Image1 Image_Height	2048.0
+Field 43 i_Image1 Image_Width	2048.0
+Field 43 i_Image1 Image_eCoeff1	0.48
+Field 43 i_Image1 Image_eOffset1	100.0
+Field 44 Binning	1.0
+Field 44 Capture_Depth	16.0
+Field 44 Image_Depth	16.0
+Field 44 Image_Height	2048.0
+Field 44 Image_Width	2048.0
+Field 44 Time_From_Last	0.03332500000000005
+Field 44 Time_From_Start	1.433005
+Field 44 i_Image1 Binning	1.0
+Field 44 i_Image1 Capture_Depth	16.0
+Field 44 i_Image1 Image_Depth	16.0
+Field 44 i_Image1 Image_Exposure1	0.003021
+Field 44 i_Image1 Image_Height	2048.0
+Field 44 i_Image1 Image_Width	2048.0
+Field 44 i_Image1 Image_eCoeff1	0.48
+Field 44 i_Image1 Image_eOffset1	100.0
+Field 45 Binning	1.0
+Field 45 Capture_Depth	16.0
+Field 45 Image_Depth	16.0
+Field 45 Image_Height	2048.0
+Field 45 Image_Width	2048.0
+Field 45 Time_From_Last	0.03332599999999997
+Field 45 Time_From_Start	1.466331
+Field 45 i_Image1 Binning	1.0
+Field 45 i_Image1 Capture_Depth	16.0
+Field 45 i_Image1 Image_Depth	16.0
+Field 45 i_Image1 Image_Exposure1	0.003021
+Field 45 i_Image1 Image_Height	2048.0
+Field 45 i_Image1 Image_Width	2048.0
+Field 45 i_Image1 Image_eCoeff1	0.48
+Field 45 i_Image1 Image_eOffset1	100.0
+Field 46 Binning	1.0
+Field 46 Capture_Depth	16.0
+Field 46 Image_Depth	16.0
+Field 46 Image_Height	2048.0
+Field 46 Image_Width	2048.0
+Field 46 Time_From_Last	0.03332599999999997
+Field 46 Time_From_Start	1.499657
+Field 46 i_Image1 Binning	1.0
+Field 46 i_Image1 Capture_Depth	16.0
+Field 46 i_Image1 Image_Depth	16.0
+Field 46 i_Image1 Image_Exposure1	0.003021
+Field 46 i_Image1 Image_Height	2048.0
+Field 46 i_Image1 Image_Width	2048.0
+Field 46 i_Image1 Image_eCoeff1	0.48
+Field 46 i_Image1 Image_eOffset1	100.0
+Field 47 Binning	1.0
+Field 47 Capture_Depth	16.0
+Field 47 Image_Depth	16.0
+Field 47 Image_Height	2048.0
+Field 47 Image_Width	2048.0
+Field 47 Time_From_Last	0.03332599999999997
+Field 47 Time_From_Start	1.532983
+Field 47 i_Image1 Binning	1.0
+Field 47 i_Image1 Capture_Depth	16.0
+Field 47 i_Image1 Image_Depth	16.0
+Field 47 i_Image1 Image_Exposure1	0.003021
+Field 47 i_Image1 Image_Height	2048.0
+Field 47 i_Image1 Image_Width	2048.0
+Field 47 i_Image1 Image_eCoeff1	0.48
+Field 47 i_Image1 Image_eOffset1	100.0
+Field 48 Binning	1.0
+Field 48 Capture_Depth	16.0
+Field 48 Image_Depth	16.0
+Field 48 Image_Height	2048.0
+Field 48 Image_Width	2048.0
+Field 48 Time_From_Last	0.03332500000000005
+Field 48 Time_From_Start	1.566308
+Field 48 i_Image1 Binning	1.0
+Field 48 i_Image1 Capture_Depth	16.0
+Field 48 i_Image1 Image_Depth	16.0
+Field 48 i_Image1 Image_Exposure1	0.003021
+Field 48 i_Image1 Image_Height	2048.0
+Field 48 i_Image1 Image_Width	2048.0
+Field 48 i_Image1 Image_eCoeff1	0.48
+Field 48 i_Image1 Image_eOffset1	100.0
+Field 49 Binning	1.0
+Field 49 Capture_Depth	16.0
+Field 49 Image_Depth	16.0
+Field 49 Image_Height	2048.0
+Field 49 Image_Width	2048.0
+Field 49 Time_From_Last	0.03332599999999997
+Field 49 Time_From_Start	1.599634
+Field 49 i_Image1 Binning	1.0
+Field 49 i_Image1 Capture_Depth	16.0
+Field 49 i_Image1 Image_Depth	16.0
+Field 49 i_Image1 Image_Exposure1	0.003021
+Field 49 i_Image1 Image_Height	2048.0
+Field 49 i_Image1 Image_Width	2048.0
+Field 49 i_Image1 Image_eCoeff1	0.48
+Field 49 i_Image1 Image_eOffset1	100.0
+Field 5 Binning	1.0
+Field 5 Capture_Depth	16.0
+Field 5 Image_Depth	16.0
+Field 5 Image_Height	2048.0
+Field 5 Image_Width	2048.0
+Field 5 Time_From_Last	0.03332600000000001
+Field 5 Time_From_Start	0.133303
+Field 5 i_Image1 Binning	1.0
+Field 5 i_Image1 Capture_Depth	16.0
+Field 5 i_Image1 Image_Depth	16.0
+Field 5 i_Image1 Image_Exposure1	0.003021
+Field 5 i_Image1 Image_Height	2048.0
+Field 5 i_Image1 Image_Width	2048.0
+Field 5 i_Image1 Image_eCoeff1	0.48
+Field 5 i_Image1 Image_eOffset1	100.0
+Field 50 Binning	1.0
+Field 50 Capture_Depth	16.0
+Field 50 Image_Depth	16.0
+Field 50 Image_Height	2048.0
+Field 50 Image_Width	2048.0
+Field 50 Time_From_Last	0.03332599999999997
+Field 50 Time_From_Start	1.63296
+Field 50 i_Image1 Binning	1.0
+Field 50 i_Image1 Capture_Depth	16.0
+Field 50 i_Image1 Image_Depth	16.0
+Field 50 i_Image1 Image_Exposure1	0.003021
+Field 50 i_Image1 Image_Height	2048.0
+Field 50 i_Image1 Image_Width	2048.0
+Field 50 i_Image1 Image_eCoeff1	0.48
+Field 50 i_Image1 Image_eOffset1	100.0
+Field 51 Binning	1.0
+Field 51 Capture_Depth	16.0
+Field 51 Image_Depth	16.0
+Field 51 Image_Height	2048.0
+Field 51 Image_Width	2048.0
+Field 51 Time_From_Last	0.03332500000000005
+Field 51 Time_From_Start	1.666285
+Field 51 i_Image1 Binning	1.0
+Field 51 i_Image1 Capture_Depth	16.0
+Field 51 i_Image1 Image_Depth	16.0
+Field 51 i_Image1 Image_Exposure1	0.003021
+Field 51 i_Image1 Image_Height	2048.0
+Field 51 i_Image1 Image_Width	2048.0
+Field 51 i_Image1 Image_eCoeff1	0.48
+Field 51 i_Image1 Image_eOffset1	100.0
+Field 52 Binning	1.0
+Field 52 Capture_Depth	16.0
+Field 52 Image_Depth	16.0
+Field 52 Image_Height	2048.0
+Field 52 Image_Width	2048.0
+Field 52 Time_From_Last	0.03332599999999997
+Field 52 Time_From_Start	1.699611
+Field 52 i_Image1 Binning	1.0
+Field 52 i_Image1 Capture_Depth	16.0
+Field 52 i_Image1 Image_Depth	16.0
+Field 52 i_Image1 Image_Exposure1	0.003021
+Field 52 i_Image1 Image_Height	2048.0
+Field 52 i_Image1 Image_Width	2048.0
+Field 52 i_Image1 Image_eCoeff1	0.48
+Field 52 i_Image1 Image_eOffset1	100.0
+Field 53 Binning	1.0
+Field 53 Capture_Depth	16.0
+Field 53 Image_Depth	16.0
+Field 53 Image_Height	2048.0
+Field 53 Image_Width	2048.0
+Field 53 Time_From_Last	0.03332599999999997
+Field 53 Time_From_Start	1.732937
+Field 53 i_Image1 Binning	1.0
+Field 53 i_Image1 Capture_Depth	16.0
+Field 53 i_Image1 Image_Depth	16.0
+Field 53 i_Image1 Image_Exposure1	0.003021
+Field 53 i_Image1 Image_Height	2048.0
+Field 53 i_Image1 Image_Width	2048.0
+Field 53 i_Image1 Image_eCoeff1	0.48
+Field 53 i_Image1 Image_eOffset1	100.0
+Field 54 Binning	1.0
+Field 54 Capture_Depth	16.0
+Field 54 Image_Depth	16.0
+Field 54 Image_Height	2048.0
+Field 54 Image_Width	2048.0
+Field 54 Time_From_Last	0.03332599999999997
+Field 54 Time_From_Start	1.766263
+Field 54 i_Image1 Binning	1.0
+Field 54 i_Image1 Capture_Depth	16.0
+Field 54 i_Image1 Image_Depth	16.0
+Field 54 i_Image1 Image_Exposure1	0.003021
+Field 54 i_Image1 Image_Height	2048.0
+Field 54 i_Image1 Image_Width	2048.0
+Field 54 i_Image1 Image_eCoeff1	0.48
+Field 54 i_Image1 Image_eOffset1	100.0
+Field 55 Binning	1.0
+Field 55 Capture_Depth	16.0
+Field 55 Image_Depth	16.0
+Field 55 Image_Height	2048.0
+Field 55 Image_Width	2048.0
+Field 55 Time_From_Last	0.03332500000000005
+Field 55 Time_From_Start	1.799588
+Field 55 i_Image1 Binning	1.0
+Field 55 i_Image1 Capture_Depth	16.0
+Field 55 i_Image1 Image_Depth	16.0
+Field 55 i_Image1 Image_Exposure1	0.003021
+Field 55 i_Image1 Image_Height	2048.0
+Field 55 i_Image1 Image_Width	2048.0
+Field 55 i_Image1 Image_eCoeff1	0.48
+Field 55 i_Image1 Image_eOffset1	100.0
+Field 56 Binning	1.0
+Field 56 Capture_Depth	16.0
+Field 56 Image_Depth	16.0
+Field 56 Image_Height	2048.0
+Field 56 Image_Width	2048.0
+Field 56 Time_From_Last	0.03332599999999997
+Field 56 Time_From_Start	1.832914
+Field 56 i_Image1 Binning	1.0
+Field 56 i_Image1 Capture_Depth	16.0
+Field 56 i_Image1 Image_Depth	16.0
+Field 56 i_Image1 Image_Exposure1	0.003021
+Field 56 i_Image1 Image_Height	2048.0
+Field 56 i_Image1 Image_Width	2048.0
+Field 56 i_Image1 Image_eCoeff1	0.48
+Field 56 i_Image1 Image_eOffset1	100.0
+Field 57 Binning	1.0
+Field 57 Capture_Depth	16.0
+Field 57 Image_Depth	16.0
+Field 57 Image_Height	2048.0
+Field 57 Image_Width	2048.0
+Field 57 Time_From_Last	0.03332599999999997
+Field 57 Time_From_Start	1.86624
+Field 57 i_Image1 Binning	1.0
+Field 57 i_Image1 Capture_Depth	16.0
+Field 57 i_Image1 Image_Depth	16.0
+Field 57 i_Image1 Image_Exposure1	0.003021
+Field 57 i_Image1 Image_Height	2048.0
+Field 57 i_Image1 Image_Width	2048.0
+Field 57 i_Image1 Image_eCoeff1	0.48
+Field 57 i_Image1 Image_eOffset1	100.0
+Field 58 Binning	1.0
+Field 58 Capture_Depth	16.0
+Field 58 Image_Depth	16.0
+Field 58 Image_Height	2048.0
+Field 58 Image_Width	2048.0
+Field 58 Time_From_Last	0.03332500000000005
+Field 58 Time_From_Start	1.899565
+Field 58 i_Image1 Binning	1.0
+Field 58 i_Image1 Capture_Depth	16.0
+Field 58 i_Image1 Image_Depth	16.0
+Field 58 i_Image1 Image_Exposure1	0.003021
+Field 58 i_Image1 Image_Height	2048.0
+Field 58 i_Image1 Image_Width	2048.0
+Field 58 i_Image1 Image_eCoeff1	0.48
+Field 58 i_Image1 Image_eOffset1	100.0
+Field 59 Binning	1.0
+Field 59 Capture_Depth	16.0
+Field 59 Image_Depth	16.0
+Field 59 Image_Height	2048.0
+Field 59 Image_Width	2048.0
+Field 59 Time_From_Last	0.03332599999999997
+Field 59 Time_From_Start	1.932891
+Field 59 i_Image1 Binning	1.0
+Field 59 i_Image1 Capture_Depth	16.0
+Field 59 i_Image1 Image_Depth	16.0
+Field 59 i_Image1 Image_Exposure1	0.003021
+Field 59 i_Image1 Image_Height	2048.0
+Field 59 i_Image1 Image_Width	2048.0
+Field 59 i_Image1 Image_eCoeff1	0.48
+Field 59 i_Image1 Image_eOffset1	100.0
+Field 6 Binning	1.0
+Field 6 Capture_Depth	16.0
+Field 6 Image_Depth	16.0
+Field 6 Image_Height	2048.0
+Field 6 Image_Width	2048.0
+Field 6 Time_From_Last	0.033324999999999994
+Field 6 Time_From_Start	0.166628
+Field 6 i_Image1 Binning	1.0
+Field 6 i_Image1 Capture_Depth	16.0
+Field 6 i_Image1 Image_Depth	16.0
+Field 6 i_Image1 Image_Exposure1	0.003021
+Field 6 i_Image1 Image_Height	2048.0
+Field 6 i_Image1 Image_Width	2048.0
+Field 6 i_Image1 Image_eCoeff1	0.48
+Field 6 i_Image1 Image_eOffset1	100.0
+Field 60 Binning	1.0
+Field 60 Capture_Depth	16.0
+Field 60 Image_Depth	16.0
+Field 60 Image_Height	2048.0
+Field 60 Image_Width	2048.0
+Field 60 Time_From_Last	0.03332600000000019
+Field 60 Time_From_Start	1.966217
+Field 60 i_Image1 Binning	1.0
+Field 60 i_Image1 Capture_Depth	16.0
+Field 60 i_Image1 Image_Depth	16.0
+Field 60 i_Image1 Image_Exposure1	0.003021
+Field 60 i_Image1 Image_Height	2048.0
+Field 60 i_Image1 Image_Width	2048.0
+Field 60 i_Image1 Image_eCoeff1	0.48
+Field 60 i_Image1 Image_eOffset1	100.0
+Field 7 Binning	1.0
+Field 7 Capture_Depth	16.0
+Field 7 Image_Depth	16.0
+Field 7 Image_Height	2048.0
+Field 7 Image_Width	2048.0
+Field 7 Time_From_Last	0.033325999999999995
+Field 7 Time_From_Start	0.199954
+Field 7 i_Image1 Binning	1.0
+Field 7 i_Image1 Capture_Depth	16.0
+Field 7 i_Image1 Image_Depth	16.0
+Field 7 i_Image1 Image_Exposure1	0.003021
+Field 7 i_Image1 Image_Height	2048.0
+Field 7 i_Image1 Image_Width	2048.0
+Field 7 i_Image1 Image_eCoeff1	0.48
+Field 7 i_Image1 Image_eOffset1	100.0
+Field 8 Binning	1.0
+Field 8 Capture_Depth	16.0
+Field 8 Image_Depth	16.0
+Field 8 Image_Height	2048.0
+Field 8 Image_Width	2048.0
+Field 8 Time_From_Last	0.033325999999999995
+Field 8 Time_From_Start	0.23328
+Field 8 i_Image1 Binning	1.0
+Field 8 i_Image1 Capture_Depth	16.0
+Field 8 i_Image1 Image_Depth	16.0
+Field 8 i_Image1 Image_Exposure1	0.003021
+Field 8 i_Image1 Image_Height	2048.0
+Field 8 i_Image1 Image_Width	2048.0
+Field 8 i_Image1 Image_eCoeff1	0.48
+Field 8 i_Image1 Image_eOffset1	100.0
+Field 9 Binning	1.0
+Field 9 Capture_Depth	16.0
+Field 9 Image_Depth	16.0
+Field 9 Image_Height	2048.0
+Field 9 Image_Width	2048.0
+Field 9 Time_From_Last	0.033324999999999994
+Field 9 Time_From_Start	0.266605
+Field 9 i_Image1 Binning	1.0
+Field 9 i_Image1 Capture_Depth	16.0
+Field 9 i_Image1 Image_Depth	16.0
+Field 9 i_Image1 Image_Exposure1	0.003021
+Field 9 i_Image1 Image_Height	2048.0
+Field 9 i_Image1 Image_Width	2048.0
+Field 9 i_Image1 Image_eCoeff1	0.48
+Field 9 i_Image1 Image_eOffset1	100.0
+File Info GroupSelectedFields	2.1219957915E-314
+Location	E:/KENZA Folder/PROJECT2_ClRosea/sorting/droplet_HS/20210210-dropletspeed-dgw003-dgo004-sp00-00041.cxd
+factor	1.623300
+scale_len	100.000000
+symbol	?m
+title	Red(4X)
+units	Microns
