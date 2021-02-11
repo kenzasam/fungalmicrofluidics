@@ -36,7 +36,6 @@ import time, copy
 #Syringe pump modules
 import sys
 import os
-import numpy
 '''
 qmixsdk_dir =  "C:/QmixSDK" #path to Qmix SDK
 sys.path.append(qmixsdk_dir + "/lib/python")
@@ -253,8 +252,9 @@ class Setup():
 
 
     ####### sorting ##############
-    def sortseq(self,nr):
+    def sortseq(self,nr, t):
         '''Function defining a sorting electrode sequence '''
+        self.seq['S%d'%(nr)].onTime = t
         self.seq['S%d'%(nr)].start(1)
         print "....................."
     
@@ -273,23 +273,31 @@ class Setup():
         self.PID.stop()
         print "....................."
 
-    def sortingthingy(self, t):
+    def sortingthingy(self, t_wait, onPin):
         '''Function to start the spectrometer signal processing class (peak detection)
         and actuating electrode pattern for sorting, after 'wait' seconds 
         '''
-        t_wait=t #seconds
+        t=t_wait #seconds
         #check if Spec process is running
-        if self.spec.SPECstatus == True:
-            #start SpecSP process
-            self.specsp.start()
-            #check if peak above treshold was detected
-            if self.specsp.erm == True:
-                time.sleep(t_wait)
-                print('!!!....Droplet > Treshold intensity detected....!!!')
-                self.sortseq(1)
-        else:
+        #try:
+        while True:
+            if self.spec.SPECstatus == True:
+                #start SpecSP process
+                self.specsp.start()
+                #turn on bottom elec
+                self.ExtGpio.pinWrite(onPin, 1)
+                #check if peak above treshold was detected
+                while self.specsp.erm == True:
+                    time.sleep(t)
+                    print('!!!....Droplet > Treshold intensity detected....!!!')
+                    self.seq['S%d'%(nr)].onTime = t
+                    self.seq['S%d'%(nr)].start(1)
+                self.ExtGpio.pinWrite(onPin, 0)
+        '''    
+        except:
             print ('Spectrometer thread needs to be started first. Spec.start()')
             return
+        '''
         
     def tempfeedbackstream(self,t, T, step=1):
         pad_str = ' ' * len('%d' % step)
