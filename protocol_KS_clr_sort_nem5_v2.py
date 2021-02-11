@@ -71,7 +71,7 @@ class Protocol(bt.BasicThread):
 Start of setup class
 """
 class Setup():
-    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, PID):
+    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, SpecSP, PID):
         '''
         # >>>>>>> SETUP SPECIFIC PARAMETERS BLOCK <<<<<<< #
         deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308" #--> change path to device configuration folder
@@ -82,11 +82,11 @@ class Setup():
         '''
 
         self.init_pumps(Pumps=Pumps)
-        self.init_spec(Spec=Spec)
+        self.init_spec(Spec=Spec, SpecSP=SpecSP)
         self.init_incubation(PID=PID)
         self.init_elecs(gpio=gpio,ExtGpio = ExtGpio, chipViewer = chipViewer)
 
-    def init_spec(self, Spec):
+    def init_spec(self, Spec, SpecSP):
         """
         Initializing spectrometer thread.
         """
@@ -98,6 +98,14 @@ class Setup():
             #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.spec=Spec
+            print "ok."
+
+        if (SpecSP is None):
+            print "Spectrometer signal processing thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol."
+            #sys.exit(1)
+            #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
+        else:
+            self.specsp=SpecSP
             print "ok."
 
     def init_pumps(self, Pumps):
@@ -152,7 +160,7 @@ class Setup():
         seqCategory = 'Sorting'  #<-- EDIT THIS
         seqName = 'S2'  #<-- EDIT THIS
         seqDesc = ''  #<-- EDIT THIS
-        b=[[42,78,41,100,40,75,39,97,38,72,94,37]]
+        b=[[]]
         seqList = b # <-- Electrodes 1 and 2 actuated at same time. 3 actuated after 1 and 2.
         seqOnTime= 0.7 # <-- How long is the electrode actuated [Sec]
         seqPeriod= 1 # <-- Keep this at least 0.2 seconds above onTime [Sec]
@@ -163,7 +171,7 @@ class Setup():
         seqCategory = 'Sorting'  #<-- EDIT THIS
         seqName = 'S3'  #<-- EDIT THIS
         seqDesc = ''  #<-- EDIT THIS
-        b=[[42,78,41,100,40,75,39,97,38,72,94,37]]
+        b=[[]]
         seqList = b # <-- Electrodes 1 and 2 actuated at same time. 3 actuated after 1 and 2.
         seqOnTime= 0.7 # <-- How long is the electrode actuated [Sec]
         seqPeriod= 1 # <-- Keep this at least 0.2 seconds above onTime [Sec]
@@ -243,51 +251,20 @@ class Setup():
             self.nem.pump_calibration(self.nem.pumpID(i))
             self.nem.pump_aspirate(self.nem.pumpID(i), v)
 
-    ####### droplet generation ###############
-    def DropGen(self,n=1,t=0,pumpID=0):
-        '''
-        # n is amount of repeats (drops)
-        # t is wait time (d*Period, seconds),
-        # flrt is the flowrate
-        # and pumpID is the pump from which dispensing happens
-        if type(t)==float:
-            print "time needs to be an integer"
-            return
-        print "making %d droplets" %(n)
-        print "waiting %d seconds between droplets" %(t)
-        #totalvolume=self.DropletVolume*n #calculate totalvolume loss
-        #print "total volume loss [uL]: " ,totalvolume
-        if self.DropletVolume < 0.0009: #self.dropletvolume you give as par on top
-           DropletVolume=0.0008
-           print "droplet volume is smaller than 0.001. "
-        else:
-           DropletVolume= self.DropletVolume
-        #Calculate the flowrate by which aq flow needs to resuply 1 droplet
-        #  this is the total volume of one drop
-        #  devided by time in sec it takes to make 1 drop
-        droptime = len(self.seq['DropGenL'].elecList) * self.seq['DropGenL'].Period # is an integer
-        print 'time requiered to make 1 drop: %d sec' %(droptime)
-        dropflowrate = DropletVolume / droptime #is a float
-        if dropflowrate < 0.0006:
-            dropflowrate=0.0006
-        #Loop: (resupply one drop with Nem, Actuate and wait) x n times
-        for i in range(n):
-          self.nem.pump_dispense(self.nem.pumpID(pumpID), DropletVolume, dropflowrate) #dispense totalvolume
-          print "resupplying w Nemesys done"
-          DropGenLSeq = self.DropGenLSeq +[110]*t
-          self.seq['DropGenL'].elecList = DropGenLSeq
-          self.seq['DropGenL'].start(1)
-          print "making drop %d" %(i+1)
-          #while bt.BasicThread.isAlive()):
-          time.sleep(droptime)
-        print "....................."
-        '''
-    ####### droplet operations ##############
-    def sort(self,nr):
+
+    ####### sorting ##############
+    def sortseq(self,nr):
+        '''Function defining a sorting electrode sequence '''
         self.seq['S%d'%(nr)].start(1)
         print "....................."
+    
 
+    ####### incubating ##############
     def incubation(self,RC=0.5,T=37,t=30):
+        '''Function to start the PID process, set it to a certain temperature,
+         and leave it running for a specific amount of time.
+        Printout of measured temperatures.
+        '''
     	self.PID.start()
         self.PID.RC_div_DT=RC
     	self.PID.ctrl(T)
@@ -296,6 +273,24 @@ class Setup():
         self.PID.stop()
         print "....................."
 
+    def sortingthingy(self, t):
+        '''Function to start the spectrometer signal processing class (peak detection)
+        and actuating electrode pattern for sorting, after 'wait' seconds 
+        '''
+        t_wait=t #seconds
+        #check if Spec process is running
+        if self.spec.SPECstatus == True:
+            #start SpecSP process
+            self.specsp.start()
+            #check if peak above treshold was detected
+            if self.specsp.erm == True:
+                time.sleep(t_wait)
+                print('!!!....Droplet > Treshold intensity detected....!!!')
+                self.sortseq(1)
+        else:
+            print ('Spectrometer thread needs to be started first. Spec.start()')
+            return
+        
     def tempfeedbackstream(self,t, T, step=1):
         pad_str = ' ' * len('%d' % step)
         fbT= self.PID.getFeedback()
@@ -304,3 +299,4 @@ class Setup():
             sys.stdout.flush()
             time.sleep(step)
             print 'Done incubating for %d sec at %d C!' % ( t, T)
+    

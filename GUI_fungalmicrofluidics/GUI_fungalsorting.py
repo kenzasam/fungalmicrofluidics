@@ -337,13 +337,15 @@ class OperationsPanel(wx.Panel):
         fnSizer.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
         #sorting
         box1=wx.BoxSizer(wx.HORIZONTAL)
-        self.SortBtn=wx.Button( self, label='Sort', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn=wx.Button( self, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
         self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
         box1.Add(self.SortBtn, flag=wx.RIGHT, border=8)
+        '''
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]  ')
         box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box1.Add(self.entry1, proportion=1)
+        '''
         fnSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         fnSizer.AddSpacer(5)
         self.SetSizer(fnSizer)
@@ -354,11 +356,7 @@ class OperationsPanel(wx.Panel):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onSort(self, event):
-        try:
-            t=int(float(self.entry1.GetValue()))
-        except:
-            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.Sorting(%d)'%(t)
+        s = 'setup.sortseq(1)'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -416,7 +414,6 @@ class IncubationPanel(wx.Panel):
         box4.Add(self.ImgBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
         incSizer.AddSpacer(5)
-
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
 
@@ -427,10 +424,11 @@ class IncubationPanel(wx.Panel):
         else:
             try:
                 temp=int(float(self.entry1.GetValue()))
-                t=int(float(self.entry2.GetValue()))
+                time=int(float(self.entry2.GetValue()))
+                RC=0.5
             except:
                 wx.MessageDialog(self, "Enter a valid temperature and time", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-            s = 'setup.incubation(0.5, %d, %d)'%(temp,t)
+            s = 'setup.incubation(%d, %d, %d)'%(RC, temp,time)
             pyperclip.copy(s)
             if self.udpSend != False:
                 self.udpSend.Send(s)
@@ -480,48 +478,79 @@ class SortingPanel(wx.Panel):
         self.PauseBtn.SetBitmap(bmp2)
         self.PauseBtn.Bind(wx.EVT_BUTTON, self.onPauseSpec)
         self.SaveBtn=wx.Button(self, label='Save Data', name='save()')
-        #bmp2 = wx.Bitmap('pause.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
-        #self.PauseBtn.SetBitmap(bmp2)
         self.SaveBtn.Bind(wx.EVT_BUTTON, self.onSaveSpec)
         box3 = wx.BoxSizer(wx.HORIZONTAL)
         box3.Add(self.PlayBtn, flag=wx.RIGHT, border=8)
         box3.Add(self.PauseBtn, flag=wx.RIGHT, border=8)
         box3.Add(self.SaveBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.AddSpacer(5)
+        box2=wx.BoxSizer(wx.HORIZONTAL)
+        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Treshold Intensity [counts]')
+        self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
+        self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(70,24))
+        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetTres)
+        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        box2.Add(self.entry1, proportion=1, border=8)
+        box2.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
+        box4=wx.BoxSizer(wx.HORIZONTAL)
+        self.text2 = wx.StaticText(self,  wx.ID_ANY, label='Integration time [msec]')
+        self.entry2 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
+        self.SetInttBtn = wx.Button( self, label='Set', name='Set()', size=(70,24))
+        self.SetInttBtn.Bind(wx.EVT_BUTTON, self.onSetIntt)
+        box4.Add(self.text2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        box4.Add(self.entry2, proportion=1, border=8)
+        box4.Add(self.SetInttBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
+        srtSizer.AddSpacer(10)
         #Sort
         titlebox3  = wx.BoxSizer(wx.HORIZONTAL)
         title3 = wx.StaticText(self, label='Sorting')
         title3.SetFont(font2)
         titlebox3.Add(title3, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox3, 0, wx.ALIGN_CENTER_VERTICAL)
-        srtSizer.AddSpacer(5)
-        box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.StartSortBtn=wx.Button( self, label='Start Sorting', name='Sort()', size=(70,24)) #ADDED KS
-        self.StartSortBtn.Bind(wx.EVT_BUTTON, self.onStart)
-        self.text1=wx.StaticText(self,  wx.ID_ANY, label='Treshold Intensity [counts]')
-        self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        self.SetSortBtn=wx.Button( self, label='Set', name='Set()', size=(70,24)) #ADDED KS
-        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSet)
-        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        box2.Add(self.entry1, proportion=1, border=8)
-        box2.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
-        srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
-        srtSizer.AddSpacer(10)
+        self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(70,24))
+        self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
+        box5 = wx.BoxSizer(wx.HORIZONTAL)
+        box5.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box5, flag=wx.ALIGN_CENTER_VERTICAL)
         self.SetSizer(srtSizer)
         #self.SetBackgroundColour('#f2dd88')
 
-    def onStart(self, event):
+    def onStart(self):
         s = 'setup.Sorting(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+            
+    def toggledbutton(self, event):
+        # Active State
+        if self.button.GetValue() == True:
+            self.onStart()
+            self.button.SetLabel('Stop')
+            self.button.SetBackgroundColour(250,128,114)
+        # Inactive State
+        if self.button.GetValue() == False:
+            self.button.SetLabel('Start')
+            self.button.SetBackgroundColour(152,251,152)
 
-    def onSet(self, event):
+    def onSetTres(self, event):
         try:
             t=int(float(self.entry1.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'specSP.treshold=(%d)'%(t)
+        s = 'specSP.treshold=%d'%(t)
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onSetIntt(self, event):
+        try:
+            t=int(float(self.entry2.GetValue()))
+        except:
+            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        s = 'specSP.scan_time=%d'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -741,16 +770,13 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     sys.path.append(os.path.abspath(lib))
     protocol= __import__("protocol_KS_wizzardv4_nemesys5")
     """
-    setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, PID=False)
-
-    #setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Nemesys=False)
-    #setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, magPin=0)
+    setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False, PID=False)
     #setup.enOut(True)
     app = wx.App(False)
     frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
     frame.Show()
 
     #inspection tool for GUI troubleshooting
-    wx.lib.inspection.InspectionTool().Show()
+    #wx.lib.inspection.InspectionTool().Show()
     #
     app.MainLoop()

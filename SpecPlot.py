@@ -49,7 +49,7 @@ class Spectogram(client.tcpControl):
                 RxPort,
                 callFunc,
                 enable_plot,
-                enable_proc
+                enable_sp
                 #scan_frames,
                 #scan_time
                 ):
@@ -61,15 +61,16 @@ class Spectogram(client.tcpControl):
         """Initialize instance variables"""
         #self.run_measurement = False
         self.enable_plot = enable_plot
-        self.enable_proc = enable_proc
+        self.enable_sp = enable_sp
         #self.output_file = output_file
         #self.scan_frames = scan_frames
         #self.scan_time = scan_time
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
         #init VARIABLES#
-        self.ydata = []
-        self.ydata2 = []
-        self.ydata3 = 0 # treshoold. See decoding.
+        self.ydata = [] 
+        self.ydata1 = [] # denoised. See decoding.
+        self.ydata2 = [] # peaks. See decoding.
+        self.ydata3 = 0 # treshold. See decoding.
         self.xdata = []
         self.measurement = 0
         ###########
@@ -85,7 +86,7 @@ class Spectogram(client.tcpControl):
         self.figure, (self.ax1, self.ax2) = plot.subplots(2, sharex='col', sharey='row')
         self.line1, = self.ax1.plot([], [])
         self.graph = self.line1
-        if self.enable_proc == True:
+        if self.enable_sp == True:
             self.line2, = self.ax2.plot([], [], 'b')
             #self.graph3 = self.axes[1].plot([], [], 'bo')
             #self.graph2, = self.axes.plot([], [], 'r')
@@ -125,18 +126,18 @@ class Spectogram(client.tcpControl):
            self.line1.set_data(self.xdata, self.ydata)
            #self.graph.set_data(self.xdata, self.ydata)
            #self.graph.set_ydata(self.ydata)
-           if self.enable_proc == True:
+           if self.enable_sp == True:
                #denoised
-               self.line2.set_data(self.xdata, self.ydata2)
+               self.line2.set_data(self.xdata, self.ydata1)
+               
                #peaks
-               """
                ind = [i for i, item in enumerate(self.ydata) if item in self.ydata2]
                peakwvl = [self.xdata[i] for i in ind]
-               self.graph2.set_data(peakwvl, self.ydata2)
-               for i,j in zip(xtemp, self.ydata2):
-                   self.graph2.annotate(str(j),xy=(i,j+0.5))
-               print(peakwvl)
-               """
+               #self.graph2.set_data(peakwvl, self.ydata2)
+               #for i,j in zip(xtemp, self.ydata2):
+               #    self.graph2.annotate(str(j),xy=(i,j+0.5))
+               #print(peakwvl)
+               
                #treshold https://www.python-course.eu/matplotlib_subplots.php
                self.line3.set_ydata(self.ydata3)
            for ax in [self.ax1, self.ax2]:
@@ -156,13 +157,12 @@ class Spectogram(client.tcpControl):
         #self.scan_frames=object['Fr']
         self.ydata = object['Dat']
         self.xdata = object['L']
-        #if 'Peaks' in object:
-        #    self.ydata2 = object['Peaks']
+        if 'Peaks' in object:
+            self.ydata2 = object['Peaks']
         if 'Treshold' in object:
             self.ydata3 = object['Treshold']
         if 'DatDn' in object:
-            self.ydata2 = object['DatDn']
-        #self.peaks=object['Peaks']
+            self.ydata1 = object['DatDn']
         #print 'Msrmt #'
         #print self.measurement
         #print self.ydata
@@ -178,7 +178,7 @@ if __name__== "__main__":
     VERSION = '1.0.0' # version
     #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
     print 'GUI: Protocol GUI Ver:%s'%(VERSION)
-    print 'Copyright: Kenza Samlali, 2020'
+    print 'Copyright: Kenza Samlali, 2020-2021'
 
     """Command line option parser"""
     parser = OptionParser()
@@ -191,7 +191,7 @@ if __name__== "__main__":
     (options, args) = parser.parse_args()
 
     """Spectogram class Instance"""
-    ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, enable_proc=options.proc)
+    ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, enable_sp=options.proc)
     #ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, enable_proc=options.proc, scan_frames=options.frames, scan_time=options.scantime)
     #ag=Spectogram(TCP=udpConsol, enable_plot=True, scan_frames=scan_frames, measurement=measurement, scan_time=scan_time)
     #ag=Spectogram(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=Spectogram.decodingPayload,enable_plot=True, scan_frames=scan_frames, scan_time=scan_time) # , measurement=measurement
