@@ -1,4 +1,4 @@
-from pycromanager import Acquisition, multi_d_acquisition_events, Bridge
+from pycromanager import Acquisition, multi_d_acquisition_events, Bridge, Dataset
 from matplotlib import pyplot as plt
 import numpy as np
 import time
@@ -17,7 +17,6 @@ z_array = []
 for idx in range(pos_list.get_number_of_positions()):
    pos = pos_list.get_position(idx)
    #pos.go_to_position(pos, mmc)
-   #print(pos.get_label())
 
    x=pos_list.get_position(idx).get(0).x
    y=pos_list.get_position(idx).get(0).y
@@ -31,27 +30,38 @@ x_array = np.array(x_array)
 y_array = np.array(y_array)
 z_array = np.array(z_array)
    
-#xyz = np.hstack([x_array[:, None], y_array[:, None], z_array[:, None]])
-#print(xyz)
+def img_process_fn(image, metadata):
+   #add in some new metadata
+   metadata['a_new_metadata_key'] = 'a new value'
 
-with Acquisition(directory='E:\KENZA Folder\CapstoneTests', name='saving_name') as acq:
-   #Generate the events for a single z-stack
-   xyz = np.hstack([x_array[:, None], y_array[:, None], z_array[:, None]])
-   events = multi_d_acquisition_events(xyz_positions=xyz)
-   acq.acquire(events)
-                                    
-#with Acquisition('E:\KENZA Folder\CapstoneTests', 'saving_name', tile_overlap=10) as acq:
-#10 pixel overlap between adjacent tiles
-#acquire a 2 x 1 grid
-    #acq.acquire({'row': 0, 'col': 0})
-    #acq.acquire({'row': 1, 'col': 0})
+   #modify the pixels by setting a 100 pixel square at the top left to 0
+   image[:100, :100] = 0
+   
+   #propogate the image and metadata to the default viewer and saving classes
+   return image, metadata
 
-#mmc.acquisitions().stopSequenceAcquisition()
-time.sleep(5)
+# run an acquisition using this image processor
+if __name__ == '__main__':
 
-dataset = acq.get_dataset().as_array()
-img = dataset.read_image()
+   with Acquisition(directory='E:\KENZA Folder\CapstoneTests', name='saving_name', image_process_fn=img_process_fn) as acq:
+      #Generate the events for a single z-stack
+      xyz = np.hstack([x_array[:, None], y_array[:, None], z_array[:, None]])
+      events = multi_d_acquisition_events(xyz_positions=xyz)
+      acq.acquire(events)
+      mmc._close()
+
+dataset = acq.get_dataset()
+dask_array = dataset.as_array(stitched=True)
+with napari.gui_qt():
+   v = napari.Viewer()
+   v.add_image(dask_array)
+#img = dask_array.read_image()
+#plt.imshow(img, interpolation='nearest')
+#plt.show()  # <--- show us the image
+
+#dataset = acq.get_dataset().as_array()
+#img = dataset.read_image()
   # <---- read our z-stack index 0
-plt.imshow(img, interpolation='nearest')  # <---- convert numpy array into image
-plt.show()  # <--- show us the image
+#plt.imshow(img, interpolation='nearest')  # <---- convert numpy array into image
+#plt.show()  # <--- show us the image
 
