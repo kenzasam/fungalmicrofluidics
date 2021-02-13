@@ -1,8 +1,10 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from os import listdir
 from os.path import isfile, join
 #filename='20210210-dropletspeed-dgw003-dgo004-sp00-00003.txt'
-mypath='E:/KENZA Folder/PROJECT2_ClRosea/sorting/droplet_HS/metadata/'
+#mypath='E:/KENZA Folder/PROJECT2_ClRosea/sorting/droplet_HS/metadata/'
+mypath='/Users/kenza/OneDrive - Concordia University - Canada/CASB-PhD/Gitbubble/fungalmicrofluidics_basement/Experimental/Droplet_speed/Metadata/'
 start= [6, 2, 5, 5, 5, 3, 7, 3, 4, 7, 7, 7, 8, 10, 26, 20, 8, 7, 12, 2, 26, 6, 7, 23, 24, 15, 39, 3, 4, 6, 35, 17, 27, 1, 17, 29, 23, 17, 8, 7, 25, 13 ]
 #stop= [36, 27, 28, 27, 25, 22, 25, 19, 19, 21, 21, 19, 20, 21, 37, 30, 19, 17, 21 , 11, 34, 14, 14, 30, 30, 21, 45, 8, 9, 11, 40, 22, 31, 5, 18/2, 33/2, 25, 19, 10, 9, 27, 15 ]
 stop= [36, 27, 28, 27, 25, 22, 25, 19, 19, 21, 21, 19, 20, 21, 37, 30, 19, 17, 21 , 11, 34, 14, 14, 30, 30, 21, 45, 8, 9, 11, 40, 22, 31, 5, 18, 33, 25, 19, 10, 9, 27, 15 ]
@@ -35,6 +37,13 @@ data = {'File': files,
 'stop': stop
 }
 df = pd.DataFrame(data, columns=['File','Flowrate', 'start', 'stop'])
-print df
+df['Flowrate']=pd.to_numeric(df['Flowrate'])
 df['Speed'] = df.apply(lambda x: returnspeed(x['File'], x['start'], x['stop']), axis=1) 
+
+data['Speed']= list(lambda x: returnspeed(data['File'], data['start'], data['stop']))
+df.sort_values(by=['Flowrate'])
 print (df)
+print data
+plt.figure()
+plt.plot(x=data['Flowrate'], y=data['Speed'])
+plt.show()
