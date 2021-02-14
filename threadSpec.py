@@ -376,6 +376,7 @@ class Flame(BT.BasicThread):
 
 class Processing(BT.BasicThread):
     def __init__(self,
+                 gpio,
                  Period,
                  nameID,
                  treshold,
@@ -383,8 +384,12 @@ class Processing(BT.BasicThread):
                  PeakProminence,
                  PeakWidth,
                  PeakWlen,
+                 Pin_cte,
+                 Pin_pulse,
+                 Pin_onTime,
                  DenoiseType):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer={})
+        self.gpio = gpio
         self.T0 = time.time()
         self.treshold = treshold
         self.peaks= False #np.array([])
@@ -394,20 +399,37 @@ class Processing(BT.BasicThread):
         self.width = PeakWidth
         self.wlen = PeakWlen
         self.type = DenoiseType
-        self.erm = False
+        self.pin_ct = Pin_cte
+        self.pin_pulse = Pin_pulse
+        self.onTime = Pin_onTime
+        # Instances set by ardubridge
+        self.enOut = False
         #self.dndata = []
-        self.spec= None # Instance set by ardubridge
+        self.spec= None 
+        #set for test
+        self.t_wait=2
+
+    def draft_data(self):
+        ''' Use this function to test specSP functions on saved data (Spec.save())
+        '''
+        with open('Spectrometer data/YData-20210208-T18h32m07s.dat' , 'r') as f:
+            for line in f:
+                num=line
+                a = np.fromstring(num[1:-1], sep=',') #, dtype=np.float
+        return a
 
     def denoising(self, y):
+        '''Function to denoise y-data.
+        BW, Buterworth filter
+        SG, Savitzky-Golay filter
+        '''
         self.denoise = True
         if self.type == 'BW':
-            # BW, Buterworth filter
             N  = 3 # Filter polynomial order
             Wn = 0.1 # Cutoff frequency
             B, A = sps.butter(N, Wn, output='ba')
             yf = sps.filtfilt(B, A, y)
         if self.type == 'SG':
-            # SG, Savitzky-Golay filter
             W = 5 # wl window size
             P = 3 # Flter polynomial order
             yf = sps.savgol_filter(y, 51, 3)
@@ -416,6 +438,8 @@ class Processing(BT.BasicThread):
         return yf
 
     def findallpeaks(self, y):
+        '''Function to find peaks using scipy signal processing library
+        '''
         self.peaks = True
         arr = np.asarray(y)
         peaks, properties = sps.find_peaks(arr,
@@ -428,8 +452,11 @@ class Processing(BT.BasicThread):
         return peak_int
 
     def findpeaks(self, y):
+        '''Function to find all peaks above treshold using scipy
+         signal processing library
+        '''
         self.peaks = True
-        arr =  np.asarray(y)
+        arr = np.asarray(y)
         peaks, properties = sps.find_peaks(arr,
                                          height = self.treshold,
                                          prominence = self.prom,
@@ -439,22 +466,50 @@ class Processing(BT.BasicThread):
         peak_int = arr[peaks]
         return peak_int
 
+    def enIO(self, val):
+        ''' Function used in ArduBridge, to turn comm on 
+        '''
+        self.enOut = True
+    
     def start(self):
+        ''' Start the thread for peak detection and actuating 
+        electrode pattern for sorting, after 'wait' seconds 
+        '''
         print('Starting thread...')
         BT.BasicThread.start(self)
+        #turn bottomn elec on
         print('%s: Started ON line'%(self.name))
-
+        if self.enOut:
+                self.gpio.pinWrite(self.pin_ct, 1)
+                self.teleUpdate('%s, E%d: 1'%(self.name, self.pin_ct))
+    
     def process(self):
-        self.erm=False
-        peaks = self.findpeaks(self.spec.data) #data (spectrometer y-axis data, intensities) should be global variable so it's accessible between threads!!
+        peakfound = False
+        try:
+            #peaks = self.findpeaks(self.spec.data)
+            peaks = self.findpeaks(self.draft_data())
+        except:
+            print('oops')
         if len(peaks) > 0:
-            self.erm=True
+            peakfound=True
+            #wait, depending on distance between detection and electrodes
+            time.sleep(self.t_wait)
+            #turn top elec on
+            if self.enOut:
+                self.gpio.pinPulse(self.pin_pulse, self.onTime)
+                self.teleUpdate('%s, E%d: %d s pulse'%(self.name, self.pin_pulse, self.onTime))
+    
+    def stop(self):
+        '''Function stopping the thread and turinging elecs off
+        '''
+        self.gpio.pinWrite(self.pin_ct, 0)
+        self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
+        print('Stopping thread...')
+        BT.BasicThread.stop(self)
+        
     """
-    def stop():
     def pause():
-    def play():
+    def play():     
     """
-            
-
             
 

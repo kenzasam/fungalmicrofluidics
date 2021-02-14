@@ -77,11 +77,10 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = False
-    #<-- False for simulation
+    ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = True #<-- True when user wants to use a spectrometer thread.
+    SPEC = False #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
@@ -145,7 +144,8 @@ if __name__ == "__main__":
         print 'type PID.start() to start the PID thread process\n'
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
     '''
-    Setting up spectrometer thread and server
+    Setting up spectrometer thread and server.
+    This will allow you to retrieve data from a spectrometer and plot it.
     '''
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
@@ -168,18 +168,26 @@ if __name__ == "__main__":
         Spec = None
 
     '''
-    Use spectrometer signal processing library
+    Use spectrometer signal processing library. 
+    This will allow you to analyze the spectrum from SPEC.
+    A sorting thread autonomously sorts droplets above a treshold.
     '''
     print 'Spectrometer Signal Processing status: %s' %(SPECSP)
     if SPEC and SPECSP == True:
-        SpecSP = threadSpec.Processing (Period = 0 , # Period-time of the control-loop. Defines plotting speed.
+    if SPECSP == True:
+        SpecSP = threadSpec.Processing (gpio =  ExtGpio,
+                                        Period = 0 , # Period-time of the control-loop. Defines plotting speed.
                                         nameID = 'Auto Sort',
                                         treshold = 8000, # Treshold peak intensity above which trigger goes.
                                         noise = 2500, # background noise level.
                                         PeakProminence = None,
                                         PeakWidth = [10,200], # [min,max] width of the peak in nm
                                         PeakWlen = None, 
+                                        Pin_cte = 37,
+                                        Pin_pulse = 38,
+                                        Pin_onTime = 0.5,
                                         DenoiseType = 'BW') # BW, Butterworth filter
+        SpecSP.enIO(True) #Spec.enOut = True
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
         SpecSP.spec = Spec
         print 'Spectrometer signal processing library initiated. Access by typing "SpecSP."'
@@ -187,7 +195,7 @@ if __name__ == "__main__":
         SpecSP = None
 
     '''
-    Setting up Nemesys syringe pump bridge
+    Setting up Nemesys syringe pump bridge.
     '''
     print 'Pumps status: %s' %(PUMPS)
     if PUMPS == True:
@@ -212,7 +220,6 @@ if __name__ == "__main__":
     print 'USER: %s'%(user)
     print 'ASSIGNED PROTOCOL: using %s'%(lib)
     print ''
-
     if (lib =='protocol_KS_clr_sort_nem5_v2') :
       print 'The protocol you are using, requires the NeMESYS syringe pump add-on'
       print 'Change the device config file if needed'
@@ -220,13 +227,9 @@ if __name__ == "__main__":
       print 'status: %s' %(PUMPS)
       print 'Change the SPEC spectrometer to True or False to go online'
       print 'status: %s' %(SPEC)
-
     print 'Loading protocol: %s' %(lib)
     setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=PID)
-
     #SETUP= False
-    #print 'setup wrongsihsoihs'
-
     SETUP = True
     setup.enOut(ELEC_EN)
     prot = protocol.Protocol(setup)
