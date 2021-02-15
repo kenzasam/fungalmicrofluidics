@@ -30,6 +30,7 @@ except ImportError:
         def __init__(self, nameID):
             self.name = nameID
 
+#from ArduBridge_ClR import SpecSP
 from GSOF_ArduBridge import threadBasic as bt
 import time, copy
 
@@ -249,7 +250,10 @@ class Setup():
         for i in range(5):
             self.nem.pump_calibration(self.nem.pumpID(i))
             self.nem.pump_aspirate(self.nem.pumpID(i), v)
-
+   
+    ####### SPECTROMETER #############
+    def setInttime(self, t):
+        self.spec.scan_time=t
 
     ####### sorting ##############
     def sortseq(self,nr, t):
@@ -258,20 +262,15 @@ class Setup():
         self.seq['S%d'%(nr)].start(1)
         print "....................."
     
+    def setTreshold(self, tr):
+        self.specsp.treshold = tr
+    
+    def setOnTime(self, t):
+        self.sepcsp.onTime=t
 
-    ####### incubating ##############
-    def incubation(self,RC=0.5,T=37,t=30):
-        '''Function to start the PID process, set it to a certain temperature,
-         and leave it running for a specific amount of time.
-        Printout of measured temperatures.
-        '''
-    	self.PID.start()
-        self.PID.RC_div_DT=RC
-    	self.PID.ctrl(T)
-        self.tempfeedbackstream(t,T,step=10)
-    	#time.sleep(t)
-        self.PID.stop()
-        print "....................."
+    def setElecs(self, pin_ct, pin_pulse):
+        self.specsp.pin_ct=pin_ct
+        self.specsp.pin_pulse=pin_pulse
 
     def sortingthingy(self, t_wait, onPin):
         '''Function to start the spectrometer signal processing class (peak detection)
@@ -298,7 +297,20 @@ class Setup():
             print ('Spectrometer thread needs to be started first. Spec.start()')
             return
         '''
-        
+    ####### incubating ##############
+    def incubation(self,RC=0.5,T=37,t=30):
+        '''Function to start the PID process, set it to a certain temperature,
+         and leave it running for a specific amount of time.
+        Printout of measured temperatures.
+        '''
+    	self.PID.start()
+        self.PID.RC_div_DT=RC
+    	self.PID.ctrl(T)
+        self.tempfeedbackstream(t,T,step=10)
+    	#time.sleep(t)
+        self.PID.stop()
+        print "....................."    
+
     def tempfeedbackstream(self,t, T, step=1):
         pad_str = ' ' * len('%d' % step)
         fbT= self.PID.getFeedback()

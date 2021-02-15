@@ -77,10 +77,10 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = False #<-- False for simulation
+    ELEC_EN = True #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = False #<-- True when user wants to use a spectrometer thread.
+    SPEC = True #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
@@ -174,19 +174,22 @@ if __name__ == "__main__":
     '''
     print 'Spectrometer Signal Processing status: %s' %(SPECSP)
     if SPEC and SPECSP == True:
-    if SPECSP == True:
+    #if SPECSP == True:
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
                                         Period = 0 , # Period-time of the control-loop. Defines plotting speed.
                                         nameID = 'Auto Sort',
                                         treshold = 8000, # Treshold peak intensity above which trigger goes.
                                         noise = 2500, # background noise level.
+                                        DenoiseType = 'BW', # BW, Butterworth filter
                                         PeakProminence = None,
                                         PeakWidth = [10,200], # [min,max] width of the peak in nm
                                         PeakWlen = None, 
-                                        Pin_cte = 37,
-                                        Pin_pulse = 38,
-                                        Pin_onTime = 0.5,
-                                        DenoiseType = 'BW') # BW, Butterworth filter
+                                        Pin_cte = 37, # electrode to turn on constantly
+                                        Pin_pulse = 38, # electrode to pulse for sorting
+                                        Pin_onTime = 0.5, # pulse on time.
+                                        t_wait=0.7 # time between detection and electrode pulse [s]
+                                        )
+                                        
         SpecSP.enIO(True) #Spec.enOut = True
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
         SpecSP.spec = Spec

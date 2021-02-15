@@ -16,6 +16,7 @@ waiting 15sec after increasing oil flow.
 - Droplet generation oil flow:
 - Droplet generation H2O flow:
 - Both kept stable, and only spacer oil increased.
+See Spectrometer Data / metadata sheets.
 
 ***Probing 50 - 200mVpp***
  Pin 46. 10X

@@ -93,7 +93,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, menubar.onPIDstop, menubar.pidItem3)
         self.Bind(wx.EVT_MENU, menubar.onPIDVwr, menubar.pidItem4)
         self.Bind(wx.EVT_MENU, menubar.onStartSpec, menubar.specItem1)
-        self.Bind(wx.EVT_MENU, menubar.onSpecVwr, menubar.specItem2)
+        self.Bind(wx.EVT_MENU, menubar.onStopSpec, menubar.specItem2)
+        self.Bind(wx.EVT_MENU, menubar.onSpecVwr, menubar.specItem3)
         Pumpnrs = list(range(pumpnrs))
         for i in Pumpnrs:
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
@@ -519,28 +520,35 @@ class SortingPanel(wx.Panel):
         #self.SetBackgroundColour('#f2dd88')
 
     def onStart(self):
-        s = 'setup.Sorting(%d)'%(t)
+        s = 'setup.specsp.start()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
+    def onStop(self):
+        s = 'setup.specsp.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
             
     def toggledbutton(self, event):
         # Active State
-        if self.button.GetValue() == True:
+        if self.StartSortBtn.GetValue() == True:
             self.onStart()
-            self.button.SetLabel('Stop')
-            self.button.SetBackgroundColour(250,128,114)
+            self.StartSortBtn.SetLabel('Stop')
+            self.StartSortBtn.SetBackgroundColour(250,128,114)
         # Inactive State
-        if self.button.GetValue() == False:
-            self.button.SetLabel('Start')
-            self.button.SetBackgroundColour(152,251,152)
+        if self.StartSortBtn.GetValue() == False:
+            self.onStop()
+            self.StartSortBtn.SetLabel('Start')
+            self.StartSortBtn.SetBackgroundColour(152,251,152)
 
     def onSetTres(self, event):
         try:
             t=int(float(self.entry1.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'specSP.treshold=%d'%(t)
+        s = 'setup.setTreshold(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -550,37 +558,41 @@ class SortingPanel(wx.Panel):
             t=int(float(self.entry2.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'specSP.scan_time=%d'%(t)
+        s = 'setup.setInttime(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
 
     def onBckgrSpec(self,event):
-        s = 'Spec.background()'
+        s = 'setup.spec.background()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
 
     def onPlaySpec(self,event):
-        s = 'Spec.play()'
+        s = 'setup.spec.play()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
 
     def onPauseSpec(self,event):
-        s = 'Spec.pause()'
+        s = 'setup.spec.pause()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
 
     def onStopSpec(self,event):
-        s = 'Spec.stop()'
+        s = 'setup.spec.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
 
     def onSaveSpec(self,event):
+        s = 'setup.spec.save()'
         print('Data Saved')
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
@@ -624,7 +636,7 @@ class MenuBar(wx.MenuBar):
         specMenu = wx.Menu()
         self.specItem1 = specMenu.Append(wx.ID_ANY, 'Open Spec', 'Spec.start()')
         self.specItem2 = specMenu.Append(wx.ID_ANY, 'Close Spec', 'PID.pause()')
-        self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', 'PID.stop()')
+        self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', '')
         self.Append(specMenu, 'Spectrometer')
 
     def onQuit(self,event):
@@ -688,20 +700,20 @@ class MenuBar(wx.MenuBar):
 
     def onPIDstart(self, event):
         self.PID=True
-        s = 'Pid.start()'
+        s = 'setup.PID.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
     def onPIDpause(self, event):
-        s = 'Pid.pause()'
+        s = 'setup.PID.pause()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
     def onPIDstop(self, event):
         self.PID = False
-        s = 'Pid.stop()'
+        s = 'setup.PID.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
@@ -720,13 +732,20 @@ class MenuBar(wx.MenuBar):
 
     def onStartSpec(self, event):
         self.Spec = True
-        s = 'Spec.start()'
+        s = 'setup.spec.start()'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+                self.udpSend.Send(s)
+
+    def onStopSpec(self, event):
+        self.Spec = True
+        s = 'setup.spec.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
     def onSpecVwr(self, event):
-        cmd = [str(self.tvwr)]
+        cmd = [str(self.svwr)]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":

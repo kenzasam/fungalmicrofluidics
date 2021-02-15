@@ -381,13 +381,15 @@ class Processing(BT.BasicThread):
                  nameID,
                  treshold,
                  noise,
+                 DenoiseType,
                  PeakProminence,
                  PeakWidth,
                  PeakWlen,
                  Pin_cte,
                  Pin_pulse,
                  Pin_onTime,
-                 DenoiseType):
+                 t_wait,
+                 ):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer={})
         self.gpio = gpio
         self.T0 = time.time()
@@ -407,7 +409,7 @@ class Processing(BT.BasicThread):
         #self.dndata = []
         self.spec= None 
         #set for test
-        self.t_wait=2
+        self.t_wait=t_wait
 
     def draft_data(self):
         ''' Use this function to test specSP functions on saved data (Spec.save())
@@ -497,7 +499,7 @@ class Processing(BT.BasicThread):
             #turn top elec on
             if self.enOut:
                 self.gpio.pinPulse(self.pin_pulse, self.onTime)
-                self.teleUpdate('%s, E%d: %d s pulse'%(self.name, self.pin_pulse, self.onTime))
+                self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
     
     def stop(self):
         '''Function stopping the thread and turinging elecs off
