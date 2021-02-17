@@ -418,8 +418,8 @@ class IncubationPanel(wx.Panel):
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
 
-    def onIncubate(self, parent, event):
-        status= parent.PID_status(parent.menubar)
+    def onIncubate(self, event):
+        status= self.PID_status(self.menubar)
         if status != True:
             wx.MessageDialog(self, "Please first start the PID", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -513,6 +513,7 @@ class SortingPanel(wx.Panel):
         srtSizer.Add(titlebox3, 0, wx.ALIGN_CENTER_VERTICAL)
         self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(70,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
+        self.StartSortBtn.SetBackgroundColour((250,128,114))
         box5 = wx.BoxSizer(wx.HORIZONTAL)
         box5.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box5, flag=wx.ALIGN_CENTER_VERTICAL)
@@ -536,12 +537,12 @@ class SortingPanel(wx.Panel):
         if self.StartSortBtn.GetValue() == True:
             self.onStart()
             self.StartSortBtn.SetLabel('Stop')
-            self.StartSortBtn.SetBackgroundColour(250,128,114)
+            self.StartSortBtn.SetBackgroundColour((250,128,114))
         # Inactive State
         if self.StartSortBtn.GetValue() == False:
             self.onStop()
             self.StartSortBtn.SetLabel('Start')
-            self.StartSortBtn.SetBackgroundColour(152,251,152)
+            self.StartSortBtn.SetBackgroundColour((152,251,152))
 
     def onSetTres(self, event):
         try:
@@ -616,7 +617,7 @@ class MenuBar(wx.MenuBar):
         self.nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'nem.bus_open()')
         self.nemItem2 = nemMenu.Append(wx.ID_ANY, 'Close NeMESYS bus', 'nem.bus_close()')
         stopMenu = wx.Menu()
-        self.stopAll = stopMenu.Append(wx.ID_ANY, 'Stop All', '')
+        self.stopAll = stopMenu.Append(wx.ID_ANY, 'Stop All', 'stop')
         self.stopItem=[]
         for i in Pumpnrs:
             self.stopItem.append(stopMenu.Append(wx.ID_ANY, str(i), str(i)))
@@ -636,7 +637,7 @@ class MenuBar(wx.MenuBar):
         specMenu = wx.Menu()
         self.specItem1 = specMenu.Append(wx.ID_ANY, 'Open Spec', 'Spec.start()')
         self.specItem2 = specMenu.Append(wx.ID_ANY, 'Close Spec', 'PID.pause()')
-        self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', '')
+        self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', 'wxSpecViewer')
         self.Append(specMenu, 'Spectrometer')
 
     def onQuit(self,event):

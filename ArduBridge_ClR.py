@@ -77,11 +77,11 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = True #<-- False for simulation
-    PID = True #<-- True / False to build a PID controller.
+    ELEC_EN = False #<-- False for simulation
+    PID = False #<-- True / False to build a PID controller.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = True #<-- True when user wants to use a spectrometer thread.
-    SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
+    SPEC = False #<-- True when user wants to use a spectrometer thread.
+    SPECSP = False #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
@@ -124,19 +124,21 @@ if __name__ == "__main__":
     '''
     print 'PID status: %s' %(PID)
     if PID == True:
-        ### ###
+        #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
+        ########################################################################################
         Pid = threadPID_KS.ArduPidThread(bridge=ardu,
-                                      nameID='PID', #proces name
-                                      Period=0.5,   #Period-time of the control-loop. PID calculation cycle time in sec.
-                                      fbPin=1,      #The analog pin (Ardu) of the temp sensor.
-                                      outPin=10,    #The output pin  of the driver (Ardu connection).
-                                      dirPin=7      #The direction pin for the driver (Ardu connection).
+                                      nameID='PID', #<-- proces name
+                                      Period=0.5,   #<-- Period-time of the control-loop. PID calculation cycle time in sec.
+                                      fbPin=1,      #<-- The analog pin (Ardu) of the temp sensor.
+                                      outPin=10,    #<-- The output pin  of the driver (Ardu connection).
+                                      dirPin=7      #<-- The direction pin for the driver (Ardu connection).
                                       )
-        Pid.PID.Kp = 30 # proportional control of PID
-        Pid.PID.Ki = 1.2 # integral of PID
-        Pid.PID.Kd = 0.0 # rate of change of PID (derivative)
-        Pid.RC_div_DT = 10.0 # time constant, determining how fast you reach settle point
-        ### ^^^ ^^^ ^^^ ###
+        Pid.PID.Kp = 30 #<-- proportional control of PID
+        Pid.PID.Ki = 1.2 #<-- integral of PID
+        Pid.PID.Kd = 0.0 #<-- rate of change of PID (derivative)
+        Pid.RC_div_DT = 10.0 #<-- time constant, determining how fast you reach settle point
+        #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
+        ######################################################################################
         pidViewer=udpSendPid.Send
         Pid.addViewer('UDPpid',pidViewer) #'UDP',udpSendPid1.Send)
         Pid.enIO(True) #PID.enOut = True
@@ -149,18 +151,22 @@ if __name__ == "__main__":
     '''
     print 'Spectrometer Thread status: %s' %(SPEC)
     if SPEC == True:
+        #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
+        ########################################################################################
         #threadSpec = __import__('threadSpec') # delete when you place in ArduBridge. For now place thread in folder
-        Spec = threadSpec.Flame(nameID ='FLAME', # Thread proces name
-                                Period = 0, # Period-time of the control-loop. Defines plotting speed. 
-                                device = 'FLMS04421', # Spectrometer serial number FLMS04421. If empty, first available.
-                                autorepeat = True, # Auto repeat measurements
-                                autosave = False, # Enable Auto Save
-                                dark_frames = 1, # The nr of dark frames
-                                enable_plot = True, # Enable plotting
-                                output_file ='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat',
-                                scan_frames = 1, # Number of frames averaged after which measurement resets.
-                                scan_time = 100000, # Integration time in microseconds
+        Spec = threadSpec.Flame(nameID ='FLAME',    #<-- Thread proces name
+                                Period = 0,         #<-- Period-time of the control-loop. Defines plotting speed. 
+                                device = 'FLMS04421',#<-- Spectrometer serial number FLMS04421. If empty, first available.
+                                autorepeat = True,  #<-- Auto repeat measurements
+                                autosave = False,   #<-- Enable Auto Save
+                                dark_frames = 1,    #<-- The nr of dark frames
+                                enable_plot = True, #<-- Enable plotting
+                                output_file ='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat', #<-- File format for saved data.
+                                scan_frames = 1,    #<-- Number of frames averaged after which measurement resets.
+                                scan_time = 100000, #<-- Integration time in microseconds
                                 )
+        #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
+        ######################################################################################
         specViewer=tcpSendSpec
         Spec.addViewer('TCPspec',specViewer)
         print 'Type Spec.start() to start the spectrometer thread process\n'
@@ -175,22 +181,25 @@ if __name__ == "__main__":
     print 'Spectrometer Signal Processing status: %s' %(SPECSP)
     if SPEC and SPECSP == True:
     #if SPECSP == True:
+        #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
+        ########################################################################################
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
-                                        Period = 0 , # Period-time of the control-loop. Defines plotting speed.
+                                        Period = 0.1 ,      #<-- Period-time of the control-loop [s]. Defines plotting speed.
                                         nameID = 'Auto Sort',
-                                        treshold = 8000, # Treshold peak intensity above which trigger goes.
-                                        noise = 2500, # background noise level.
-                                        DenoiseType = 'BW', # BW, Butterworth filter
+                                        treshold = 3200,    #<-- Treshold peak intensity above which trigger goes.
+                                        noise = 2500,       #<-- background noise level.
+                                        DenoiseType = 'BW', #<-- BW, Butterworth filter
                                         PeakProminence = None,
-                                        PeakWidth = [10,200], # [min,max] width of the peak in nm
+                                        PeakWidth = [10,200],#<-- [min,max] width of the peak in nm
                                         PeakWlen = None, 
-                                        Pin_cte = 37, # electrode to turn on constantly
-                                        Pin_pulse = 38, # electrode to pulse for sorting
-                                        Pin_onTime = 0.5, # pulse on time.
-                                        t_wait=0.7 # time between detection and electrode pulse [s]
+                                        Pin_cte = 37,       #<-- electrode to turn on constantly
+                                        Pin_pulse = 38,     #<-- electrode to pulse for sorting
+                                        Pin_onTime = 0.5,   #<-- pulse on time [s].
+                                        t_wait=0.7          #<-- time between detection and electrode pulse [s]
                                         )
-                                        
-        SpecSP.enIO(True) #Spec.enOut = True
+        #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
+        ######################################################################################                                
+        SpecSP.enIO(True) # sets Spec.enOut to True
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
         SpecSP.spec = Spec
         print 'Spectrometer signal processing library initiated. Access by typing "SpecSP."'
@@ -202,12 +211,15 @@ if __name__ == "__main__":
     '''
     print 'Pumps status: %s' %(PUMPS)
     if PUMPS == True:
-        #Pumpsbridge= __import__('Nemesys_Bridge')  #--> change protocol file if needed
-        Pumps = Pumpsbridge.Nem(
-                deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308", #change path to device configuration folder
-                syringe_diam=[7.29,3.26,3.26,3.26,3.26], #syringe diameter, in mm
-                syringe_stroke=[59,40,40,40,40] #syringe stroke length, in mm
-                )
+        #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
+        ########################################################################################
+        #Pumpsbridge= __import__('Nemesys_Bridge')  #<-- change protocol file if needed
+        Pumps = Pumpsbridge.Nem( deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308", #<-- change path to device configuration folder
+                                syringe_diam=[7.29,3.26,3.26,3.26,3.26], #<-- syringe diameter, in mm
+                                syringe_stroke=[59,40,40,40,40] #<-- syringe stroke length, in mm
+                                )
+        #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
+        ######################################################################################
         #nem=nemesysprot.nemesys(cfg=deviceconfig)
         print 'Syringe pumps ready...'
     else:
