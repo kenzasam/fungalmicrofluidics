@@ -7,6 +7,22 @@
 ## To Do
 
 
+# Mon, DD YYYY 
+
+## Experiment details
+
+## Notes
+
+broke fiber in chip. 
+Used PDMS filled chip.
+
+## To Do
+
+- [ ] peaks" print intensities and wavelengths
+- [ ] for autosort, be able to tell range of wavelennth in between which you expect peak. e.g. in case background substraction doesn't work well...
+- [ ] print for after setting treshold or Int time through GUI.
+
+
 # Feb, 10 2021
 
 ## Experiment details

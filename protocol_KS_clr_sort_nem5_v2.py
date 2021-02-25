@@ -254,6 +254,7 @@ class Setup():
     ####### SPECTROMETER #############
     def setInttime(self, t):
         self.spec.scan_time=t
+        print ("Integration time set to %d ms") %(t)
 
     ####### sorting ##############
     def sortseq(self,nr, t):
@@ -264,6 +265,7 @@ class Setup():
     
     def setTreshold(self, tr):
         self.specsp.treshold = tr
+        print ("Treshold set to %d ") %(tr)
     
     def setOnTime(self, t):
         self.sepcsp.onTime=t

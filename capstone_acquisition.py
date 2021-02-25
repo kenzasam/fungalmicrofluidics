@@ -32,14 +32,13 @@ x_array = np.array(x_array)
 y_array = np.array(y_array)
 z_array = np.array(z_array)
 
-
 with Acquisition(directory='E:\KENZA Folder\CapstoneTests', name='saving_name') as acq:
    x=np.hstack([x_array[:, None]])
    y=np.hstack([y_array[:, None]])
    z=np.hstack([z_array[:, None]])
    #Generate the events for a single z-stack
    xyz = np.hstack([x_array[:, None], y_array[:, None], z_array[:, None]])
-   events = multi_d_acquisition_events(xyz_positions=xyz)           
+   events = multi_d_acquisition_events(xyz_positions=xyz, channel_group='ESP-XLED', channels=['Resorufin', 'BF'])           
    acq.acquire(events)
    #acquire a 2 x 1 grid
    #acq.acquire({'row': 0, 'col': 0})

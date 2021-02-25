@@ -421,7 +421,8 @@ class Processing(BT.BasicThread):
         return a
 
     def denoising(self, y):
-        '''Function to denoise y-data.
+        '''y = Intensity list
+        Function to denoise y-data.
         BW, Buterworth filter
         SG, Savitzky-Golay filter
         '''
@@ -439,8 +440,9 @@ class Processing(BT.BasicThread):
             print('Type needs to be BW or SG')
         return yf
 
-    def findallpeaks(self, y):
-        '''Function to find peaks using scipy signal processing library
+    def findallpeaks(self, x, y):
+        '''x = wavelength list, y = Intensity list
+        Function to find peaks using scipy signal processing library
         '''
         self.peaks = True
         arr = np.asarray(y)
@@ -451,22 +453,25 @@ class Processing(BT.BasicThread):
                                          wlen = self.wlen)
         #peak_ht = properties['peak_heights']
         peak_int = arr[peaks] #peaks is an index
-        return peak_int
+        peak_wvl = x[peaks]
+        return peak_int, peak_wvl
 
-    def findpeaks(self, y):
-        '''Function to find all peaks above treshold using scipy
+    def findpeaks(self, x, y):
+        '''x = wavelength list, y = Intensity list
+        Function to find all peaks above treshold using scipy
          signal processing library
         '''
         self.peaks = True
-        arr = np.asarray(y)
-        peaks, properties = sps.find_peaks(arr,
+        int = np.asarray(y)
+        peaks, properties = sps.find_peaks(int,
                                          height = self.treshold,
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
         #peak_ht = properties['peak_heights']
-        peak_int = arr[peaks]
-        return peak_int
+        peak_int = int[peaks] 
+        peak_wvl = x[peaks]
+        return peak_int, peak_wvl
 
     def enIO(self, val):
         ''' Function used in ArduBridge, to turn comm on 
@@ -488,11 +493,13 @@ class Processing(BT.BasicThread):
     def process(self):
         peakfound = False
         try:
-            #peaks = self.findpeaks(self.spec.data)
-            peaks = self.findpeaks(self.draft_data())
+            int, wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
+            #peaks = self.findpeaks(self.draft_data())
+        
         except:
             print('oops')
-        if len(peaks) > 0:
+        if len(int) > 0:
+            #if peakrange = True:
             peakfound=True
             #wait, depending on distance between detection and electrodes
             time.sleep(self.t_wait)
@@ -500,6 +507,7 @@ class Processing(BT.BasicThread):
             if self.enOut:
                 self.gpio.pinPulse(self.pin_pulse, self.onTime)
                 self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
+                
     
     def stop(self):
         '''Function stopping the thread and turinging elecs off

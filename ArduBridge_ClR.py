@@ -80,8 +80,8 @@ if __name__ == "__main__":
     ELEC_EN = False #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = False #<-- True when user wants to use a spectrometer thread.
-    SPECSP = False #<-- True when user wants to perform signal processing on spectrum .
+    SPEC = True #<-- True when user wants to use a spectrometer thread.
+    SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
