@@ -190,8 +190,9 @@ if __name__ == "__main__":
                                         noise = 2500,       #<-- background noise level.
                                         DenoiseType = 'BW', #<-- BW, Butterworth filter
                                         PeakProminence = None,
-                                        PeakWidth = [10,200],#<-- [min,max] width of the peak in nm
-                                        PeakWlen = None, 
+                                        PeakWidth = [10,200],#<-- [min,max] width of the peak(s) in nm
+                                        PeakWlen = None,
+                                        Peak_range = None,  #<-- [min,max] wavelength of the peak(s) in nm
                                         Pin_cte = 37,       #<-- electrode to turn on constantly
                                         Pin_pulse = 38,     #<-- electrode to pulse for sorting
                                         Pin_onTime = 0.5,   #<-- pulse on time [s].

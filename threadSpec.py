@@ -85,7 +85,6 @@ class SBSimulator:
 
 class Flame(BT.BasicThread):
     def __init__(self,
-                Period,
                 nameID,
                 device,
                 autorepeat,
@@ -97,7 +96,7 @@ class Flame(BT.BasicThread):
                 scan_time,
                 viewer={}
                 ):
-        BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer=viewer)
+        BT.BasicThread.__init__(self, nameID=nameID, Period=0, viewer=viewer)
         self.T0 = time.time()
         self.SPECstatus = False
         self.init_device(device = device)
@@ -221,9 +220,9 @@ class Flame(BT.BasicThread):
     def run(self):
         """
         The thread code that manages the periodic run, pause/play and stop.
-        BT.basicthread overwrite: implement functionality without period
+        BT.basicthread overwrite: implement functionality with period = 0 
         """
-        while ( not(self.stopped()) ):
+        while (not(self.stopped())):
             self.lock.acquire(True)
             if self.enable:
                 ## \/ Code begins below \/
@@ -385,6 +384,7 @@ class Processing(BT.BasicThread):
                  PeakProminence,
                  PeakWidth,
                  PeakWlen,
+                 Peak_range,
                  Pin_cte,
                  Pin_pulse,
                  Pin_onTime,
@@ -401,12 +401,13 @@ class Processing(BT.BasicThread):
         self.width = PeakWidth
         self.wlen = PeakWlen
         self.type = DenoiseType
+        self.range = Peak_range
         self.pin_ct = Pin_cte
         self.pin_pulse = Pin_pulse
         self.onTime = Pin_onTime
+        self.run_autosort = False
         # Instances set by ardubridge
         self.enOut = False
-        #self.dndata = []
         self.spec= None 
         #set for test
         self.t_wait=t_wait
@@ -483,6 +484,7 @@ class Processing(BT.BasicThread):
         electrode pattern for sorting, after 'wait' seconds 
         '''
         print('Starting thread...')
+        self.run_autosort = True
         BT.BasicThread.start(self)
         #turn bottomn elec on
         print('%s: Started ON line'%(self.name))
@@ -493,34 +495,46 @@ class Processing(BT.BasicThread):
     def process(self):
         peakfound = False
         try:
-            int, wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
-            #peaks = self.findpeaks(self.draft_data())
-        
+            p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
+            #p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.draft_data())
+            if len(p_int) > 0:
+                #if peakrange = True:
+                if self.range = None or self.range[0]< p_wvl <self.range[1]
+                    peakfound=True
+                    #wait, depending on distance between detection and electrodes
+                    time.sleep(self.t_wait)
+                    #turn top elec on
+                    if self.enOut:
+                        self.gpio.pinPulse(self.pin_pulse, self.onTime)
+                        self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
         except:
             print('oops')
-        if len(int) > 0:
-            #if peakrange = True:
-            peakfound=True
-            #wait, depending on distance between detection and electrodes
-            time.sleep(self.t_wait)
-            #turn top elec on
-            if self.enOut:
-                self.gpio.pinPulse(self.pin_pulse, self.onTime)
-                self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
-                
     
     def stop(self):
-        '''Function stopping the thread and turinging elecs off
+        '''Function stopping the thread and turning elecs off
         '''
+        self.run_autosort = False
+        self.enable = False
         self.gpio.pinWrite(self.pin_ct, 0)
         self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
         self.enOut = False
         print('Stopping thread...')
         BT.BasicThread.stop(self)
         
-    """
-    def pause():
-    def play():     
-    """
+    
+    def pause(self):
+        """pause the Threading process
+        """
+        self.run_autosort = False
+        self.enable = False
+
+    def play(self):
+        """restart the Threading process
+        """
+        self.run_autosort = True
+        self.enable = True
+        BT.BasicThread.start(self)
+        print('%s: Started ON line'%(self.name))   
+    
             
 
