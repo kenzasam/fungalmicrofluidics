@@ -79,6 +79,7 @@ if __name__ == "__main__":
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
+    MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
     SPEC = True #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
@@ -146,6 +147,24 @@ if __name__ == "__main__":
         print 'type PID.start() to start the PID thread process\n'
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
     '''
+    Setting up micromanager core and image processing
+    '''
+    print 'MM_PROC status: %s' %(MM_PROC)
+    if MM_PROC == True:
+        #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
+        ########################################################################################
+        mmproc = threadPID_KS.ArduPidThread(bridge=ardu,
+                                      nameID='PID', #<-- proces name
+                                      Period=0.5,   #<-- Period-time of the control-loop. PID calculation cycle time in sec.
+                                      fbPin=1,      #<-- The analog pin (Ardu) of the temp sensor.
+                                      outPin=10,    #<-- The output pin  of the driver (Ardu connection).
+                                      dirPin=7      #<-- The direction pin for the driver (Ardu connection).
+                                      )
+        
+        #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
+        ######################################################################################
+        
+    '''
     Setting up spectrometer thread and server.
     This will allow you to retrieve data from a spectrometer and plot it.
     '''
@@ -155,7 +174,6 @@ if __name__ == "__main__":
         ########################################################################################
         #threadSpec = __import__('threadSpec') # delete when you place in ArduBridge. For now place thread in folder
         Spec = threadSpec.Flame(nameID ='FLAME',    #<-- Thread proces name
-                                Period = 0,         #<-- Period-time of the control-loop. Defines plotting speed. 
                                 device = 'FLMS04421',#<-- Spectrometer serial number FLMS04421. If empty, first available.
                                 autorepeat = True,  #<-- Auto repeat measurements
                                 autosave = False,   #<-- Enable Auto Save
@@ -163,7 +181,7 @@ if __name__ == "__main__":
                                 enable_plot = True, #<-- Enable plotting
                                 output_file ='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat', #<-- File format for saved data.
                                 scan_frames = 1,    #<-- Number of frames averaged after which measurement resets.
-                                scan_time = 100000, #<-- Integration time in microseconds
+                                scan_time = 100000 #<-- Integration time in microseconds
                                 )
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
@@ -184,7 +202,7 @@ if __name__ == "__main__":
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
-                                        Period = 0.1 ,      #<-- Period-time of the control-loop [s]. Defines plotting speed.
+                                        Period = 1 ,      #<-- Period-time of the control-loop [s]. Defines plotting speed.
                                         nameID = 'Auto Sort',
                                         treshold = 3200,    #<-- Treshold peak intensity above which trigger goes.
                                         noise = 2500,       #<-- background noise level.
@@ -192,7 +210,7 @@ if __name__ == "__main__":
                                         PeakProminence = None,
                                         PeakWidth = [10,200],#<-- [min,max] width of the peak(s) in nm
                                         PeakWlen = None,
-                                        Peak_range = None,  #<-- [min,max] wavelength of the peak(s) in nm
+                                        Peak_range = [500,600],  #<-- [min,max] wavelength of the peak(s) in nm
                                         Pin_cte = 37,       #<-- electrode to turn on constantly
                                         Pin_pulse = 38,     #<-- electrode to pulse for sorting
                                         Pin_onTime = 0.5,   #<-- pulse on time [s].

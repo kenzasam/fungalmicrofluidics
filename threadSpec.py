@@ -207,15 +207,21 @@ class Flame(BT.BasicThread):
 
     def pause(self):
         #self.run_measurement = False
-        self.enable = False
+        if self.SPECstatus:
+            self.enable = False
+        else:
+            print('Thread is not running in the first place!')
 
     def play(self):
         """restart the Threading process
         """
-        #self.run_measurement = True
-        self.enable=True
-        BT.BasicThread.start(self)
-        print('%s: Started ON line'%(self.name))
+        if self.SPECstatus:
+            #self.run_measurement = True
+            self.enable=True
+            BT.BasicThread.start(self)
+            print('%s: Started ON line'%(self.name))
+        else:
+            print('You need to Spec.start() first!')
 
     def run(self):
         """
@@ -279,7 +285,7 @@ class Flame(BT.BasicThread):
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         if self.SPS != None:
             #dndata = self.SPS.denoising(self.data)
-            peaks = self.SPS.findallpeaks(self.data)
+            peaks = self.SPS.findallpeaks(self.wavelengths, self.data)
             dndata = self.data
             d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks, 'Treshold':self.SPS.treshold , 'DatDn':dndata}
         """sending data dictionary to client, by TCP"""
@@ -497,9 +503,13 @@ class Processing(BT.BasicThread):
         try:
             p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
             #p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.draft_data())
+            #print p_int
+            #print p_wvl
+            z = [i for i in p_wvl if (self.range[0]< i <self.range[1])]
+            if len(z) > 0: zz = True
             if len(p_int) > 0:
                 #if peakrange = True:
-                if self.range = None or self.range[0]< p_wvl <self.range[1]
+                if (self.range == None) or zz:
                     peakfound=True
                     #wait, depending on distance between detection and electrodes
                     time.sleep(self.t_wait)
@@ -508,8 +518,12 @@ class Processing(BT.BasicThread):
                         self.gpio.pinPulse(self.pin_pulse, self.onTime)
                         self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
         except:
-            print('oops')
-    
+            print('Error...')
+            exc_type, exc_value = sys.exc_info()[:2]
+            print '%s : Handling %s exception with message "%s"' % \
+                (self.name, exc_type.__name__, exc_value)
+            #stop thread???
+
     def stop(self):
         '''Function stopping the thread and turning elecs off
         '''
