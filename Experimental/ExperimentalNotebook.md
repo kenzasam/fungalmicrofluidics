@@ -6,6 +6,22 @@
 
 ## To Do
 
+# March,1 2021 
+
+## Experiment details
+Doing a bunch of coding and testing. The autonomoussorting is now ready for use!!
+***Probing 50 - 200mVpp***
+ Pin 46. 10X
+10khz
+## Notes
+```python
+Vpp3=[50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1100, 1300, 1600]
+Vrms3=[3.97, 8.13, 12.1, 16.0, 20.0, 23.9, 27.9, 31.8, 35.7, 39.7, 43.7, 47.7, 51.6, 55.6, 59.5, 63.5, 67.4, 71.0, 87.3, 102, 126]
+```
+## To Do
+
+
+
 
 # Feb, 21 2021 
 
@@ -22,7 +38,7 @@ Auto sort is buggy: for some reason, always in each loop detects drop....
 ## To Do
 
 - [x] peaks" print intensities and wavelengths
-- [ ] for autosort, be able to tell range of wavelennth in between which you expect peak. e.g. in case background substraction doesn't work well...
+- [x] for autosort, be able to tell range of wavelennth in between which you expect peak. e.g. in case background substraction doesn't work well...
 - [x] print for after setting treshold or Int time through GUI.
 
 
@@ -95,8 +111,8 @@ Implemented the code for this in ThreadSpec.py and Specplot.py. Peak detection w
 - [] test elec sequence through GUI
 - [] change period and ontime of elec sequence, tune. GUI?
 - [] test GUI
-- [] test autonomous sorting thread
-- [] plot peaks and annotate with wavelength
+- [x] test autonomous sorting thread
+- [x] plot peaks and annotate with wavelength
 - [] denoised spectrum
 
 # Feb, 02 2021
