@@ -70,6 +70,7 @@ class Spectogram(client.tcpControl):
         self.ydata = [] 
         self.ydata1 = [] # denoised. See decoding.
         self.ydata2 = [] # peaks. See decoding.
+        self.xdata2 = [] # peaks wavelength. See decoding.
         self.ydata3 = 0 # treshold. See decoding.
         self.xdata = []
         self.measurement = 0
@@ -89,10 +90,11 @@ class Spectogram(client.tcpControl):
         if self.enable_sp == True:
             self.line2, = self.ax2.plot([], [], 'b')
             #self.graph3 = self.axes[1].plot([], [], 'bo')
-            #self.graph2, = self.axes.plot([], [], 'r')
+            self.graph2 = self.ax2.scatter([], [], marker = "x")
             self.line3 = self.ax2.axhline(y=self.ydata3, linewidth=3, color='r')
             #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
-            self.graph= [self.line1, self.line2, self.line3]
+            #self.graph= [self.line1, self.line2, self.line3]
+            self.graph= [self.line1, self.line2, self.line3, self.graph2]
         self.figure.suptitle('No measurement taken so far.')
         '''
         for ax in [self.ax1, self.ax2]:
@@ -129,15 +131,11 @@ class Spectogram(client.tcpControl):
            if self.enable_sp == True:
                #denoised
                self.line2.set_data(self.xdata, self.ydata1)
-               
                #peaks
-               ind = [i for i, item in enumerate(self.ydata) if item in self.ydata2]
-               peakwvl = [self.xdata[i] for i in ind]
-               #self.graph2.set_data(peakwvl, self.ydata2)
-               #for i,j in zip(xtemp, self.ydata2):
-               #    self.graph2.annotate(str(j),xy=(i,j+0.5))
+               self.graph2.set_offsets(np.c_[self.xdata2, self.ydata2])
+               for i,j in zip(self.xdata2, self.ydata2):
+                   self.ax2.annotate(str(j),xy=(i,j+0.5))
                #print(peakwvl)
-               
                #treshold https://www.python-course.eu/matplotlib_subplots.php
                self.line3.set_ydata(self.ydata3)
            for ax in [self.ax1, self.ax2]:
@@ -157,10 +155,12 @@ class Spectogram(client.tcpControl):
         #self.scan_frames=object['Fr']
         self.ydata = object['Dat']
         self.xdata = object['L']
-        if 'Peaks' in object:
-            self.ydata2 = object['Peaks']
-        if 'Treshold' in object:
-            self.ydata3 = object['Treshold']
+        if 'Peak_wvl' in object:
+            self.xdata2 = object['Peak_wvl']
+        if 'Peak_int' in object:
+            self.ydata2 = object['Peak_int']
+        if 'Threshold' in object:
+            self.ydata3 = object['Threshold']
         if 'DatDn' in object:
             self.ydata1 = object['DatDn']
         #print 'Msrmt #'

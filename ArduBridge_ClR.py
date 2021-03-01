@@ -77,7 +77,7 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = False #<-- False for simulation
+    ELEC_EN = True #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
     MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
@@ -202,14 +202,15 @@ if __name__ == "__main__":
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
-                                        Period = 1 ,      #<-- Period-time of the control-loop [s]. Defines plotting speed.
+                                        Period = 0.1 ,      #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
                                         nameID = 'Auto Sort',
-                                        treshold = 3200,    #<-- Treshold peak intensity above which trigger goes.
+                                        threshold = 3200,    #<-- Threshold peak intensity above which trigger goes.
                                         noise = 2500,       #<-- background noise level.
                                         DenoiseType = 'BW', #<-- BW, Butterworth filter
-                                        PeakProminence = None,
-                                        PeakWidth = [10,200],#<-- [min,max] width of the peak(s) in nm
-                                        PeakWlen = None,
+                                        PeakProminence = None, #
+                                        PeakWlen = None, #
+                                        PeakThreshold = 100, # Vertical distance to neighbouring peaks
+                                        PeakWidth = [50,200],#<-- [min,max] width of the peak(s) in nm
                                         Peak_range = [500,600],  #<-- [min,max] wavelength of the peak(s) in nm
                                         Pin_cte = 37,       #<-- electrode to turn on constantly
                                         Pin_pulse = 38,     #<-- electrode to pulse for sorting

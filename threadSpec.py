@@ -255,7 +255,7 @@ class Flame(BT.BasicThread):
         print('%s: Terminated\n'%(self.name))
 
     def draft_data(self):
-        with open('YData-20210208-T18h32m07s.dat' , 'r') as f:
+        with open('Spectrometer Data/YData-20210208-T18h32m07s.dat' , 'r') as f:
             for line in f:
                 num=line
                 a = np.fromstring(num[1:-1], sep=',') #, dtype=np.float
@@ -285,12 +285,13 @@ class Flame(BT.BasicThread):
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         if self.SPS != None:
             #dndata = self.SPS.denoising(self.data)
-            peaks = self.SPS.findallpeaks(self.wavelengths, self.data)
+            peak_int, peak_wvl = self.SPS.findallpeaks(self.wavelengths, self.data)
             dndata = self.data
-            d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks, 'Treshold':self.SPS.treshold , 'DatDn':dndata}
+            d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peak_wvl':peak_wvl,'Peak_int':peak_int, 'Threshold':self.SPS.threshold , 'DatDn':dndata}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
+        '''printouts during thread:
         if ((self.measurement % 100) == 0):
             print('O'), #py3: print ('O', end='', flush=True)
         elif (self.measurement % 10) == 0:
@@ -298,6 +299,7 @@ class Flame(BT.BasicThread):
         else:
             print('.'),
             #py3: print('.', end='', flush=True)
+        '''
         if (self.scan_frames > 0):
             if self.measurement % self.scan_frames == 0: # all frames are summed
                 if self.autosave != 0:
@@ -316,7 +318,6 @@ class Flame(BT.BasicThread):
             self.run_measurement = False
             #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
             #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
-            #self.message.set('Ready.')
             #self.teleUpdate('Ready.')
             self.measurement = 0
         else:
@@ -327,19 +328,19 @@ class Flame(BT.BasicThread):
             #print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))
             while count < int(self.dark_frames.get()):
                 newData = list(map(lambda x,y:x+y, self.spec.intensities(), newData))
+                '''printouts whhile thread is running:
                 if (count % 100 == 0):
                     print('O'),
                 elif (count % 10 == 0):
                     print('o'),
                 else:
                     print('.'),
+                '''
                 count += 1
                 #self.message.set('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames.get()))
-                #self.root.update()
             self.darkness_correction = list(map(lambda x:x/count, newData))
             self.have_darkness_correction = True # important for saving file
             #self.axes.set_ylabel('Intensity [corrected count]')
-            #self.message.set(str(self.dark_frames.get()) + ' dark frames scanned. Ready.')
             #print(str(self.dark_frames) + ' dark frames scanned. Ready.')
 
     def save(self):
@@ -384,10 +385,11 @@ class Processing(BT.BasicThread):
                  gpio,
                  Period,
                  nameID,
-                 treshold,
+                 threshold,
                  noise,
                  DenoiseType,
                  PeakProminence,
+                 PeakThreshold,
                  PeakWidth,
                  PeakWlen,
                  Peak_range,
@@ -399,13 +401,14 @@ class Processing(BT.BasicThread):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer={})
         self.gpio = gpio
         self.T0 = time.time()
-        self.treshold = treshold
+        self.threshold = threshold
         self.peaks= False #np.array([])
         self.denoise = False
         self.noise = noise
         self.prom = PeakProminence
         self.width = PeakWidth
         self.wlen = PeakWlen
+        self.dist = PeakThreshold
         self.type = DenoiseType
         self.range = Peak_range
         self.pin_ct = Pin_cte
@@ -455,6 +458,7 @@ class Processing(BT.BasicThread):
         arr = np.asarray(y)
         peaks, properties = sps.find_peaks(arr,
                                          height = self.noise,
+                                         threshold = self.dist,
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
@@ -471,7 +475,8 @@ class Processing(BT.BasicThread):
         self.peaks = True
         int = np.asarray(y)
         peaks, properties = sps.find_peaks(int,
-                                         height = self.treshold,
+                                         height = self.threshold,
+                                         threshold = self.dist,
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
