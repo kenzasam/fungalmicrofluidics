@@ -133,8 +133,10 @@ class Spectogram(client.tcpControl):
                self.line2.set_data(self.xdata, self.ydata1)
                #peaks
                self.graph2.set_offsets(np.c_[self.xdata2, self.ydata2])
+               '''
                for i,j in zip(self.xdata2, self.ydata2):
                    self.ax2.annotate(str(j),xy=(i,j+0.5))
+                '''
                #print(peakwvl)
                #treshold https://www.python-course.eu/matplotlib_subplots.php
                self.line3.set_ydata(self.ydata3)

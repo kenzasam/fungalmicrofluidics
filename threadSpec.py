@@ -508,8 +508,8 @@ class Processing(BT.BasicThread):
         try:
             p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
             #p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.draft_data())
-            #print p_int
-            #print p_wvl
+            print p_int
+            print p_wvl
             z = [i for i in p_wvl if (self.range[0]< i <self.range[1])]
             if len(z) > 0: zz = True
             if len(p_int) > 0:

@@ -6,6 +6,30 @@
 
 ## To Do
 
+#March, 2nd 2021
+## Experiment details
+autosort with fibers and all the bells.
+
+## Notes
+
+## To Do
+
+Settings SApecSP:
+                                        Period = 0.1 ,      #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
+                                        nameID = 'Auto Sort',
+                                        threshold = 3200,    #<-- Threshold peak intensity above which trigger goes.
+                                        noise = 2500,       #<-- background noise level.
+                                        DenoiseType = 'BW', #<-- BW, Butterworth filter
+                                        PeakProminence = None, #
+                                        PeakWlen = None, #
+                                        PeakThreshold = None, #100, # Vertical distance to neighbouring peaks
+                                        PeakWidth = [15,200],#<-- [min,max] width of the peak(s) in nm
+                                        Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in nm
+                                        Pin_cte = 75, #37,       #<-- electrode to turn on constantly
+                                        Pin_pulse = 98, #38,     #<-- electrode to pulse for sorting
+                                        Pin_onTime = 0.2,   #<-- pulse on time [s].
+                                        t_wait=0.1 
+
 # March,1 2021 
 
 ## Experiment details
@@ -19,7 +43,7 @@ Vpp3=[50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 
 Vrms3=[3.97, 8.13, 12.1, 16.0, 20.0, 23.9, 27.9, 31.8, 35.7, 39.7, 43.7, 47.7, 51.6, 55.6, 59.5, 63.5, 67.4, 71.0, 87.3, 102, 126]
 ```
 ## To Do
-
+- [x] add results to graph
 
 
 
