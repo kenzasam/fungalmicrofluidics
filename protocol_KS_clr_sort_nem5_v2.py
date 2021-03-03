@@ -253,8 +253,11 @@ class Setup():
    
     ####### SPECTROMETER #############
     def setInttime(self, t):
-        self.spec.scan_time=t
-        print ("Integration time set to %d ms") %(t)
+        try:
+            self.spec.scan_time=t
+            print ("Integration time set to %d ms") %(t)
+        except:
+            print("Error. Can't set integrtion time.")
 
     ####### sorting ##############
     def sortseq(self,nr, t):
@@ -263,16 +266,28 @@ class Setup():
         self.seq['S%d'%(nr)].start(1)
         print "....................."
     
-    def setTreshold(self, tr):
-        self.specsp.treshold = tr
-        print ("Treshold set to %d ") %(tr)
+    def setThreshold(self, tr):
+        try:
+            self.specsp.threshold = tr
+            print ("Treshold set to %d AU ") %(tr)
+        except:
+            print("Error. Can't set threshold.")
+        
     
     def setOnTime(self, t):
-        self.sepcsp.onTime=t
+        try:
+            self.sepcsp.onTime=t
+            print("onTime set to: %d sec ")%(t)
+        except:
+            print("Error. Can't set onTime.")
 
     def setElecs(self, pin_ct, pin_pulse):
-        self.specsp.pin_ct=pin_ct
-        self.specsp.pin_pulse=pin_pulse
+        try:
+            self.specsp.pin_ct=pin_ct
+            self.specsp.pin_pulse=pin_pulse
+            print("Pin_cte: %d , Pin_pulse: %d.")%(pin_ct, pin_pulse)
+        except:
+            print("Error. Can't set pint_cte or pin_pulse.")
 
     def sortingthingy(self, t_wait, onPin):
         '''Function to start the spectrometer signal processing class (peak detection)

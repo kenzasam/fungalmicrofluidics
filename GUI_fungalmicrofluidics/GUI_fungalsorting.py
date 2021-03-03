@@ -71,7 +71,6 @@ class MainFrame(wx.Frame):
         udpSend = False
         if port > 1:
             udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
-
         '''setting up wx Main Frame window.'''
         self.setup=setup
         self.CreateStatusBar()
@@ -321,6 +320,7 @@ class OperationsPanel(wx.Panel):
     def __init__(self, parent, viewer, udpSend):
         super(OperationsPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
+        self.udpSend = udpSend
         self.cvwr = viewer
         """Create and populate main sizer."""
         fnSizer = wx.BoxSizer(wx.VERTICAL)
@@ -487,10 +487,10 @@ class SortingPanel(wx.Panel):
         srtSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(5)
         box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Treshold Intensity [counts]')
+        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Threshold Intensity [counts]')
         self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(70,24))
-        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetTres)
+        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetThres)
         box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         box2.Add(self.entry1, proportion=1, border=8)
         box2.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
@@ -544,12 +544,12 @@ class SortingPanel(wx.Panel):
             self.StartSortBtn.SetLabel('Start')
             self.StartSortBtn.SetBackgroundColour((152,251,152))
 
-    def onSetTres(self, event):
+    def onSetThres(self, event):
         try:
             t=int(float(self.entry1.GetValue()))
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.setTreshold(%d)'%(t)
+        s = 'setup.setThreshold(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
