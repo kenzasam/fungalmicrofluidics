@@ -81,9 +81,9 @@ class MainFrame(wx.Frame):
         #panel = wx.Panel(self)
         menubar = MenuBar(pumpnrs, self.tvwr, self.svwr, udpSend)
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
+        self.Bind(wx.EVT_MENU, menubar.onCloseAll, menubar.fileItem2)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteClosePort, menubar.arduItem2)
-        self.Bind(wx.EVT_MENU, menubar.onCloseArdu, menubar.arduItem3)
         self.Bind(wx.EVT_MENU, menubar.onOpenNem, menubar.nemItem1)
         self.Bind(wx.EVT_MENU, menubar.onCloseNem, menubar.nemItem2)
         self.Bind(wx.EVT_MENU, menubar.onStopPumps, menubar.stopAll)
@@ -107,10 +107,10 @@ class MainFrame(wx.Frame):
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
         #incpanel = IncubationPanel(panel, self.tvwr, udpSend)
-        self.incpanel = IncubationPanel(self, udpSend)
+        self.incpanel = IncubationPanel(self, menubar, udpSend)
         MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
         #sortingpanel = SortingPanel(panel, self.svwr, udpSend)
-        self.sortingpanel = SortingPanel(self, udpSend)
+        self.sortingpanel = SortingPanel(self, menubar, udpSend)
         MAINbox.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         self.SetMenuBar(menubar)
         #
@@ -333,14 +333,22 @@ class OperationsPanel(wx.Panel):
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         fnSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         fnSizer.AddSpacer(10)
-        self.vwrBtn=wx.Button( self, label='Show chip viewer', name='PID.start()',style=wx.BU_EXACTFIT)
+        self.vwrBtn=wx.Button( self, label='Show chip viewer', name='wxChipViewer',style=wx.BU_EXACTFIT)
         self.vwrBtn.Bind(wx.EVT_BUTTON, self.onVwr)
         fnSizer.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
         #sorting
+        box=wx.BoxSizer(wx.HORIZONTAL)
+        onTime=wx.StaticText(self,  wx.ID_ANY, label='onTime [s]')
+        box.Add(onTime, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        entry=wx.TextCtrl(self, wx.ID_ANY,'0', size=(45, -1))
+        box.Add(entry, proportion=0.5, border=8)
         box1=wx.BoxSizer(wx.HORIZONTAL)
-        self.SortBtn=wx.Button( self, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn=wx.Button( self, 1, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
         self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
         box1.Add(self.SortBtn, flag=wx.RIGHT, border=8)
+        self.SortBtn2=wx.Button( self, 2, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn2.Bind(wx.EVT_BUTTON, self.onSort)
+        box1.Add(self.SortBtn2, flag=wx.RIGHT, border=8)
         '''
         self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]  ')
         box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
@@ -357,7 +365,8 @@ class OperationsPanel(wx.Panel):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onSort(self, event):
-        s = 'setup.sortseq(1)'
+        t=int(self.entry.GetValue())
+        s = 'setup.sortseq(%d, %d)'%(event.GetId(), t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -365,11 +374,11 @@ class OperationsPanel(wx.Panel):
 class IncubationPanel(wx.Panel):
     """Panel class for setting incubation parameters (temperature, time, PID control)
     and imaging pipeline"""
-    def __init__(self, parent, udpSend):
+    def __init__(self, parent, menubar, udpSend):
         super(IncubationPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend = udpSend
-        #self.PID_status=PID
+        self.menu = menubar
         """Create and populate main sizer."""
         incSizer = wx.BoxSizer(wx.VERTICAL)
         #
@@ -419,7 +428,7 @@ class IncubationPanel(wx.Panel):
         self.SetBackgroundColour('#c597c72')
 
     def onIncubate(self, event):
-        status= self.PID_status(self.menubar)
+        status= self.PID_status(self.menu)
         if status != True:
             wx.MessageDialog(self, "Please first start the PID", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -434,6 +443,10 @@ class IncubationPanel(wx.Panel):
             if self.udpSend != False:
                 self.udpSend.Send(s)
 
+    def PID_status(self, menubar):
+            """checkPID status"""
+            return menubar.PID
+
     def onImgsetup(self, event):
         return
 
@@ -442,9 +455,10 @@ class IncubationPanel(wx.Panel):
 
 class SortingPanel(wx.Panel):
     """ Panel class for droplet sorting: starting spectrometer, sorting electrode sequences"""
-    def __init__(self, parent, udpSend):
+    def __init__(self, parent, menubar, udpSend):
         super(SortingPanel, self).__init__(parent)
-        self.udpSend=udpSend
+        self.udpSend = udpSend
+        self.menu = menubar
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
         srtSizer.AddSpacer(5)
@@ -544,25 +558,37 @@ class SortingPanel(wx.Panel):
             self.StartSortBtn.SetLabel('Start')
             self.StartSortBtn.SetBackgroundColour((152,251,152))
 
+    def SPEC_status(self, menubar):
+        """check spec status"""
+        return menubar.SPEC
+
     def onSetThres(self, event):
-        try:
-            t=int(float(self.entry1.GetValue()))
-        except:
-            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.setThreshold(%d)'%(t)
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
+        status=self.SPEC_status(self.menu)
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            try:
+                t=int(float(self.entry1.GetValue()))
+            except:
+                wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+            s = 'setup.setThreshold(%d)'%(t)
+            pyperclip.copy(s)
+            if self.udpSend != False:
+                self.udpSend.Send(s)
 
     def onSetIntt(self, event):
-        try:
-            t=int(float(self.entry2.GetValue()))
-        except:
-            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s = 'setup.setInttime(%d)'%(t)
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
+        status=self.SPEC_status(self.menu)
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            try:
+                t=int(float(self.entry2.GetValue()))
+            except:
+                wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+            s = 'setup.setInttime(%d)'%(t)
+            pyperclip.copy(s)
+            if self.udpSend != False:
+                self.udpSend.Send(s)
 
     def onBckgrSpec(self,event):
         s = 'setup.spec.background()'
@@ -571,29 +597,45 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
 
     def onPlaySpec(self,event):
-        s = 'setup.spec.play()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
+        status=self.SPEC_status(self.menu)
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            s = 'setup.spec.play()'
+            pyperclip.copy(s)
+            if self.udpSend != False:
+                self.udpSend.Send(s)
 
     def onPauseSpec(self,event):
-        s = 'setup.spec.pause()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
+        status=self.SPEC_status(self.menu)
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            s = 'setup.spec.pause()'
+            pyperclip.copy(s)
+            if self.udpSend != False:
+                self.udpSend.Send(s)
 
     def onStopSpec(self,event):
-        s = 'setup.spec.stop()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
+        status=self.SPEC_status(self.menu)
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            s = 'setup.spec.stop()'
+            pyperclip.copy(s)
+            if self.udpSend != False:
+                self.udpSend.Send(s)
 
     def onSaveSpec(self,event):
-        s = 'setup.spec.save()'
-        print('Data Saved')
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
+        status=self.SPEC_status(self.menu)
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            s = 'setup.spec.save()'
+            print('Data Saved')
+            pyperclip.copy(s)
+            if self.udpSend != False:
+                self.udpSend.Send(s)
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
@@ -604,14 +646,15 @@ class MenuBar(wx.MenuBar):
         self.tvwr = tviewer
         self.svwr = sviewer
         self.PID = False
+        self.SPEC = False
         Pumpnrs=list(range(self.pumpnrs))
         fileMenu = wx.Menu()
         self.fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
+        self.fileItem2 = fileMenu.Append(wx.ID_ANY, 'Close all communication', 'Close()')
         self.Append(fileMenu, 'File')
         arduMenu = wx.Menu()
         self.arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port', 'openPort()')
         self.arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'closePort()')
-        self.arduItem3 = arduMenu.Append(wx.ID_ANY, 'Close Arduino comm', 'close()')
         self.Append(arduMenu, 'Ardu')
         nemMenu = wx.Menu()
         self.nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'nem.bus_open()')
@@ -632,18 +675,18 @@ class MenuBar(wx.MenuBar):
         self.pidItem1 = pidMenu.Append(wx.ID_ANY, 'Open PID', 'Pid.start()')
         self.pidItem2 = pidMenu.Append(wx.ID_ANY, 'Pause PID', 'Pid.pause()')
         self.pidItem3 = pidMenu.Append(wx.ID_ANY, 'Close PID', 'Pid.stop()')
-        self.pidItem4 = pidMenu.Append(wx.ID_ANY, 'View Live Temperature Plot', 'www')
+        self.pidItem4 = pidMenu.Append(wx.ID_ANY, 'View Live Temperature Plot', 'wxChipViewer')
         self.Append(pidMenu, 'PID')
         specMenu = wx.Menu()
         self.specItem1 = specMenu.Append(wx.ID_ANY, 'Open Spec', 'Spec.start()')
-        self.specItem2 = specMenu.Append(wx.ID_ANY, 'Close Spec', 'PID.pause()')
+        self.specItem2 = specMenu.Append(wx.ID_ANY, 'Close Spec', 'Spec.pause()')
         self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', 'wxSpecViewer')
         self.Append(specMenu, 'Spectrometer')
 
     def onQuit(self,event):
         self.Close()
 
-    def onCloseArdu(self,event):
+    def onCloseAll(self,event):
         s= 'close()'
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -732,14 +775,14 @@ class MenuBar(wx.MenuBar):
         '''
 
     def onStartSpec(self, event):
-        self.Spec = True
+        self.SPEC = True
         s = 'setup.spec.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
     def onStopSpec(self, event):
-        self.Spec = True
+        self.SPEC = False
         s = 'setup.spec.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
