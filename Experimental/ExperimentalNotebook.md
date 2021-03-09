@@ -6,29 +6,64 @@
 
 ## To Do
 
-#March, 2nd 2021
+# March 4th, 2021
+
 ## Experiment details
-autosort with fibers and all the bells.
+Sorting: varying Vpp and oil flow rate.
+Kept droplet generation constant at W:0.0005, O:0.001/0.0012.
+Made videos of failures.
 
 ## Notes
+All results into spreadsheet.
 
 ## To Do
+- [x] plot and analyze data.
+- [ ] take excerpts from videos
 
-Settings SApecSP:
-                                        Period = 0.1 ,      #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
-                                        nameID = 'Auto Sort',
-                                        threshold = 3200,    #<-- Threshold peak intensity above which trigger goes.
-                                        noise = 2500,       #<-- background noise level.
-                                        DenoiseType = 'BW', #<-- BW, Butterworth filter
-                                        PeakProminence = None, #
-                                        PeakWlen = None, #
-                                        PeakThreshold = None, #100, # Vertical distance to neighbouring peaks
-                                        PeakWidth = [15,200],#<-- [min,max] width of the peak(s) in nm
-                                        Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in nm
-                                        Pin_cte = 75, #37,       #<-- electrode to turn on constantly
-                                        Pin_pulse = 98, #38,     #<-- electrode to pulse for sorting
-                                        Pin_onTime = 0.2,   #<-- pulse on time [s].
-                                        t_wait=0.1 
+
+# March, 2nd 2021
+## Experiment details
+autosort with fibers and all the bells nd whistles.
+With 10ng/L resorufin and BP filter.
+Took around 1 hr to set up: place new chip in holder, inserting fibers, taping fibers, connecting optics, starting flow...
+
+## Notes
+Went ok. Good first try. Problem: outlet of +sorting channel was partially blockd, so not good flow. Also had no clue what ideal Vpp/oil settings were.
+But figured out SpecSP settings! 
+
+**Settings SApecSP:**
+
+Period = 0.1 ,      #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
+nameID = 'Auto Sort',
+threshold = 3200,    #<-- Threshold peak intensity above which trigger goes.
+noise = 2500,       #<-- background noise level.
+DenoiseType = 'BW', #<-- BW, Butterworth filter
+PeakProminence = None, #
+PeakWlen = None, #
+PeakThreshold = None, # Vertical distance to neighbouring peaks
+PeakWidth = [15,200],#<-- [min,max] width of the peak(s) in nm
+Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in nm
+Pin_cte = 75, #37,       #<-- electrode to turn on constantly
+Pin_pulse = 98, #38,     #<-- electrode to pulse for sorting
+Pin_onTime = 0.2,   #<-- pulse on time [s].
+t_wait=0.1 
+
+**Settings PID:**
+
+nameID='PID', #<-- proces name
+Period=0.5,   #<-- Period-time of the control-loop. PID calculation cycle time in sec.
+fbPin=1,      #<-- The analog pin (Ardu) of the temp sensor.
+outPin=10,    #<-- The output pin  of the driver (Ardu connection).
+dirPin=7      #<-- The direction pin for the driver (Ardu connection).                                  
+Pid.PID.Kp = 30 #<-- proportional control of PID
+Pid.PID.Ki = 1.2 #<-- integral of PID
+Pid.PID.Kd = 0.0 #<-- rate of change of PID (derivative)
+Pid.RC_div_DT = 10.0 #<-- time constant, determining how fast you reach settle point
+
+
+## To Do
+- [x] save succesful settings and write in methods or results.
+
 
 # March,1 2021 
 
