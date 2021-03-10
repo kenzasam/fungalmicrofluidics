@@ -81,8 +81,8 @@ if __name__ == "__main__":
     PID = True #<-- True / False to build a PID controller.
     MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = False     #<-- True when user wants to use a spectrometer thread.
-    SPECSP = False #<-- True when user wants to perform signal processing on spectrum .
+    SPEC = True     #<-- True when user wants to use a spectrometer thread.
+    SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
@@ -214,7 +214,7 @@ if __name__ == "__main__":
                                         Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in nm
                                         Pin_cte = 75, #37,       #<-- electrode to turn on constantly
                                         Pin_pulse = 98, #38,     #<-- electrode to pulse for sorting
-                                        Pin_onTime = 0.2,   #<-- pulse on time [s].
+                                        Pin_onTime = 0.8,   #<-- pulse on time [s].
                                         t_wait=0.1          #<-- time between detection and electrode pulse [s]
                                         )
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################

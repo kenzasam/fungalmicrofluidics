@@ -6,6 +6,24 @@
 
 ## To Do
 
+# March, 9 2021
+
+## Experiment details
+Autosort!!
+Two chips: sorter with droplet input, and double drop generator of chiara.
+20ng/mL resorufin.
+Droplet generation varied, see videos.
+
+Trying to find at which speed we can still detect with Int time of 100000.
+
+## Notes
+Plotting has delay when overlay.
+
+## To Do
+- [] Integration time
+- [] easily turn overlay off.
+
+
 # March 4th, 2021
 
 ## Experiment details

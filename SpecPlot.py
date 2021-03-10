@@ -90,11 +90,11 @@ class Spectogram(client.tcpControl):
         if self.enable_sp == True:
             self.line2, = self.ax2.plot([], [], 'b')
             #self.graph3 = self.axes[1].plot([], [], 'bo')
-            self.graph2 = self.ax2.scatter([], [], marker = "x")
+            #self.graph2 = self.ax2.scatter([], [], marker = "x")
             self.line3 = self.ax2.axhline(y=self.ydata3, linewidth=3, color='r')
             #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
-            #self.graph= [self.line1, self.line2, self.line3]
-            self.graph= [self.line1, self.line2, self.line3, self.graph2]
+            self.graph= [self.line1, self.line2, self.line3]
+            #self.graph= [self.line1, self.line2, self.line3, self.graph2]
         self.figure.suptitle('No measurement taken so far.')
         '''
         for ax in [self.ax1, self.ax2]:
@@ -132,7 +132,7 @@ class Spectogram(client.tcpControl):
                #denoised
                self.line2.set_data(self.xdata, self.ydata1)
                #peaks
-               self.graph2.set_offsets(np.c_[self.xdata2, self.ydata2])
+               #self.graph2.set_offsets(np.c_[self.xdata2, self.ydata2])
                '''
                for i,j in zip(self.xdata2, self.ydata2):
                    self.ax2.annotate(str(j),xy=(i,j+0.5))
