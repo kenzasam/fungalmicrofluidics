@@ -20,7 +20,7 @@ Trying to find at which speed we can still detect with Int time of 100000.
 Plotting has delay when overlay.
 
 ## To Do
-- [] Integration time
+- [x] Integration time
 - [] easily turn overlay off.
 
 
@@ -36,7 +36,8 @@ All results into spreadsheet.
 
 ## To Do
 - [x] plot and analyze data.
-- [ ] take excerpts from videos
+- [ / ] take excerpts from videos
+- [ ] make slomo videos of errors
 
 
 # March, 2nd 2021

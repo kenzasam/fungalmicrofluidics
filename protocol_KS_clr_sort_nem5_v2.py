@@ -254,7 +254,7 @@ class Setup():
     ####### SPECTROMETER #############
     def setInttime(self, t):
         try:
-            self.spec.scan_time=t
+            self.spec.set_int_time(t)
             print ("Integration time set to %d ms") %(t)
         except:
             print("Error. Can't set integrtion time.")
