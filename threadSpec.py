@@ -108,7 +108,8 @@ class Flame(BT.BasicThread):
                            output_file = output_file,
                            scan_frames = scan_frames,
                            scan_time = scan_time)
-        self.spec.integration_time_micros(self.scan_time)
+        self.set_int_time(time)
+        #self.spec.integration_time_micros(self.scan_time)
 
     def init_device(self, device=''):
         #Initialize spectrometer device
@@ -174,6 +175,9 @@ class Flame(BT.BasicThread):
         self.data = [0.0]*(self.samplesize)
         self.client = None # TCP client, the Specplot.py
         self.SPS = None #Signal processing class instance set from Ardubridge
+
+    def set_int_time(time): #integration time in microseconds
+        self.spec.integration_time_micros(time)
 
     def start(self):
         """Start the Threading process
