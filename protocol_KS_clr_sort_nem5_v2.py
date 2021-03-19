@@ -266,10 +266,10 @@ class Setup():
         self.seq['S%d'%(nr)].start(1)
         print "....................."
     
-    def setThreshold(self, thr):
+    def setThreshold(self, t):
         try:
-            self.specsp.threshold = tr
-            print ("Treshold set to %d AU ") %(thr)
+            self.specsp.threshold = t
+            print ("Treshold set to %d [AU] ") %(thr)
         except:
             print("Error. Can't set threshold.")
         
