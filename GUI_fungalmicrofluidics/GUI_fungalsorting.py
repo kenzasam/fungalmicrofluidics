@@ -117,6 +117,7 @@ class MainFrame(wx.Frame):
         self.SetSizerAndFit(MAINbox)
         #panel.SetSizerAndFit(MAINbox)
         #self.Centre()
+        
 
     def on_quit_click(self, event):
         """Handle close event."""
@@ -341,12 +342,14 @@ class OperationsPanel(wx.Panel):
         onTime=wx.StaticText(self,  wx.ID_ANY, label='onTime [s]')
         box.Add(onTime, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         entry=wx.TextCtrl(self, wx.ID_ANY,'0', size=(45, -1))
+        fnSizer.Add(box, flag=wx.ALIGN_CENTER_VERTICAL)
+        fnSizer.AddSpacer(5)
         box.Add(entry, proportion=0.5, border=8)
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.SortBtn=wx.Button( self, 1, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
         self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
         box1.Add(self.SortBtn, flag=wx.RIGHT, border=8)
-        self.SortBtn2=wx.Button( self, 2, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn2=wx.Button( self, 2, label='Sort v2', name='Sort()', size=(70,24)) #ADDED KS
         self.SortBtn2.Bind(wx.EVT_BUTTON, self.onSort)
         box1.Add(self.SortBtn2, flag=wx.RIGHT, border=8)
         '''
@@ -416,8 +419,8 @@ class IncubationPanel(wx.Panel):
         incSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         #imaging pipeline
         box4=wx.BoxSizer(wx.HORIZONTAL)
-        self.imgsetupBtn=wx.Button( self, label='Set up imaging pipeline ...', name='PID.start()', style=wx.BU_EXACTFIT)
-        self.imgsetupBtn.Bind(wx.EVT_BUTTON, self.onImgsetup)
+        self.imgsetupBtn=wx.Button( self, label='Start imaging pipeline ...', name='PID.start()', style=wx.BU_EXACTFIT)
+        self.imgsetupBtn.Bind(wx.EVT_BUTTON, self.onShowPopup)
         box4.Add(self.imgsetupBtn, flag=wx.RIGHT, border=8)
         self.ImgBtn=wx.Button( self, label='Start imaging', name='PID.start()', style=wx.BU_EXACTFIT)
         self.ImgBtn.Bind(wx.EVT_BUTTON, self.onImage)
@@ -426,6 +429,11 @@ class IncubationPanel(wx.Panel):
         incSizer.AddSpacer(5)
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
+
+    def onShowPopup(self, event):
+        """Imaging pop-up window"""
+        win = popup()
+        win.Show(True)
 
     def onIncubate(self, event):
         status= self.PID_status(self.menu)
@@ -446,9 +454,6 @@ class IncubationPanel(wx.Panel):
     def PID_status(self, menubar):
             """checkPID status"""
             return menubar.PID
-
-    def onImgsetup(self, event):
-        return
 
     def onImage(self, event):
         return
@@ -501,33 +506,31 @@ class SortingPanel(wx.Panel):
         srtSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(5)
         box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Threshold Intensity [counts]')
-        self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(70,24))
+        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Threshold Intensity [A.U.]')
+        self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(50,24))
         self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetThres)
         box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         box2.Add(self.entry1, proportion=1, border=8)
         box2.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
         box4=wx.BoxSizer(wx.HORIZONTAL)
-        self.text2 = wx.StaticText(self,  wx.ID_ANY, label='Integration time [msec]')
-        self.entry2 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        self.SetInttBtn = wx.Button( self, label='Set', name='Set()', size=(70,24))
+        self.text2 = wx.StaticText(self,  wx.ID_ANY, label='Integration time [ms]')
+        self.entry2 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        self.SetInttBtn = wx.Button( self, label='Set', name='Set()', size=(50,24))
         self.SetInttBtn.Bind(wx.EVT_BUTTON, self.onSetIntt)
         box4.Add(self.text2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         box4.Add(self.entry2, proportion=1, border=8)
         box4.Add(self.SetInttBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(10)
+        #spacer
+        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+        srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         #Sort
-        titlebox3  = wx.BoxSizer(wx.HORIZONTAL)
-        title3 = wx.StaticText(self, label='Sorting')
-        title3.SetFont(font2)
-        titlebox3.Add(title3, flag=wx.ALIGN_LEFT, border=8)
-        srtSizer.Add(titlebox3, 0, wx.ALIGN_CENTER_VERTICAL)
-        self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(70,24))
+        self.StartSortBtn = wx.ToggleButton(self, label='Start Auto-Sort', name='Sort()', size=(90,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
-        self.StartSortBtn.SetBackgroundColour((250,128,114))
+        self.StartSortBtn.SetBackgroundColour((152,251,152))
         box5 = wx.BoxSizer(wx.HORIZONTAL)
         box5.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box5, flag=wx.ALIGN_CENTER_VERTICAL)
@@ -744,20 +747,20 @@ class MenuBar(wx.MenuBar):
 
     def onPIDstart(self, event):
         self.PID=True
-        s = 'setup.PID.start()'
+        s = 'setup.Pid.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
     def onPIDpause(self, event):
-        s = 'setup.PID.pause()'
+        s = 'setup.Pid.pause()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
     def onPIDstop(self, event):
         self.PID = False
-        s = 'setup.PID.stop()'
+        s = 'setup.Pid.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
@@ -792,11 +795,22 @@ class MenuBar(wx.MenuBar):
         cmd = [str(self.svwr)]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
+class popup(wx.Frame):
+    title = "Imaging Pipeline"
+    def __init__(self,parent,id):
+        wx.Frame.__init__(self, id,'popup', size=(1000,700))
+        panel=wx.Panel(self, -1)
+
+        self.SetBackgroundColour(wx.Colour(100,100,100))
+        self.Centre()
+        #self.Show()
+
+
 if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     def fileChooser():
         root = Tkinter.Tk()
         root.withdraw()
-        filename = tkFileDialog.askopenfilename(title = "Select ArduBridge Protocol file", filetypes = (("python files","*.py"),("all files","*.*")))
+        filename = tkFileDialog.askopenfilename(title = "GUI Fungal uFluidics: Select ArduBridge Protocol file", filetypes = (("python files","*.py"),("all files","*.*")))
         return filename
     ver = '3.1.2'
     date = '28/10/2020'
@@ -828,16 +842,21 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     print 'Importing: %s'%(lib)
     print 'Using remote-ip:port -> %s:%d'%(options.ip, options.port)
     protocol = __import__(lib)
-    """for on Mac testing
-    lib="/Users/kenza/OneDrive - Concordia University - Canada/CASB-PhD/Automation/PYTHON/nemesys/"
-    sys.path.append(os.path.abspath(lib))
-    protocol= __import__("protocol_KS_wizzardv4_nemesys5")
-    """
     setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False, PID=False)
     #setup.enOut(True)
     app = wx.App(False)
     frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
     frame.Show()
+    """
+    '''Splash screen'''
+        bitmap = wx.Bitmap('shih.ico')
+        splash = wx.adv.SplashScreen(
+                     bitmap, 
+                     wx.adv.SPLASH_CENTER_ON_SCREEN|wx.adv.SPLASH_TIMEOUT, 
+                     5000, self)
+        splash.Show()
+    """
+
 
     #inspection tool for GUI troubleshooting
     #wx.lib.inspection.InspectionTool().Show()

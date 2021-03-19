@@ -77,11 +77,11 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = True #<-- False for simulation
+    ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
     MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = True     #<-- True when user wants to use a spectrometer thread.
+    SPEC = True#<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
@@ -222,7 +222,8 @@ if __name__ == "__main__":
         SpecSP.enIO(True) # sets Spec.enOut to True
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
         SpecSP.spec = Spec
-        print 'Spectrometer signal processing library initiated. Access by typing "SpecSP."'
+        print 'Access Spec signal processing by typing "SpecSP.". Change sorting Threshold and peakfinding properties accordingly before starting Auto-Sort.'
+        print 'Type "SpecSP.start() to start the auto-sort process."'
     else:
         SpecSP = None
 
@@ -263,7 +264,7 @@ if __name__ == "__main__":
       print 'Change the SPEC spectrometer to True or False to go online'
       print 'status: %s' %(SPEC)
     print 'Loading protocol: %s' %(lib)
-    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=PID)
+    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid)
     #SETUP= False
     SETUP = True
     setup.enOut(ELEC_EN)
