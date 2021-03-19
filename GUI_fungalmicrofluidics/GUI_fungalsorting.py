@@ -163,13 +163,13 @@ class PumpPanel(wx.Panel):
         boxNem3=wx.BoxSizer(wx.HORIZONTAL)
         flrt3=wx.StaticText(self,  wx.ID_ANY, label='Oil [uL/s]')
         boxNem3.Add(flrt3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entryflrt3=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem3.Add(entryflrt3, proportion=0.5, border=8)
+        self.entryflrt3=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem3.Add(self.entryflrt3, proportion=0.5, border=8)
         textPump3=wx.StaticText(self, wx.ID_ANY, label='Pump')
         boxNem3.Add(textPump3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        combo3 = wx.ComboBox(self, value=choices[0], choices=choices)
-        combo3.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem3.Add(combo3, 0, wx.ALIGN_RIGHT)
+        self.combo3 = wx.ComboBox(self, value=choices[0], choices=choices)
+        self.combo3.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem3.Add(self.combo3, 0, wx.ALIGN_RIGHT)
         Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
         boxNem3.Add(Btn3, 0, wx.ALIGN_RIGHT)
@@ -177,13 +177,13 @@ class PumpPanel(wx.Panel):
         boxNem4=wx.BoxSizer(wx.HORIZONTAL)
         flrt4=wx.StaticText(self,  wx.ID_ANY, label='Aq [uL/s]')
         boxNem4.Add(flrt4, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entryflrt4=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem4.Add(entryflrt4, proportion=0.5, border=8)
+        self.entryflrt4=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem4.Add(self.entryflrt4, proportion=0.5, border=8)
         textPump4=wx.StaticText(self, wx.ID_ANY, label='Pump')
         boxNem4.Add(textPump4, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        combo4 = wx.ComboBox(self, value=choices[0], choices=choices)
-        combo4.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem4.Add(combo4, 0, wx.ALIGN_RIGHT)
+        self.combo4 = wx.ComboBox(self, value=choices[0], choices=choices)
+        self.combo4.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem4.Add(self.combo4, 0, wx.ALIGN_RIGHT)
         Btn4=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn4.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
         boxNem4.Add(Btn4, 0, wx.ALIGN_RIGHT)
@@ -191,13 +191,13 @@ class PumpPanel(wx.Panel):
         boxNem0=wx.BoxSizer(wx.HORIZONTAL)
         flrt0=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
         boxNem0.Add(flrt0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entryflrt0=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem0.Add(entryflrt0, proportion=0.5, border=8)
+        self.entryflrt0=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem0.Add(self.entryflrt0, proportion=0.5, border=8)
         textPump0=wx.StaticText(self, wx.ID_ANY, label='Pump')
         boxNem0.Add(textPump0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        combo0 = wx.ComboBox(self, value=choices[0], choices=choices)
-        combo0.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem0.Add(combo0, 0, wx.ALIGN_RIGHT)
+        self.combo0 = wx.ComboBox(self, value=choices[0], choices=choices)
+        self.combo0.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem0.Add(self.combo0, 0, wx.ALIGN_RIGHT)
         Btn0=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn0.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem0.Add(Btn0, 0, wx.ALIGN_RIGHT)
@@ -205,13 +205,13 @@ class PumpPanel(wx.Panel):
         boxNem1=wx.BoxSizer(wx.HORIZONTAL)
         flrt1=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
         boxNem1.Add(flrt1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entryflrt1=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem1.Add(entryflrt1, proportion=0.5, border=8)
+        self.entryflrt1=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem1.Add(self.entryflrt1, proportion=0.5, border=8)
         textPump1=wx.StaticText(self, wx.ID_ANY, label='Pump')
         boxNem1.Add(textPump1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        combo1 = wx.ComboBox(self , value=choices[0], choices=choices)
-        combo1.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem1.Add(combo1, 0, wx.ALIGN_RIGHT)
+        self.combo1 = wx.ComboBox(self , value=choices[0], choices=choices)
+        self.combo1.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem1.Add(self.combo1, 0, wx.ALIGN_RIGHT)
         Btn1=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn1.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem1.Add(Btn1, 0, wx.ALIGN_RIGHT)
@@ -219,13 +219,13 @@ class PumpPanel(wx.Panel):
         boxNem2=wx.BoxSizer(wx.HORIZONTAL)
         flrt2=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
         boxNem2.Add(flrt2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entryflrt2=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem2.Add(entryflrt2, proportion=0.5, border=8)
+        self.entryflrt2=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
+        boxNem2.Add(self.entryflrt2, proportion=0.5, border=8)
         textPump2=wx.StaticText(self, wx.ID_ANY, label='Pump')
         boxNem2.Add(textPump2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        combo2 = wx.ComboBox(self, value=choices[0], choices=choices)
-        combo2.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem2.Add(combo2, 0, wx.ALIGN_RIGHT)
+        self.combo2 = wx.ComboBox(self, value=choices[0], choices=choices)
+        self.combo2.Bind(wx.EVT_COMBOBOX, self.onCombo)
+        boxNem2.Add(self.combo2, 0, wx.ALIGN_RIGHT)
         Btn2=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn2.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem2.Add(Btn2, 0, wx.ALIGN_RIGHT)
@@ -341,10 +341,10 @@ class OperationsPanel(wx.Panel):
         box=wx.BoxSizer(wx.HORIZONTAL)
         onTime=wx.StaticText(self,  wx.ID_ANY, label='onTime [s]')
         box.Add(onTime, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        entry=wx.TextCtrl(self, wx.ID_ANY,'0', size=(45, -1))
+        self.entry=wx.TextCtrl(self, wx.ID_ANY,'0', size=(45, -1))
         fnSizer.Add(box, flag=wx.ALIGN_CENTER_VERTICAL)
         fnSizer.AddSpacer(5)
-        box.Add(entry, proportion=0.5, border=8)
+        box.Add(self.entry, proportion=0.5, border=8)
         box1=wx.BoxSizer(wx.HORIZONTAL)
         self.SortBtn=wx.Button( self, 1, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
         self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
@@ -402,7 +402,7 @@ class IncubationPanel(wx.Panel):
         incSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         #Time
         box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.text2=wx.StaticText(self,  wx.ID_ANY, label='Time [min]:')
+        self.text2=wx.StaticText(self,  wx.ID_ANY, label='Max. Time [min]:')
         box2.Add(self.text2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.entry2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
         box2.Add(self.entry2, proportion=1)
@@ -422,9 +422,6 @@ class IncubationPanel(wx.Panel):
         self.imgsetupBtn=wx.Button( self, label='Start imaging pipeline ...', name='PID.start()', style=wx.BU_EXACTFIT)
         self.imgsetupBtn.Bind(wx.EVT_BUTTON, self.onShowPopup)
         box4.Add(self.imgsetupBtn, flag=wx.RIGHT, border=8)
-        self.ImgBtn=wx.Button( self, label='Start imaging', name='PID.start()', style=wx.BU_EXACTFIT)
-        self.ImgBtn.Bind(wx.EVT_BUTTON, self.onImage)
-        box4.Add(self.ImgBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
         incSizer.AddSpacer(5)
         self.SetSizer(incSizer)
@@ -653,17 +650,17 @@ class MenuBar(wx.MenuBar):
         Pumpnrs=list(range(self.pumpnrs))
         fileMenu = wx.Menu()
         self.fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
-        self.fileItem2 = fileMenu.Append(wx.ID_ANY, 'Close all communication', 'Close()')
+        self.fileItem2 = fileMenu.Append(wx.ID_ANY, 'Close all communication', 'Close all threads safely. Close()')
         self.Append(fileMenu, 'File')
         arduMenu = wx.Menu()
-        self.arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port', 'openPort()')
-        self.arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'closePort()')
+        self.arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port',Open connection with Arduino. openPort()')
+        self.arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'Close connection with Arduino. closePort()')
         self.Append(arduMenu, 'Ardu')
         nemMenu = wx.Menu()
-        self.nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'nem.bus_open()')
-        self.nemItem2 = nemMenu.Append(wx.ID_ANY, 'Close NeMESYS bus', 'nem.bus_close()')
+        self.nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'Open connection with Nemesys. nem.bus_open()')
+        self.nemItem2 = nemMenu.Append(wx.ID_ANY, 'Close NeMESYS bus', 'Close connection with Nemesys. nem.bus_close()')
         stopMenu = wx.Menu()
-        self.stopAll = stopMenu.Append(wx.ID_ANY, 'Stop All', 'stop')
+        self.stopAll = stopMenu.Append(wx.ID_ANY, 'Stop All', 'Stop all pumps.')
         self.stopItem=[]
         for i in Pumpnrs:
             self.stopItem.append(stopMenu.Append(wx.ID_ANY, str(i), str(i)))
@@ -675,15 +672,15 @@ class MenuBar(wx.MenuBar):
         nemMenu.Append(wx.ID_ANY, 'Calibrate', calibrateMenu)
         self.Append(nemMenu, 'Nemesys')
         pidMenu = wx.Menu()
-        self.pidItem1 = pidMenu.Append(wx.ID_ANY, 'Open PID', 'Pid.start()')
-        self.pidItem2 = pidMenu.Append(wx.ID_ANY, 'Pause PID', 'Pid.pause()')
-        self.pidItem3 = pidMenu.Append(wx.ID_ANY, 'Close PID', 'Pid.stop()')
-        self.pidItem4 = pidMenu.Append(wx.ID_ANY, 'View Live Temperature Plot', 'wxChipViewer')
+        self.pidItem1 = pidMenu.Append(wx.ID_ANY, 'Open PID', 'Start PID thread. Pid.start()')
+        self.pidItem2 = pidMenu.Append(wx.ID_ANY, 'Pause PID', 'Pause PID thread. Pid.pause()')
+        self.pidItem3 = pidMenu.Append(wx.ID_ANY, 'Close PID', 'Stop PID thread. Pid.stop()')
+        self.pidItem4 = pidMenu.Append(wx.ID_ANY, 'View Live Temperature Plot', 'Start wxChipViewer')
         self.Append(pidMenu, 'PID')
         specMenu = wx.Menu()
-        self.specItem1 = specMenu.Append(wx.ID_ANY, 'Open Spec', 'Spec.start()')
-        self.specItem2 = specMenu.Append(wx.ID_ANY, 'Close Spec', 'Spec.pause()')
-        self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', 'wxSpecViewer')
+        self.specItem1 = specMenu.Append(wx.ID_ANY, 'Open Spec', 'Start SPEC thread. Spec.start()')
+        self.specItem2 = specMenu.Append(wx.ID_ANY, 'Close Spec', 'Stop SPEC thread. Spec.stop()')
+        self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', 'Start wxSpecViewer')
         self.Append(specMenu, 'Spectrometer')
 
     def onQuit(self,event):
@@ -795,6 +792,7 @@ class MenuBar(wx.MenuBar):
         cmd = [str(self.svwr)]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
+'''        
 class popup(wx.Frame):
     title = "Imaging Pipeline"
     def __init__(self,parent,id):
@@ -804,17 +802,18 @@ class popup(wx.Frame):
         self.SetBackgroundColour(wx.Colour(100,100,100))
         self.Centre()
         #self.Show()
+'''
 
-
-if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
+if __name__ == "__main__":
     def fileChooser():
         root = Tkinter.Tk()
         root.withdraw()
         filename = tkFileDialog.askopenfilename(title = "GUI Fungal uFluidics: Select ArduBridge Protocol file", filetypes = (("python files","*.py"),("all files","*.*")))
         return filename
     ver = '3.1.2'
-    date = '28/10/2020'
+    date = time.strftime("%Y-%m-%d %H:%M")
     print 'GUI: Protocol GUI Ver:%s'%(ver)
+    print'Now:%s'%(date)
     print 'Copyright: Kenza Samlali, 2020'
     #Command line option parser
     parser = OptionParser()
@@ -846,17 +845,17 @@ if __name__ == "GUI_KS_Nemesys.GUI_KS_SC_nemesys" or "__main__":
     #setup.enOut(True)
     app = wx.App(False)
     frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
-    frame.Show()
-    """
+    
+    
     '''Splash screen'''
-        bitmap = wx.Bitmap('shih.ico')
-        splash = wx.adv.SplashScreen(
-                     bitmap, 
-                     wx.adv.SPLASH_CENTER_ON_SCREEN|wx.adv.SPLASH_TIMEOUT, 
-                     5000, self)
-        splash.Show()
-    """
-
+    bitmap = wx.Bitmap('shih.ico')
+    splash = wx.adv.SplashScreen(
+                    bitmap, 
+                    wx.adv.SPLASH_CENTER_ON_SCREEN|wx.adv.SPLASH_TIMEOUT, 
+                    5000, self)
+    splash.Show()
+    
+    frame.Show()
 
     #inspection tool for GUI troubleshooting
     #wx.lib.inspection.InspectionTool().Show()
