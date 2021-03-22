@@ -202,16 +202,18 @@ if __name__ == "__main__":
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
-                                        Period = 0.1 ,      #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
+                                        Period = 0.1 ,          #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
                                         nameID = 'Auto Sort',
-                                        threshold = 3200,    #<-- Threshold peak intensity above which trigger goes.
-                                        noise = 2500,       #<-- background noise level.
-                                        DenoiseType = 'BW', #<-- BW, Butterworth filter
+                                        Gate = [3200, 10000],   #<-- Gating peak intensity: range for which trigger goes.
+                                        noise = 2500,           #<-- background noise level.
+                                        DenoiseType = 'BW',     #<-- BW, Butterworth filter
                                         PeakProminence = None, #
                                         PeakWlen = None, #
                                         PeakThreshold = None, #100, # Vertical distance to neighbouring peaks
-                                        PeakWidth = [15,200],#<-- [min,max] width of the peak(s) in nm
+                                        PeakWidth = [15,200],    #<-- [min,max] width of the peak(s) in nm
                                         Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in nm
+                                        AutoSave = True,           #<-- Enable Auto-saving of Peak info during auto-sort
+                                        Elec = True,             #<-- Enable electrodes
                                         Pin_cte = 75, #37,       #<-- electrode to turn on constantly
                                         Pin_pulse = 98, #38,     #<-- electrode to pulse for sorting
                                         Pin_onTime = 0.8,   #<-- pulse on time [s].
@@ -222,7 +224,7 @@ if __name__ == "__main__":
         SpecSP.enIO(True) # sets Spec.enOut to True
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
         SpecSP.spec = Spec
-        print 'Access Spec signal processing by typing "SpecSP.". Change sorting Threshold and peakfinding properties accordingly before starting Auto-Sort.'
+        print 'Access Spec signal processing by typing "SpecSP.". Change sorting Gate and peakfinding properties accordingly before starting Auto-Sort.'
         print 'Type "SpecSP.start() to start the auto-sort process."'
     else:
         SpecSP = None

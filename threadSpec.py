@@ -291,7 +291,7 @@ class Flame(BT.BasicThread):
             #dndata = self.SPS.denoising(self.data)
             peak_int, peak_wvl = self.SPS.findallpeaks(self.wavelengths, self.data)
             dndata = self.data
-            d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peak_wvl':peak_wvl,'Peak_int':peak_int, 'Threshold':self.SPS.threshold , 'DatDn':dndata}
+            d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peak_wvl':peak_wvl,'Peak_int':peak_int, 'Gate':self.SPS.gate , 'DatDn':dndata}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
@@ -373,7 +373,7 @@ class Flame(BT.BasicThread):
         filename2 = time.strftime('YData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
         with open(filename2, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
             f.write(str(self.data))
-        print('Data saved to ' + filename)
+        print('Data saved to ' + filename + ', YData saved to ' + filename2)
         #except:
         #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
 
@@ -389,7 +389,7 @@ class Processing(BT.BasicThread):
                  gpio,
                  Period,
                  nameID,
-                 threshold,
+                 Gate,
                  noise,
                  DenoiseType,
                  PeakProminence,
@@ -397,16 +397,17 @@ class Processing(BT.BasicThread):
                  PeakWidth,
                  PeakWlen,
                  Peak_range,
+                 AutoSave,
+                 Elec,
                  Pin_cte,
                  Pin_pulse,
                  Pin_onTime,
-                 t_wait,
+                 t_wait
                  ):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer={})
         self.gpio = gpio
-        self.T0 = time.time()
-        self.threshold = threshold
-        self.peaks= False #np.array([])
+        self.gate = Gate
+        self.SAVE = AutoSave
         self.denoise = False
         self.noise = noise
         self.prom = PeakProminence
@@ -415,15 +416,19 @@ class Processing(BT.BasicThread):
         self.dist = PeakThreshold
         self.type = DenoiseType
         self.range = Peak_range
+        self.electhread = Elec
         self.pin_ct = Pin_cte
         self.pin_pulse = Pin_pulse
         self.onTime = Pin_onTime
-        self.run_autosort = False
+        self.t_wait=t_wait
+        
         # Instances set by ardubridge
         self.enOut = False
         self.spec= None 
-        #set for test
-        self.t_wait=t_wait
+        #Other
+        self.T0 = time.time()
+        self.peaks= False #np.array([])
+        self.autosort_status = False
 
     def draft_data(self):
         ''' Use this function to test specSP functions on saved data (Spec.save())
@@ -474,12 +479,12 @@ class Processing(BT.BasicThread):
     def findpeaks(self, x, y):
         '''x = wavelength list, y = Intensity list
         Function to find all peaks above treshold using scipy
-         signal processing library
+        signal processing library
         '''
         self.peaks = True
         int = np.asarray(y)
         peaks, properties = sps.find_peaks(int,
-                                         height = self.threshold,
+                                         height = self.gate,
                                          threshold = self.dist,
                                          prominence = self.prom,
                                          width = self.width,
@@ -499,31 +504,41 @@ class Processing(BT.BasicThread):
         electrode pattern for sorting, after 'wait' seconds 
         '''
         print('Starting thread...')
-        self.run_autosort = True
+        self.autosort_status = True
         BT.BasicThread.start(self)
+        #Make file for saving data
+        if self.SAVE:
+            filename = time.strftime('PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+            with open(filename, 'w') as f:
+                f.write('\n# Time of snapshot: ' + time.strftime(self.timestamp, time.gmtime()))
+                f.write('\n# Number of frames accumulated: ' + str(self.measurement))
+                f.write('\n# Scan time per exposure [us]: ' + str(self.scan_time))
+                f.write('\n# Wavelength [nm], Intensity [count]:\n')
+            print ('Saving all data under ' +filename)
         #turn bottomn elec on
-        print('%s: Started ON line'%(self.name))
-        if self.enOut:
-                self.gpio.pinWrite(self.pin_ct, 1)
-                self.teleUpdate('%s, E%d: 1'%(self.name, self.pin_ct))
+        
+        if self.electhread and self.enOut:
+            print('%s: Started ON line'%(self.name))
+            self.gpio.pinWrite(self.pin_ct, 1)
+            self.teleUpdate('%s, E%d: 1'%(self.name, self.pin_ct))
     
     def process(self):
         peakfound = False
         try:
+            #Find peaks
             p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
-            #p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.draft_data())
             print p_int
             print p_wvl
+            #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.range[0]< i <self.range[1])]
             if len(z) > 0: zz = True
-            if len(p_int) > 0:
-                #if peakrange = True:
-                if (self.range == None) or zz:
+            if len(p_int) > 0 and ( (self.range == None) or zz):
                     peakfound=True
-                    #wait, depending on distance between detection and electrodes
-                    time.sleep(self.t_wait)
-                    #turn top elec on
-                    if self.enOut:
+                    if self.SAVE: self.savepeaks(fname, p_int, p_wvl)
+                    if self.electhread and self.enOut:
+                        #wait, depending on distance between detection and electrodes
+                        time.sleep(self.t_wait)
+                        #turn top elec on
                         self.gpio.pinPulse(self.pin_pulse, self.onTime)
                         self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
         except:
@@ -536,8 +551,7 @@ class Processing(BT.BasicThread):
     def stop(self):
         '''Function stopping the thread and turning elecs off
         '''
-        self.run_autosort = False
-        self.enable = False
+        self.autosort_status = False
         self.gpio.pinWrite(self.pin_ct, 0)
         self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
         self.enOut = False
@@ -546,18 +560,23 @@ class Processing(BT.BasicThread):
         
     
     def pause(self):
-        """pause the Threading process
+        """Pause the Threading process
         """
-        self.run_autosort = False
-        self.enable = False
+        self.autosort_status = False
 
     def play(self):
-        """restart the Threading process
+        """Restart the Threading process
         """
-        self.run_autosort = True
-        self.enable = True
+        self.autosort_status = True
         BT.BasicThread.start(self)
         print('%s: Started ON line'%(self.name))   
-    
-            
+
+    def savepeaks(self, filename, xdata, ydata):
+        """Save all detected peaks (wavelength, RFU) into snapshot file.
+        """
+        #self.spec.save()
+        fname = filename
+        with open(fname, 'w') as f:
+            f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
+        print('Peak data added to ' + fname)
 

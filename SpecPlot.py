@@ -71,7 +71,7 @@ class Spectogram(client.tcpControl):
         self.ydata1 = [] # denoised. See decoding.
         self.ydata2 = [] # peaks. See decoding.
         self.xdata2 = [] # peaks wavelength. See decoding.
-        self.ydata3 = 0 # treshold. See decoding.
+        self.ydata3 = [0,0] # treshold. See decoding.
         self.xdata = []
         self.measurement = 0
         ###########
@@ -91,9 +91,10 @@ class Spectogram(client.tcpControl):
             self.line2, = self.ax2.plot([], [], 'b')
             #self.graph3 = self.axes[1].plot([], [], 'bo')
             #self.graph2 = self.ax2.scatter([], [], marker = "x")
-            self.line3 = self.ax2.axhline(y=self.ydata3, linewidth=3, color='r')
+            self.line3 = self.ax2.axhline(y=self.ydata3[0], linewidth=3, color='r')
+            self.area = self.ax2.axhspan(self.ydata3[0], self.ydata3[1], xmin=0, xmax=1,facecolor='r', alpha=0.5)
             #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
-            self.graph= [self.line1, self.line2, self.line3]
+            self.graph= [self.line1, self.line2, self.line3, self.area]
             #self.graph= [self.line1, self.line2, self.line3, self.graph2]
         self.figure.suptitle('No measurement taken so far.')
         '''
@@ -138,8 +139,11 @@ class Spectogram(client.tcpControl):
                    self.ax2.annotate(str(j),xy=(i,j+0.5))
                 '''
                #print(peakwvl)
-               #treshold https://www.python-course.eu/matplotlib_subplots.php
-               self.line3.set_ydata(self.ydata3)
+               #gate https://www.python-course.eu/matplotlib_subplots.php
+               self.line3.set_ydata(self.ydata3[0])
+               v=([self.ydata3[0],0] ,[self.ydata3[1],0], [self.ydata3[0],1100], [self.ydata3[1],1100])
+               v=[self.ydata3[0],[self.ydata3[1]]
+               self.area.set_xy(v)
            for ax in [self.ax1, self.ax2]:
                ax.relim()
                ax.autoscale_view(True, True, True)
@@ -161,8 +165,8 @@ class Spectogram(client.tcpControl):
             self.xdata2 = object['Peak_wvl']
         if 'Peak_int' in object:
             self.ydata2 = object['Peak_int']
-        if 'Threshold' in object:
-            self.ydata3 = object['Threshold']
+        if 'Gate' in object:
+            self.ydata3 = object['Gate']
         if 'DatDn' in object:
             self.ydata1 = object['DatDn']
         #print 'Msrmt #'
@@ -175,8 +179,6 @@ if __name__== "__main__":
     PROC_EN = True # Allow plotting
     CLIENT_PORT = 7002 # Client port to which udpSend package is sent. See ArduBridge.
     IP = '127.0.0.1' # Client ip adress to which udpSend package is sent. See ArduBridge.
-    SCANTIME = 1000 # The integration time in us.
-    SCANFRAMES = 1 # The total nr of measurements/frames that will be summed.
     VERSION = '1.0.0' # version
     #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
     print 'GUI: Protocol GUI Ver:%s'%(VERSION)
@@ -186,27 +188,21 @@ if __name__== "__main__":
     parser = OptionParser()
     parser.add_option('-i', '--ip', dest='ip', help='Client IP address', type='string', default=IP)
     parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=CLIENT_PORT)
-    #parser.add_option('-t', '--scantime', dest='scantime', help='Integration time of spectrometer. See ArduBridge', type='int', default=SCANTIME)
-    #parser.add_option('-f', '--frames', dest='frames', help='Number of scan frames to sum for each experiment. See ArduBridge', type='int', default=SCANFRAMES)
     parser.add_option('-p', '--plot', dest='plot', help='Enable plotting', type='int', default=PLOT_EN)
     parser.add_option('-s', '--sproc', dest='proc', help='Enable signal processing', type='int', default=PROC_EN)
     (options, args) = parser.parse_args()
 
     """Spectogram class Instance"""
     ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, enable_sp=options.proc)
-    #ag=Spectogram(nameID='tcpSpecPlot', DesIP=options.ip, RxPort=options.port, callFunc=Spectogram.decodingPayload, enable_plot=options.plot, enable_proc=options.proc, scan_frames=options.frames, scan_time=options.scantime)
-    #ag=Spectogram(TCP=udpConsol, enable_plot=True, scan_frames=scan_frames, measurement=measurement, scan_time=scan_time)
-    #ag=Spectogram(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=Spectogram.decodingPayload,enable_plot=True, scan_frames=scan_frames, scan_time=scan_time) # , measurement=measurement
-
+   
     """Start client thread"""
     client.tcpControl.start(ag)
+    print 'TCP plotting thread started succesfully. Waiting for data from client.'
 
     """Create a FuncAnimation object to make the animation. The arguments are:
            ag.figure: the current active figure
            ag.animate: function which updates the plot from one frame to the next. Is looped continuously.
     """
-    print 'TCP plotting thread started succesfully. Waiting for data from client.'
     #if ag.received==True: #we should check this conditions beforehand. But I tried and somehow the plot remains empty.....
     plot_animation= animation.FuncAnimation(ag.figure, ag.animate, blit=False) #frames=gen_function, init_func=self.init_plot
     plot.show()
-    #self.plot_animation= animation.FuncAnimation(self.figure, self.animate, init_func=ag.init_plot, frames=gen_function, interval=10, blit=True)

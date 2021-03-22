@@ -37,7 +37,9 @@ pause.png, play.png, stop.png: Freepik (CC license)
 #-------------------------------------------------------------------
 """
 import wx
+import wx.adv
 import wx.lib.inspection
+import time
 import os, sys
 import pyperclip
 import Tkinter, tkFileDialog
@@ -653,7 +655,7 @@ class MenuBar(wx.MenuBar):
         self.fileItem2 = fileMenu.Append(wx.ID_ANY, 'Close all communication', 'Close all threads safely. Close()')
         self.Append(fileMenu, 'File')
         arduMenu = wx.Menu()
-        self.arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port',Open connection with Arduino. openPort()')
+        self.arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port', 'Open connection with Arduino. openPort()')
         self.arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'Close connection with Arduino. closePort()')
         self.Append(arduMenu, 'Ardu')
         nemMenu = wx.Menu()
@@ -817,7 +819,7 @@ if __name__ == "__main__":
     print 'Copyright: Kenza Samlali, 2020'
     #Command line option parser
     parser = OptionParser()
-    parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='Demoprotocol')
+    parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='E:/KENZA Folder/PYTHON/fungalmicrofluidics/protocol_KS_clr_sort_nem5_v2.py')
     parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=7010)
     parser.add_option('-i', '--ip', dest='ip', help='Remote ip (UDP client) to send the commands', type='string', default='127.0.0.1')
     parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat')
@@ -845,18 +847,14 @@ if __name__ == "__main__":
     #setup.enOut(True)
     app = wx.App(False)
     frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
-    
-    
-    '''Splash screen'''
+    '''Show splash screen'''
     bitmap = wx.Bitmap('shih.ico')
     splash = wx.adv.SplashScreen(
                     bitmap, 
-                    wx.adv.SPLASH_CENTER_ON_SCREEN|wx.adv.SPLASH_TIMEOUT, 
-                    5000, self)
+                    wx.adv.SPLASH_CENTER_ON_PARENT|wx.adv.SPLASH_TIMEOUT, 2000, frame)
     splash.Show()
-    
+    '''Show main frame'''
     frame.Show()
-
     #inspection tool for GUI troubleshooting
     #wx.lib.inspection.InspectionTool().Show()
     #

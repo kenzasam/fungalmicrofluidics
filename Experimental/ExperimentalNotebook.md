@@ -6,6 +6,26 @@
 
 ## To Do
 
+# March 20th 2021
+
+## Experiment details
+Auto-sort: 20ng/L Resorufin, H2O in two T-junction device. Bridge to sorter (with droplet generator, since we don't have good ones with droplet collection anymore.) Two yellow tubing going outside.
+Let run for a bit, thenm perform autosort at these scenarios:
+
+- 450Vpp, 80nL/s, 0.1t
+- 350Vpp 60nL/s, 0.13
+
+## Notes
+use tubing of Sam to fit yellow tubing inside and make bridge. Surprisingly worked.
+Droplet collection chip = incubation chamber chip. Not ideal... drops just fly past. What else??
+
+Drops came in with too many resorui=fin positive. How can I control the ratio of Reso+ vs H2O
+
+## To Do
+- [] GUI splash screen
+- [] add time interval for sorting into GUI/
+- [] Know whether spec is on, from Ardubridge, npt GUI....
+
 # March, 9 2021
 
 ## Experiment details
@@ -27,6 +47,7 @@ Plotting has delay when overlay.
 # March 4th, 2021
 
 ## Experiment details
+SORTING EFFICIENCY GRAPH
 Sorting: varying Vpp and oil flow rate.
 Kept droplet generation constant at W:0.0005, O:0.001/0.0012.
 Made videos of failures.
