@@ -266,54 +266,35 @@ class Setup():
         self.seq['S%d'%(nr)].start(1)
         print "....................."
     
-    def setThreshold(self, t):
+    def setGate(self, lower, upper):
         try:
-            self.specsp.threshold = t
-            print ("Treshold set to %d [AU] ") %(thr)
+            self.specsp.gate = [lower,upper]
+            print ("Gate set to %d - %d [RFU] ") %(lower, upper)
         except:
             print("Error. Can't set threshold.")
-        
-    
+
+    def setDropTime(self,t):
+        try:
+            self.specsp.t_wait = t
+            print("Droplet travel time set to: %d sec ") %(t)
+        except:
+            print("Error. Can't set Droplet travel Time.")
+
     def setOnTime(self, t):
         try:
-            self.sepcsp.onTime=t
+            self.specsp.onTime = t
             print("onTime set to: %d sec ")%(t)
         except:
             print("Error. Can't set onTime.")
 
     def setElecs(self, pin_ct, pin_pulse):
         try:
-            self.specsp.pin_ct=pin_ct
-            self.specsp.pin_pulse=pin_pulse
-            print("Pin_cte: %d , Pin_pulse: %d.")%(pin_ct, pin_pulse)
+            self.specsp.pin_ct = pin_ct
+            self.specsp.pin_pulse = pin_pulse
+            print("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse)
         except:
             print("Error. Can't set pint_cte or pin_pulse.")
 
-    def sortingthingy(self, t_wait, onPin):
-        '''Function to start the spectrometer signal processing class (peak detection)
-        and actuating electrode pattern for sorting, after 'wait' seconds 
-        '''
-        t=t_wait #seconds
-        #check if Spec process is running
-        #try:
-        while True:
-            if self.spec.SPECstatus == True:
-                #start SpecSP process
-                self.specsp.start()
-                #turn on bottom elec
-                self.ExtGpio.pinWrite(onPin, 1)
-                #check if peak above treshold was detected
-                while self.specsp.erm == True:
-                    time.sleep(t)
-                    print('!!!....Droplet > Treshold intensity detected....!!!')
-                    self.seq['S%d'%(nr)].onTime = t
-                    self.seq['S%d'%(nr)].start(1)
-                self.ExtGpio.pinWrite(onPin, 0)
-        '''    
-        except:
-            print ('Spectrometer thread needs to be started first. Spec.start()')
-            return
-        '''
     ####### incubating ##############
     def incubation(self,RC=0.5,T=37,t=30):
         '''Function to start the PID process, set it to a certain temperature,

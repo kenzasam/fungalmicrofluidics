@@ -504,15 +504,7 @@ class SortingPanel(wx.Panel):
         box3.Add(self.SaveBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(5)
-        box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Threshold Intensity [A.U.]')
-        self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
-        self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(50,24))
-        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetThres)
-        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        box2.Add(self.entry1, proportion=1, border=8)
-        box2.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
-        srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
+    
         box4=wx.BoxSizer(wx.HORIZONTAL)
         self.text2 = wx.StaticText(self,  wx.ID_ANY, label='Integration time [ms]')
         self.entry2 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
@@ -527,6 +519,17 @@ class SortingPanel(wx.Panel):
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
         #Sort
+        box2=wx.BoxSizer(wx.HORIZONTAL)
+        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Gating [RFU]')
+        self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        self.entry11 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(50,24))
+        self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetGate)
+        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        box2.Add(self.entry1, proportion=1, border=8)
+        box2.Add(self.entry11, proportion=1, border=8)
+        box2.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
         self.StartSortBtn = wx.ToggleButton(self, label='Start Auto-Sort', name='Sort()', size=(90,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
         self.StartSortBtn.SetBackgroundColour((152,251,152))
@@ -564,16 +567,17 @@ class SortingPanel(wx.Panel):
         """check spec status"""
         return menubar.SPEC
 
-    def onSetThres(self, event):
+    def onSetGate(self, event):
         status=self.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
             try:
-                t=int(float(self.entry1.GetValue()))
+                t1=int(float(self.entry1.GetValue()))
+                t2=int(float(self.entry11.GetValue()))
             except:
                 wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-            s = 'setup.setThreshold(%d)'%(t)
+            s = 'setup.setGate(%d, %d)'%(t1,t2)
             pyperclip.copy(s)
             if self.udpSend != False:
                 self.udpSend.Send(s)
@@ -591,6 +595,16 @@ class SortingPanel(wx.Panel):
             pyperclip.copy(s)
             if self.udpSend != False:
                 self.udpSend.Send(s)
+
+    def onSetDropTime(self,event):
+        try:
+                t=int(float(self.entry2.GetValue()))
+        except:
+            wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        s= 'setup.setDropTime(%d)'%(t)
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
 
     def onBckgrSpec(self,event):
         s = 'setup.spec.background()'

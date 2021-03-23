@@ -179,7 +179,7 @@ if __name__ == "__main__":
                                 autosave = False,   #<-- Enable Auto Save
                                 dark_frames = 1,    #<-- The nr of dark frames
                                 enable_plot = True, #<-- Enable plotting
-                                output_file ='Snapshot-%Y-%m-%dT%H:%M:%S%z.dat', #<-- File format for saved data.
+                                output_file ='Snapshot.dat', #<-- File format for saved data.
                                 scan_frames = 1,    #<-- Number of frames averaged after which measurement resets.
                                 scan_time = 100000 #<-- Integration time in microseconds
                                 )
@@ -204,20 +204,21 @@ if __name__ == "__main__":
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
                                         Period = 0.1 ,          #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
                                         nameID = 'Auto Sort',
-                                        Gate = [3200, 10000],   #<-- Gating peak intensity: range for which trigger goes.
+                                        Gate = [3200, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
                                         noise = 2500,           #<-- background noise level.
                                         DenoiseType = 'BW',     #<-- BW, Butterworth filter
                                         PeakProminence = None, #
                                         PeakWlen = None, #
                                         PeakThreshold = None, #100, # Vertical distance to neighbouring peaks
-                                        PeakWidth = [15,200],    #<-- [min,max] width of the peak(s) in nm
-                                        Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in nm
-                                        AutoSave = True,           #<-- Enable Auto-saving of Peak info during auto-sort
+                                        PeakWidth = [15,200],    #<-- [min,max] width of the peak(s) in [nm]
+                                        Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in [nm]
+                                        AutoSave = False,           #<-- Enable Auto-saving of Peak info during auto-sort
+                                        output_file = 'PeakData.dat' , #<-- File format for saved data.
                                         Elec = True,             #<-- Enable electrodes
-                                        Pin_cte = 75, #37,       #<-- electrode to turn on constantly
-                                        Pin_pulse = 98, #38,     #<-- electrode to pulse for sorting
-                                        Pin_onTime = 0.8,   #<-- pulse on time [s].
-                                        t_wait=0.1          #<-- time between detection and electrode pulse [s]
+                                        Pin_cte = 75, #37,       #<-- electrode nr to turn on constantly
+                                        Pin_pulse = 98, #38,     #<-- electrode nr to pulse for sorting
+                                        Pin_onTime = 0.8,   #<-- pulse on time [sec].
+                                        t_wait=0.1          #<-- time between detection and electrode pulse [sec]
                                         )
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################                                

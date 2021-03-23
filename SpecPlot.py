@@ -142,7 +142,7 @@ class Spectogram(client.tcpControl):
                #gate https://www.python-course.eu/matplotlib_subplots.php
                self.line3.set_ydata(self.ydata3[0])
                v=([self.ydata3[0],0] ,[self.ydata3[1],0], [self.ydata3[0],1100], [self.ydata3[1],1100])
-               v=[self.ydata3[0],[self.ydata3[1]]
+               #v=([self.ydata3[0],self.ydata3[1]])
                self.area.set_xy(v)
            for ax in [self.ax1, self.ax2]:
                ax.relim()

@@ -398,6 +398,7 @@ class Processing(BT.BasicThread):
                  PeakWlen,
                  Peak_range,
                  AutoSave,
+                 output_file,
                  Elec,
                  Pin_cte,
                  Pin_pulse,
@@ -408,6 +409,7 @@ class Processing(BT.BasicThread):
         self.gpio = gpio
         self.gate = Gate
         self.SAVE = AutoSave
+        self.output_file = output_file
         self.denoise = False
         self.noise = noise
         self.prom = PeakProminence
@@ -494,7 +496,7 @@ class Processing(BT.BasicThread):
         peak_wvl = x[peaks]
         return peak_int, peak_wvl
 
-    def enIO(self, val):
+    def enIO(self,val):
         ''' Function used in ArduBridge, to turn comm on 
         '''
         self.enOut = True
@@ -505,23 +507,24 @@ class Processing(BT.BasicThread):
         '''
         print('Starting thread...')
         self.autosort_status = True
-        BT.BasicThread.start(self)
         #Make file for saving data
         if self.SAVE:
-            filename = time.strftime('PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+            global filename
+            filename = time.strftime( 'PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
             with open(filename, 'w') as f:
-                f.write('\n# Time of snapshot: ' + time.strftime(self.timestamp, time.gmtime()))
-                f.write('\n# Number of frames accumulated: ' + str(self.measurement))
-                f.write('\n# Scan time per exposure [us]: ' + str(self.scan_time))
+                f.write('\n# Time of snapshot: ' + time.strftime(self.spec.timestamp, time.gmtime()))
+                f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
+                f.write('\n# Scan time per exposure [us]: ' + str(self.spec.scan_time))
                 f.write('\n# Wavelength [nm], Intensity [count]:\n')
             print ('Saving all data under ' +filename)
-        #turn bottomn elec on
-        
+        #turn bottom electrode on
         if self.electhread and self.enOut:
             print('%s: Started ON line'%(self.name))
             self.gpio.pinWrite(self.pin_ct, 1)
             self.teleUpdate('%s, E%d: 1'%(self.name, self.pin_ct))
-    
+        # starting thread
+        BT.BasicThread.start(self)
+
     def process(self):
         peakfound = False
         try:
@@ -534,7 +537,7 @@ class Processing(BT.BasicThread):
             if len(z) > 0: zz = True
             if len(p_int) > 0 and ( (self.range == None) or zz):
                     peakfound=True
-                    if self.SAVE: self.savepeaks(fname, p_int, p_wvl)
+                    if self.SAVE: self.savepeaks(filename, p_int, p_wvl)
                     if self.electhread and self.enOut:
                         #wait, depending on distance between detection and electrodes
                         time.sleep(self.t_wait)
@@ -571,11 +574,11 @@ class Processing(BT.BasicThread):
         BT.BasicThread.start(self)
         print('%s: Started ON line'%(self.name))   
 
-    def savepeaks(self, filename, xdata, ydata):
-        """Save all detected peaks (wavelength, RFU) into snapshot file.
+    def savepeaks(name, xdata, ydata):
+        """Append all detected peaks (wavelength, RFU) into one snapshot file.
         """
         #self.spec.save()
-        fname = filename
+        fname = name
         with open(fname, 'w') as f:
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
         print('Peak data added to ' + fname)
