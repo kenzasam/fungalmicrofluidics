@@ -389,14 +389,14 @@ class Processing(BT.BasicThread):
                  gpio,
                  Period,
                  nameID,
-                 Gate,
+                 intensity_gate,
+                 wavelength_gate,
                  noise,
                  DenoiseType,
                  PeakProminence,
                  PeakThreshold,
                  PeakWidth,
                  PeakWlen,
-                 Peak_range,
                  AutoSave,
                  output_file,
                  Elec,
@@ -407,7 +407,7 @@ class Processing(BT.BasicThread):
                  ):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer={})
         self.gpio = gpio
-        self.gate = Gate
+        self.gate = intensity_gate
         self.SAVE = AutoSave
         self.output_file = output_file
         self.denoise = False
@@ -417,7 +417,7 @@ class Processing(BT.BasicThread):
         self.wlen = PeakWlen
         self.dist = PeakThreshold
         self.type = DenoiseType
-        self.range = Peak_range
+        self.range = wavelength_gate
         self.electhread = Elec
         self.pin_ct = Pin_cte
         self.pin_pulse = Pin_pulse
@@ -515,7 +515,7 @@ class Processing(BT.BasicThread):
                 f.write('\n# Time of snapshot: ' + time.strftime(self.spec.timestamp, time.gmtime()))
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
                 f.write('\n# Scan time per exposure [us]: ' + str(self.spec.scan_time))
-                f.write('\n# Wavelength [nm], Intensity [count]:\n')
+                f.write('\n Wavelength [nm], Intensity [RFU]:\n')
             print ('Saving all data under ' +filename)
         #turn bottom electrode on
         if self.electhread and self.enOut:
@@ -537,7 +537,7 @@ class Processing(BT.BasicThread):
             if len(z) > 0: zz = True
             if len(p_int) > 0 and ( (self.range == None) or zz):
                     peakfound=True
-                    if self.SAVE: self.savepeaks(filename, p_int, p_wvl)
+                    if self.SAVE: self.savepeaks(filename, p_wvl, p_int)
                     if self.electhread and self.enOut:
                         #wait, depending on distance between detection and electrodes
                         time.sleep(self.t_wait)
@@ -574,12 +574,12 @@ class Processing(BT.BasicThread):
         BT.BasicThread.start(self)
         print('%s: Started ON line'%(self.name))   
 
-    def savepeaks(name, xdata, ydata):
+    def savepeaks(self, name, xdata, ydata):
         """Append all detected peaks (wavelength, RFU) into one snapshot file.
         """
         #self.spec.save()
         fname = name
-        with open(fname, 'w') as f:
+        with open(fname, 'a') as f:
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
         print('Peak data added to ' + fname)
 

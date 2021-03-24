@@ -81,7 +81,7 @@ if __name__ == "__main__":
     PID = True #<-- True / False to build a PID controller.
     MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = True#<-- True when user wants to use a spectrometer thread.
+    SPEC = True #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
@@ -204,17 +204,17 @@ if __name__ == "__main__":
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
                                         Period = 0.1 ,          #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
                                         nameID = 'Auto Sort',
-                                        Gate = [3200, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
+                                        intensity_gate = [3200, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
+                                        wavelength_gate = [520,680],  #<-- [min,max] wavelength of the peak(s) in [nm]
                                         noise = 2500,           #<-- background noise level.
                                         DenoiseType = 'BW',     #<-- BW, Butterworth filter
                                         PeakProminence = None, #
                                         PeakWlen = None, #
                                         PeakThreshold = None, #100, # Vertical distance to neighbouring peaks
                                         PeakWidth = [15,200],    #<-- [min,max] width of the peak(s) in [nm]
-                                        Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in [nm]
-                                        AutoSave = False,           #<-- Enable Auto-saving of Peak info during auto-sort
+                                        AutoSave = True,           #<-- Enable Auto-saving of Peak info during auto-sort
                                         output_file = 'PeakData.dat' , #<-- File format for saved data.
-                                        Elec = True,             #<-- Enable electrodes
+                                        Elec = False,             #<-- Enable electrodes
                                         Pin_cte = 75, #37,       #<-- electrode nr to turn on constantly
                                         Pin_pulse = 98, #38,     #<-- electrode nr to pulse for sorting
                                         Pin_onTime = 0.8,   #<-- pulse on time [sec].

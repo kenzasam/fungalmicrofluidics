@@ -6,6 +6,19 @@
 
 ## To Do
 
+# March 24 2021
+
+## Experiment details
+histogram of resorufin intensity for gating
+
+
+## Notes
+- oil: 0.004
+- resorufin 20g 60g: 0.001
+- spacer 0.06
+
+## To Do
+
 # March 20th 2021
 
 ## Experiment details
