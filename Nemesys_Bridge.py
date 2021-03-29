@@ -19,12 +19,13 @@ This file is part of GSOF_ArduBridge.
 """
 """
 ## Protocol by Kenza Smalali
-## June 2020: V1.0
+June 2020: V1.0
+March 2021 v1.1
 """
-#Syringe pump modules
+
+import time
 import sys
 import os
-import numpy
 qmixsdk_dir =  "C:/QmixSDK" #path to Qmix SDK
 sys.path.append(qmixsdk_dir + "/lib/python")
 os.environ['PATH'] += os.pathsep + qmixsdk_dir

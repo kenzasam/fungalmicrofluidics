@@ -153,6 +153,32 @@ Auto sort is buggy: for some reason, always in each loop detects drop....
 - [x] for autosort, be able to tell range of wavelennth in between which you expect peak. e.g. in case background substraction doesn't work well...
 - [x] print for after setting treshold or Int time through GUI.
 
+# Mon, DD YYYY 
+
+## Experiment details
+
+## Notes
+
+## To Do
+
+# Feb, D15 2021
+
+## Experiment details
+Tested the Spec.SP.start() function experimentally.
+Device channel V4 elec V4 straight design.
+- Elec pulses: 10kHz, 250mVpp. Probed:
+- Droplet generation oil flow: 0.004
+- Droplet generation H2O flow:0.003
+- spacer oil either 0.01 or 0.02
+- 400um core fiber between 580nm filter and spec.
+
+
+## Notes
+Perforated pdms with emm fiber... :( oil flow goes out.
+Tested SpecSP.start() and stop(). Both worked as expected. The findpeaks function was able to find peak above treshold set (3700). Correct elecs are turned on and off, and elec pulsing works too, tested by probing.
+
+## To Do
+
 
 # Feb, 10 2021
 

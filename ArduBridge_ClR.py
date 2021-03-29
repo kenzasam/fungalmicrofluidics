@@ -79,8 +79,8 @@ if __name__ == "__main__":
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
-    MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
-    PUMPS = False #<-- True when user wants to use Nemesys pump through python.
+    MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
+    PUMPS = True #<-- True when user wants to use Nemesys pump through python.
     SPEC = False #<-- True when user wants to use a spectrometer thread.
     SPECSP = False #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
@@ -152,6 +152,7 @@ if __name__ == "__main__":
     print 'MM_PROC status: %s' %(MM_PROC)
     if MM_PROC == True:
         print('imaging.')
+        Img_pipe=True
         '''
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -238,7 +239,7 @@ if __name__ == "__main__":
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
         #Pumpsbridge= __import__('Nemesys_Bridge')  #<-- change protocol file if needed
-        Pumps = Pumpsbridge.Nem( deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308", #<-- change path to device configuration folder
+        Pumps = Nemesys_Bridge.Nem( deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308", #<-- change path to device configuration folder
                                 syringe_diam=[7.29,3.26,3.26,3.26,3.26], #<-- syringe diameter, in mm
                                 syringe_stroke=[59,40,40,40,40] #<-- syringe stroke length, in mm
                                 )
@@ -267,7 +268,7 @@ if __name__ == "__main__":
       print 'Change the SPEC spectrometer to True or False to go online'
       print 'status: %s' %(SPEC)
     print 'Loading protocol: %s' %(lib)
-    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid)
+    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid, ImgA=Img_pipe)
     #SETUP= False
     SETUP = True
     setup.enOut(ELEC_EN)

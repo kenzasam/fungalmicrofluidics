@@ -354,8 +354,8 @@ class Setup():
         pad_str = ' ' * len('%d' % step)
         fbT= self.PID.getFeedback()
         for i in range(t, 0, -step):
-            print 'Incubating at target %d C, currently %s\r C' % (T, fbT, pad_str),
-            sys.stdout.flush()
+            #print 'Incubating at target %d C, currently %d C  %s\r ' % (T, fbT, pad_str),
+            #sys.stdout.flush()
             time.sleep(step)
             print 'Done incubating for %d sec at %d C!' % ( t, T)
     
@@ -365,4 +365,5 @@ class Setup():
         '''
         print('Trigger received from Imaging pipeline.')
         self.PID.stop()
-        self.nem.pump_generate_flow(self.triggerpump, self.triggerflow)
+        self.nem.pump_generate_flow(self.nem.pumpID(self.triggerpump), self.triggerflow)
+        
