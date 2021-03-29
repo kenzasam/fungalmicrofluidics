@@ -291,7 +291,7 @@ class Flame(BT.BasicThread):
             #dndata = self.SPS.denoising(self.data)
             peak_int, peak_wvl = self.SPS.findallpeaks(self.wavelengths, self.data)
             dndata = self.data
-            d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peak_wvl':peak_wvl,'Peak_int':peak_int, 'Gate':self.SPS.gate , 'DatDn':dndata}
+            d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peak_wvl':peak_wvl,'Peak_int':peak_int, 'Gate':self.SPS.gateI , 'DatDn':dndata}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
@@ -407,7 +407,7 @@ class Processing(BT.BasicThread):
                  ):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer={})
         self.gpio = gpio
-        self.gate = intensity_gate
+        self.gateI = intensity_gate
         self.SAVE = AutoSave
         self.output_file = output_file
         self.denoise = False
@@ -417,7 +417,7 @@ class Processing(BT.BasicThread):
         self.wlen = PeakWlen
         self.dist = PeakThreshold
         self.type = DenoiseType
-        self.range = wavelength_gate
+        self.gateL = wavelength_gate
         self.electhread = Elec
         self.pin_ct = Pin_cte
         self.pin_pulse = Pin_pulse
@@ -486,7 +486,7 @@ class Processing(BT.BasicThread):
         self.peaks = True
         int = np.asarray(y)
         peaks, properties = sps.find_peaks(int,
-                                         height = self.gate,
+                                         height = self.gateI,
                                          threshold = self.dist,
                                          prominence = self.prom,
                                          width = self.width,
@@ -510,12 +510,12 @@ class Processing(BT.BasicThread):
         #Make file for saving data
         if self.SAVE:
             global filename
-            filename = time.strftime( 'PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+            filename = time.strftime( 'experimental data/PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
             with open(filename, 'w') as f:
                 f.write('\n# Time of snapshot: ' + time.strftime(self.spec.timestamp, time.gmtime()))
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
                 f.write('\n# Scan time per exposure [us]: ' + str(self.spec.scan_time))
-                f.write('\n Wavelength [nm], Intensity [RFU]:\n')
+                f.write('\n Wavelength [nm], Intensity [RFU]\n')
             print ('Saving all data under ' +filename)
         #turn bottom electrode on
         if self.electhread and self.enOut:
@@ -533,9 +533,9 @@ class Processing(BT.BasicThread):
             print p_int
             print p_wvl
             #Filter out peaks outside x range
-            z = [i for i in p_wvl if (self.range[0]< i <self.range[1])]
+            z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
             if len(z) > 0: zz = True
-            if len(p_int) > 0 and ( (self.range == None) or zz):
+            if len(p_int) > 0 and ( (self.gateL == None) or zz):
                     peakfound=True
                     if self.SAVE: self.savepeaks(filename, p_wvl, p_int)
                     if self.electhread and self.enOut:

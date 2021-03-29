@@ -71,7 +71,7 @@ class Protocol(bt.BasicThread):
 Start of setup class
 """
 class Setup():
-    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, SpecSP, PID):
+    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, SpecSP, PID, ImgA):
         '''
         # >>>>>>> SETUP SPECIFIC PARAMETERS BLOCK <<<<<<< #
         deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308" #--> change path to device configuration folder
@@ -84,6 +84,7 @@ class Setup():
         self.init_pumps(Pumps=Pumps)
         self.init_spec(Spec=Spec, SpecSP=SpecSP)
         self.init_incubation(PID=PID)
+        self.init_img_algo(imgA=ImgA)
         self.init_elecs(gpio=gpio,ExtGpio = ExtGpio, chipViewer = chipViewer)
 
     def init_spec(self, Spec, SpecSP):
@@ -134,6 +135,24 @@ class Setup():
         else:
             self.PID = PID
             print "ok."
+            
+    def init_img_algo(self, imgA):
+        """
+        Initializing imaging pipeline.
+        """
+        print '>>>  <<<'
+        print '>>>  Checking imaging pipeline.  <<<'
+        
+        self.triggerpump = 0 #<-- Pump used for hardware trigger
+        self.triggerflow = 0.01 #<-- flow in units as defined for pummps
+
+        if (imgA is None):
+            print "No imaging algorithm."
+            #sys.exit(1)
+        else:
+            self.imgA = imgA
+            print "ok."
+
 
     def init_elecs(self,gpio, ExtGpio,chipViewer):
         """
@@ -247,33 +266,46 @@ class Setup():
             self.ExtGpio.pinPulse(led, dt)
 
     def pumpstartup(self,v=100):
+        '''startup function for pumps. Run to calibrate all pumps and aspirate v.
+        v = volume to aspirate'''
         for i in range(5):
             self.nem.pump_calibration(self.nem.pumpID(i))
             self.nem.pump_aspirate(self.nem.pumpID(i), v)
-   
+
     ####### SPECTROMETER #############
     def setInttime(self, t):
+        '''Set the integration time of the FLAME spectrometer.
+        t = time in msec'''
         try:
             self.spec.set_int_time(t)
             print ("Integration time set to %d ms") %(t)
         except:
             print("Error. Can't set integrtion time.")
 
-    ####### sorting ##############
+    ####### SORTING ##############
     def sortseq(self,nr, t):
-        '''Function defining a sorting electrode sequence '''
+        '''Function defining a sorting electrode sequence.
+        t = onTime
+        nr = sequence number. See protocol file. '''
         self.seq['S%d'%(nr)].onTime = t
         self.seq['S%d'%(nr)].start(1)
         print "....................."
     
-    def setGate(self, lower, upper):
+    def setGate(self, lowerI, upperI, lowerL, upperL):
+        '''set lower intensity, upper intensity, 
+        lower wavelength, upper wavelength'''
         try:
-            self.specsp.gate = [lower,upper]
-            print ("Gate set to %d - %d [RFU] ") %(lower, upper)
+            self.specsp.gateI = [lowerI, upperI]
+            print ("Gate set to %d - %d [RFU] ") %(lowerI, upperI)
+            self.specsp.gateL = [lowerL,upperL]
+            print ("Gate set to %d - %d [nm] ") %(lowerL, upperL)
         except:
-            print("Error. Can't set threshold.")
+            print("Error. Can't set gate.")
 
     def setDropTime(self,t):
+        '''Set the droplet travel time (how long it takes for a droplet to travel from
+         excitation point to sorting electrodes)
+         t = time in sec'''
         try:
             self.specsp.t_wait = t
             print("Droplet travel time set to: %d sec ") %(t)
@@ -281,6 +313,9 @@ class Setup():
             print("Error. Can't set Droplet travel Time.")
 
     def setOnTime(self, t):
+        '''Set the onTime for the pulsing electrode.
+        t = time in sec.
+        '''
         try:
             self.specsp.onTime = t
             print("onTime set to: %d sec ")%(t)
@@ -288,6 +323,10 @@ class Setup():
             print("Error. Can't set onTime.")
 
     def setElecs(self, pin_ct, pin_pulse):
+        '''Set the electrode numbers for your sorting configuration.
+        Set pin_ct = constant pin
+        pin_pulse = pulsing sorting pin
+        '''
         try:
             self.specsp.pin_ct = pin_ct
             self.specsp.pin_pulse = pin_pulse
@@ -295,11 +334,11 @@ class Setup():
         except:
             print("Error. Can't set pint_cte or pin_pulse.")
 
-    ####### incubating ##############
+    ####### PID ##############
     def incubation(self,RC=0.5,T=37,t=30):
         '''Function to start the PID process, set it to a certain temperature,
          and leave it running for a specific amount of time.
-        Printout of measured temperatures.
+         Continuous printout of measured temperatures.
         '''
     	self.PID.start()
         self.PID.RC_div_DT=RC
@@ -310,6 +349,8 @@ class Setup():
         print "....................."    
 
     def tempfeedbackstream(self,t, T, step=1):
+        '''Continuous printout of measured temperatures.
+        '''
         pad_str = ' ' * len('%d' % step)
         fbT= self.PID.getFeedback()
         for i in range(t, 0, -step):
@@ -318,3 +359,10 @@ class Setup():
             time.sleep(step)
             print 'Done incubating for %d sec at %d C!' % ( t, T)
     
+    ##### IMAGING ALGO ######
+    def ImgTrigger(self):
+        '''Function to stop incubation, start pumps. Image aquisition based Hardware trigger.
+        '''
+        print('Trigger received from Imaging pipeline.')
+        self.PID.stop()
+        self.nem.pump_generate_flow(self.triggerpump, self.triggerflow)
