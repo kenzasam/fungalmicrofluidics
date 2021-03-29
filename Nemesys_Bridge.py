@@ -168,8 +168,8 @@ class Nem():
         print'stopped all pumps'
 
     def wait_dosage_finished(self, pump, timeout_seconds): #static method
-        #The function waits until the last dosage command has finished
-        #until the timeout occurs.
+        '''The function waits until the last dosage command has finished
+        until the timeout occurs.'''
         timer = qmixbus.PollingTimer(timeout_seconds * 1000)
         message_timer = qmixbus.PollingTimer(500)
         result = True
@@ -182,8 +182,8 @@ class Nem():
         return not result
 
     def wait_calibration_finished(self,pump, timeout_seconds): #static method
-        #The function waits until the given pump has finished calibration or
-        #until the timeout occurs.
+        '''The function waits until the given pump has finished calibration or
+        until the timeout occurs.'''
         timer = qmixbus.PollingTimer(timeout_seconds * 1000)
         result = False
         while (result == False) and not timer.is_expired():

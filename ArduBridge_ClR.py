@@ -151,19 +151,19 @@ if __name__ == "__main__":
     '''
     print 'MM_PROC status: %s' %(MM_PROC)
     if MM_PROC == True:
+        print('imaging.')
+        '''
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
-        mmproc = threadPID_KS.ArduPidThread(bridge=ardu,
-                                      nameID='PID', #<-- proces name
-                                      Period=0.5,   #<-- Period-time of the control-loop. PID calculation cycle time in sec.
-                                      fbPin=1,      #<-- The analog pin (Ardu) of the temp sensor.
-                                      outPin=10,    #<-- The output pin  of the driver (Ardu connection).
-                                      dirPin=7      #<-- The direction pin for the driver (Ardu connection).
-                                      )
+        mmproc = capstoneMain(nameID='PID', #<-- proces name
+                                            triggerpump =, #<-- Pump used for hardware trigger
+                                            triggerflow = #<-- flow in units as defined for pummps
+                                             )
         
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
-        
+        '''
+
     '''
     Setting up spectrometer thread and server.
     This will allow you to retrieve data from a spectrometer and plot it.
