@@ -3,20 +3,24 @@
 ## Experiment details
 
 ## Notes
-
+150mvpp, 15nl/s
+150, 90
+600 mvpp, 15nl/s
 ## To Do
 
 # March 24 2021
 
 ## Experiment details
 histogram of resorufin intensity for gating
-
-
 ## Notes
 - oil: 0.004
 - resorufin 20g 60g: 0.001
-- spacer 0.06
+- oil spacer 0.06
 
+BUT! resorufin syringe kind of blocked. Better check droplet size from video. Checked again on 30.03.2021 and 0.001/0.004 gives really tiny droplets...
+
+Script worked great. But gating overlaps. Resolution bad....
+Use flow rates exactly ame as for what you would use in autosort.
 ## To Do
 
 # March 20th 2021
@@ -32,12 +36,12 @@ Let run for a bit, thenm perform autosort at these scenarios:
 use tubing of Sam to fit yellow tubing inside and make bridge. Surprisingly worked.
 Droplet collection chip = incubation chamber chip. Not ideal... drops just fly past. What else??
 
-Drops came in with too many resorui=fin positive. How can I control the ratio of Reso+ vs H2O
+Drops came in with too many resoruifin positive. How can I control the ratio of Reso+ vs H2O??
 
 ## To Do
-- [] GUI splash screen
-- [] add time interval for sorting into GUI/
-- [] Know whether spec is on, from Ardubridge, npt GUI....
+- [x] GUI splash screen
+- [ ] add time interval for sorting into GUI/
+- [ ] Know whether spec is on, from Ardubridge, npt GUI....
 
 # March, 9 2021
 
@@ -54,7 +58,7 @@ Plotting has delay when overlay.
 
 ## To Do
 - [x] Integration time
-- [] easily turn overlay off.
+- [ ] easily turn overlay off.
 
 
 # March 4th, 2021

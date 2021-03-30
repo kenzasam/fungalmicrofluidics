@@ -504,7 +504,6 @@ class SortingPanel(wx.Panel):
         box3.Add(self.SaveBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(5)
-    
         box4=wx.BoxSizer(wx.HORIZONTAL)
         self.text2 = wx.StaticText(self,  wx.ID_ANY, label='Integration time [ms]')
         self.entry2 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
@@ -515,21 +514,36 @@ class SortingPanel(wx.Panel):
         box4.Add(self.SetInttBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(10)
-        #spacer
         line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
         srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
-        #Sort
-        box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='Gating [RFU]')
-        self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
-        self.entry11 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        #Sorting
+        boxtop=wx.BoxSizer(wx.HORIZONTAL)
+        self.texttop = wx.StaticText(self,  wx.ID_ANY, label='Gating')
+        boxtop.Add(self.texttop, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(50,24))
         self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetGate)
-        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        boxtop.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
+        srtSizer.Add(boxtop, flag=wx.ALIGN_CENTER_VERTICAL)
+        box2=wx.BoxSizer(wx.HORIZONTAL)
+        self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        self.text1 = wx.StaticText(self,  wx.ID_ANY, label='min')
+        self.entry11 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        self.text11 = wx.StaticText(self,  wx.ID_ANY, label='max  [RFU]')
         box2.Add(self.entry1, proportion=1, border=8)
+        box2.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         box2.Add(self.entry11, proportion=1, border=8)
-        box2.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
+        box2.Add(self.text11, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         srtSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
+        box5=wx.BoxSizer(wx.HORIZONTAL)
+        self.entry3 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        self.text3 = wx.StaticText(self,  wx.ID_ANY, label='min')
+        self.entry33 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
+        self.text33 = wx.StaticText(self,  wx.ID_ANY, label='max   [nm]')
+        box5.Add(self.entry3, proportion=1, border=8)
+        box5.Add(self.text3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        box5.Add(self.entry33, proportion=1, border=8)
+        box5.Add(self.text33, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        srtSizer.Add(box5, flag=wx.ALIGN_CENTER_VERTICAL)
         self.StartSortBtn = wx.ToggleButton(self, label='Start Auto-Sort', name='Sort()', size=(90,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
         self.StartSortBtn.SetBackgroundColour((152,251,152))
@@ -552,32 +566,39 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
             
     def toggledbutton(self, event):
-        # Active State
-        if self.StartSortBtn.GetValue() == True:
-            self.onStart()
-            self.StartSortBtn.SetLabel('Stop')
-            self.StartSortBtn.SetBackgroundColour((250,128,114))
-        # Inactive State
-        if self.StartSortBtn.GetValue() == False:
-            self.onStop()
-            self.StartSortBtn.SetLabel('Start')
-            self.StartSortBtn.SetBackgroundColour((152,251,152))
+        status=self.SPEC_status(self.menu)
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            # Active State
+            if self.StartSortBtn.GetValue() == True:
+                self.onStart()
+                self.StartSortBtn.SetLabel('Stop')
+                self.StartSortBtn.SetBackgroundColour((250,128,114))
+            # Inactive State
+            if self.StartSortBtn.GetValue() == False:
+                self.onStop()
+                self.StartSortBtn.SetLabel('Start')
+                self.StartSortBtn.SetBackgroundColour((152,251,152))
+
 
     def SPEC_status(self, menubar):
         """check spec status"""
         return menubar.SPEC
 
-    def onSetGate(self, event):
+    def onSetGate(self, event, ):
         status=self.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
             try:
-                t1=int(float(self.entry1.GetValue()))
-                t2=int(float(self.entry11.GetValue()))
+                lowerI=int(float(self.entry1.GetValue()))
+                upperI=int(float(self.entry11.GetValue()))
+                lowerL=int(float(self.entry3.GetValue()))
+                upperL=int(float(self.entry33.GetValue()))
             except:
                 wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-            s = 'setup.setGate(%d, %d)'%(t1,t2)
+            s = 'setup.setGate(%d, %d, %d, %d)'%(lowerI, upperI, lowerL, upperL)
             pyperclip.copy(s)
             if self.udpSend != False:
                 self.udpSend.Send(s)
@@ -857,7 +878,7 @@ if __name__ == "__main__":
     print 'Importing: %s'%(lib)
     print 'Using remote-ip:port -> %s:%d'%(options.ip, options.port)
     protocol = __import__(lib)
-    setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False, PID=False)
+    setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False, PID=False, ImgA=False)
     #setup.enOut(True)
     app = wx.App(False)
     frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
