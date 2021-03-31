@@ -80,7 +80,7 @@ if __name__ == "__main__":
     ELEC_EN = True #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
     MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
-    PUMPS = True #<-- True when user wants to use Nemesys pump through python.
+    PUMPS = False #<-- True when user wants to use Nemesys pump through python.
     SPEC = False #<-- True when user wants to use a spectrometer thread.
     SPECSP = False #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
