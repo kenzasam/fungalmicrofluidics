@@ -39,6 +39,7 @@ pause.png, play.png, stop.png: Freepik (CC license)
 import wx
 import wx.adv
 import wx.lib.inspection
+import wx.lib.agw.foldpanelbar as fpb
 import time
 import os, sys
 import pyperclip
@@ -102,7 +103,13 @@ class MainFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
         MAINbox = wx.BoxSizer(wx.VERTICAL)
         self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
-        MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
+        #MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
+        #
+        panel_bar = fpb.FoldPanelBar(self, -1, agwStyle=fpb.FPB_VERTICAL)
+        fold_panel = panel_bar.AddFoldPanel("Pumps")
+        panel_bar.AddFoldPanelWindow(fold_panel, self.pumppanel)
+        MAINbox.Add(panel_bar, 1, wx.EXPAND)
+        #
         self.operationspanel = OperationsPanel(self, self.cvwr, udpSend)
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
@@ -113,6 +120,7 @@ class MainFrame(wx.Frame):
         self.sortingpanel = SortingPanel(self, menubar, udpSend)
         MAINbox.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         self.SetMenuBar(menubar)
+
         #
         self.SetSizerAndFit(MAINbox)
         #panel.SetSizerAndFit(MAINbox)
