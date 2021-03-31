@@ -101,10 +101,8 @@ class MainFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
         MAINbox = wx.BoxSizer(wx.VERTICAL)
-        #pumppanel = PumpPanel(panel, pumpnrs, udpSend)
         self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
         MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
-        #operationspanel = OperationsPanel(panel, self.cvwr, udpSend)
         self.operationspanel = OperationsPanel(self, self.cvwr, udpSend)
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
@@ -119,6 +117,7 @@ class MainFrame(wx.Frame):
         self.SetSizerAndFit(MAINbox)
         #panel.SetSizerAndFit(MAINbox)
         #self.Centre()
+        #foldingpanel bar see https://wxpython.org/Phoenix/docs/html/wx.lib.agw.foldpanelbar.html
         
 
     def on_quit_click(self, event):
@@ -549,6 +548,7 @@ class SortingPanel(wx.Panel):
         box6.Add(self.text4, flag=wx.RIGHT, border=8)
         box6.Add(self.entry4, flag=wx.RIGHT, border=8)
         box6.Add(self.text5, flag=wx.RIGHT, border=8)
+        srtSizer.Add(box6, flag=wx.ALIGN_CENTER_VERTICAL)
         self.SetSortBtn = wx.Button( self, label='Set', name='Set()', size=(50,24))
         self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetSort)
         self.StartSortBtn = wx.ToggleButton(self, label='Start Auto-Sort', name='Sort()', size=(90,24))
@@ -604,7 +604,7 @@ class SortingPanel(wx.Panel):
                 upperI=int(float(self.entry11.GetValue()))
                 lowerL=int(float(self.entry3.GetValue()))
                 upperL=int(float(self.entry33.GetValue()))
-                travelt=float(self.entry4.GetValue()))
+                travelt=float(self.entry4.GetValue())
             except:
                 wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
             s1 = 'setup.setGate(%d, %d, %d, %d)'%(lowerI, upperI, lowerL, upperL)
