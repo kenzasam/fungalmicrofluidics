@@ -888,18 +888,28 @@ if __name__ == "__main__":
     #lib = options.prot
     print 'Importing: %s'%(lib)
     print 'Using remote-ip:port -> %s:%d'%(options.ip, options.port)
-    protocol = __import__(lib)
+    try:
+        protocol = __import__(lib)
+    except:
+        print 'File noth found. Loading protocol from file chooser.'
+        newPath = fileChooser()
+        path = os.path.split(newPath)
+        lib = str(path[1])[:-3]
+        path = path[0]
+        sys.path.append(path)
+        protocol = __import__(lib)
     setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False, PID=False, ImgA=False)
     #setup.enOut(True)
     app = wx.App(False)
     frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
     '''Show splash screen'''
-    bitmap = wx.Bitmap('shih.ico')
+    bitmap = wx.Bitmap('GUI-splash-01.png')
     splash = wx.adv.SplashScreen(
                     bitmap, 
                     wx.adv.SPLASH_CENTER_ON_PARENT|wx.adv.SPLASH_TIMEOUT, 2000, frame)
     splash.Show()
     '''Show main frame'''
+    time.sleep(2)
     frame.Show()
     #inspection tool for GUI troubleshooting
     #wx.lib.inspection.InspectionTool().Show()
