@@ -103,12 +103,13 @@ class MainFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
         MAINbox = wx.BoxSizer(wx.VERTICAL)
         self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
-        #MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
+        MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
         #
-        panel_bar = fpb.FoldPanelBar(self, -1, agwStyle=fpb.FPB_VERTICAL)
-        fold_panel = panel_bar.AddFoldPanel("Pumps")
-        panel_bar.AddFoldPanelWindow(fold_panel, self.pumppanel)
-        MAINbox.Add(panel_bar, 1, wx.EXPAND)
+        #self.foldpanel = fpb.FoldPanelBar(self, -1, agwStyle=fpb.FPB_VERTICAL)
+        #subpanel = self.foldpanel.AddFoldPanel("Pumps")
+        #panel= PumpPanel(self, pumpnrs, udpSend)
+        #self.foldpanel.AddFoldPanelWindow(subpanel,panel,fpb.FPB_ALIGN_WIDTH)
+        #MAINbox.Add(self.foldpanel, 1, wx.EXPAND)
         #
         self.operationspanel = OperationsPanel(self, self.cvwr, udpSend)
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
@@ -122,6 +123,7 @@ class MainFrame(wx.Frame):
         self.SetMenuBar(menubar)
 
         #
+        #self.SetSizer(MAINbox)
         self.SetSizerAndFit(MAINbox)
         #panel.SetSizerAndFit(MAINbox)
         #self.Centre()
@@ -917,7 +919,7 @@ if __name__ == "__main__":
                     wx.adv.SPLASH_CENTER_ON_PARENT|wx.adv.SPLASH_TIMEOUT, 2000, frame)
     splash.Show()
     '''Show main frame'''
-    time.sleep(2)
+    time.sleep(4)
     frame.Show()
     #inspection tool for GUI troubleshooting
     #wx.lib.inspection.InspectionTool().Show()
