@@ -61,7 +61,7 @@ Sortingpanel - Panel class to start sorting procedure
 
 class MainFrame(wx.Frame):
     '''Create MainFrame class.'''
-    def __init__(self, setup, chipViewer, tempViewer, specViewer, port=-1, ip='127.0.0.1', columns=2):
+    def __init__(self, setup, chipViewer, tempViewer, specViewer, imgViewer, port=-1, ip='127.0.0.1', columns=2):
         super(MainFrame, self).__init__(None, wx.ID_ANY) #, size=(400,400)
         #panel=wx.Panel(self, wx.ID_ANY)
         '''PARAMETERS'''
@@ -70,6 +70,7 @@ class MainFrame(wx.Frame):
         self.cvwr  = chipViewer # Path to Chip Viewer file
         self.tvwr = tempViewer # Path to PID control temperature plotting file
         self.svwr = specViewer #Path to spectrum plotting file
+        self.imgvwr = imgViewer #Path to Imaging pipeline
         '''setup sending protocol for ArduBridge Shell.'''
         udpSend = False
         if port > 1:
@@ -135,9 +136,6 @@ class MainFrame(wx.Frame):
         del event
         wx.CallAfter(self.Destroy)
 
-    def PID_status(self, menubar):
-        """checkPID status"""
-        return menubar.PID
 """
 class MainPanel(wx.Panel):
     #Panel class to contain frame widgets.
@@ -599,11 +597,6 @@ class SortingPanel(wx.Panel):
                 self.StartSortBtn.SetLabel('Start')
                 self.StartSortBtn.SetBackgroundColour((152,251,152))
 
-
-    def SPEC_status(self, menubar):
-        """check spec status"""
-        return menubar.SPEC
-
     def onSetSort(self, event):
         status=self.SPEC_status(self.menu)
         if status!= True:
@@ -825,12 +818,12 @@ class MenuBar(wx.MenuBar):
         #dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
         #os.system(dir)
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        '''
+        """
         s = 'setup.PID.plot()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
-        '''
+        """
 
     def onStartSpec(self, event):
         self.SPEC = True
@@ -850,23 +843,23 @@ class MenuBar(wx.MenuBar):
         cmd = [str(self.svwr)]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-'''        
-class popup(wx.Frame):
-    title = "Imaging Pipeline"
-    def __init__(self,parent,id):
-        wx.Frame.__init__(self, id,'popup', size=(1000,700))
-        panel=wx.Panel(self, -1)
+    def onImgVwr(self, event):
+        cmd = [str(self.imgvwr)]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-        self.SetBackgroundColour(wx.Colour(100,100,100))
-        self.Centre()
-        #self.Show()
-'''
+    def SPEC_status(self):
+        """check spec status"""
+        return self.SPEC
 
-if __name__ == "__main__":
+    def PID_status(self): #(self, menubar) when placed in mainframe
+        """checkPID status"""
+        return self.PID   #menubar.PID
+
+if __name__ == '__main__':
     def fileChooser():
         root = Tkinter.Tk()
         root.withdraw()
-        filename = tkFileDialog.askopenfilename(title = "GUI Fungal uFluidics: Select ArduBridge Protocol file", filetypes = (("python files","*.py"),("all files","*.*")))
+        filename = tkFileDialog.askopenfilename(title = 'GUI Fungal uFluidics: Select ArduBridge Protocol file', filetypes = (('python files','*.py'),('all files','*.*'')))
         return filename
     ver = '3.1.2'
     date = time.strftime("%Y-%m-%d %H:%M")
@@ -881,6 +874,7 @@ if __name__ == "__main__":
     parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat')
     parser.add_option('-y', '--tempvwr', dest='tvwr', help='PIDViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat')
     parser.add_option('-z', '--specvwr', dest='svwr', help='SpecViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxSpecViewer_fungalmicrofluidics.bat')
+    parser.add_option('-w', '--imgvwr', dest='ivwr', help='imgViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxImgViewer_fungalmicrofluidics.bat')
 
     (options, args) = parser.parse_args()
     path = os.path.split(options.prot)
@@ -901,7 +895,7 @@ if __name__ == "__main__":
     try:
         protocol = __import__(lib)
     except:
-        print 'File noth found. Loading protocol from file chooser.'
+        print 'File not found. Loading protocol from file chooser.'
         newPath = fileChooser()
         path = os.path.split(newPath)
         lib = str(path[1])[:-3]
@@ -911,15 +905,15 @@ if __name__ == "__main__":
     setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False, PID=False, ImgA=False)
     #setup.enOut(True)
     app = wx.App(False)
-    frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
+    frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, imgViewer=options.ivwr, ip=options.ip, port=options.port)
     frame.Centre()
-    '''Show splash screen'''
+    """Show splash screen"""
     bitmap = wx.Bitmap('GUI-splash-01.png')
     splash = wx.adv.SplashScreen(
                     bitmap, 
                     wx.adv.SPLASH_CENTER_ON_SCREEN|wx.adv.SPLASH_TIMEOUT, 2000, frame)
     splash.Show()
-    '''Show main frame'''
+    """Show main frame"""
     time.sleep(4)
     frame.Show()
     #inspection tool for GUI troubleshooting

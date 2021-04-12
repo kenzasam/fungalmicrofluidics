@@ -207,5 +207,6 @@ if __name__== "__main__":
            ag.animate: function which updates the plot from one frame to the next. Is looped continuously.
     """
     #if ag.received==True: #we should check this conditions beforehand. But I tried and somehow the plot remains empty.....
-    plot_animation= animation.FuncAnimation(ag.figure, ag.animate, blit=False) #frames=gen_function, init_func=self.init_plot
+    #plot_animation= animation.FuncAnimation(ag.figure, ag.animate, blit=False) #frames=gen_function, init_func=self.init_plot
+    plot_animation= animation.FuncAnimation(ag.figure, ag.animate, blit=True)
     plot.show()
