@@ -71,7 +71,7 @@ class Spectogram(client.tcpControl):
         self.ydata1 = [] # denoised. See decoding.
         self.ydata2 = [] # peaks. See decoding.
         self.xdata2 = [] # peaks wavelength. See decoding.
-        self.ydata3 = [0,0] # treshold. See decoding.
+        self.ydata3 = [0,0,0,0] # Gating. See decoding. [self.SPS.gateI,self.SPS.gateL]
         self.xdata = []
         self.measurement = 0
         ###########
@@ -92,7 +92,7 @@ class Spectogram(client.tcpControl):
             #self.graph3 = self.axes[1].plot([], [], 'bo')
             #self.graph2 = self.ax2.scatter([], [], marker = "x")
             self.line3 = self.ax2.axhline(y=self.ydata3[0], linewidth=3, color='r')
-            self.area = self.ax2.axhspan(self.ydata3[0], self.ydata3[1], xmin=0, xmax=1,facecolor='r', alpha=0.5)
+            self.area = self.ax2.axhspan(self.ydata3[0], self.ydata3[1], facecolor='r', alpha=0.5)
             #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
             self.graph= [self.line1, self.line2, self.line3, self.area]
             #self.graph= [self.line1, self.line2, self.line3, self.graph2]
@@ -122,7 +122,7 @@ class Spectogram(client.tcpControl):
            #return self.init()
        '''
        if (self.enable_plot > 0): #(self.measurement == self.scan_frames) or \
-           title = '%s Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
+           title = '%s /n Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
            #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
            self.figure.suptitle(title)
            #plot.suptitle(title)
@@ -141,7 +141,9 @@ class Spectogram(client.tcpControl):
                #print(peakwvl)
                #gate https://www.python-course.eu/matplotlib_subplots.php
                self.line3.set_ydata(self.ydata3[0])
-               v=([self.ydata3[0],0] ,[self.ydata3[1],0], [self.ydata3[0],1100], [self.ydata3[1],1100])
+               #xmin, xmax = self.ax2.get_xlim() 
+               #v=([xmin, self.ydata3[0]] ,[xmin,self.ydata3[1]], [xmax, self.ydata3[0]], [xmax, self.ydata3[1]])
+               v=([self.ydata3[2], self.ydata3[0]] ,[self.ydata3[2],self.ydata3[1]], [self.ydata3[3], self.ydata3[0]], [self.ydata3[3], self.ydata3[1]])
                #v=([self.ydata3[0],self.ydata3[1]])
                self.area.set_xy(v)
            for ax in [self.ax1, self.ax2]:
@@ -153,8 +155,9 @@ class Spectogram(client.tcpControl):
            #return (self.graph, self.graph2, self.line)
 
     def decodingPayload(self, object):
-        """Object received from Server (tcpSend, threadSpec)
-        In this case, a dictionary d={'Msr':self.measurement,'Dat':self.data}"""
+        '''Object received from Server (tcpSend, threadSpec)
+        In this case, a dictionary d={'Msr':self.measurement,'Dat':self.data}
+        '''
         self.received == True
         #print 'Received.',
         self.measurement=object['Msr']

@@ -58,13 +58,13 @@ def close():
     if SETUP != False:
         if PUMPS != False:
             setup.nem.bus.stop()
-            print 'Nemesys Bus closed...'
-        if PID != False & Pid.PIDstatus != False:
+            print 'Nemesys Bus closed...\n'
+        if PID != False and Pid.PIDstatus != False:
             PID.stop()
-            print 'PID thread stopped...'
-        if SPEC != False & Spec.SPECstatus != False:
+            print 'PID thread stoped...\n'
+        if SPEC != False and Spec.SPECstatus != False:
             Spec.stop()
-            print 'Spec thread stopped...'
+            print 'Spec thread stoped...\n'
         setup.stop()
     ardu.OpenClosePort(0)
     print 'Bye Bye...'
@@ -77,12 +77,12 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = True #<-- False for simulation
+    ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
     MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = False #<-- True when user wants to use a spectrometer thread.
-    SPECSP = False #<-- True when user wants to perform signal processing on spectrum .
+    SPEC = True #<-- True when user wants to use a spectrometer thread.
+    SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     protocol = __import__(lib)
     SETUP=False
     '''
-    Setting up Server and Clients
+    Setting up Server and Clients (UDP and TCP networking protocols)
     '''
     udpSendPid = UDP_Send.udpSend(nameID='UDP1', DesIP='127.0.0.1', DesPort=PORT_BASE +0)
     udpSendChip = UDP_Send.udpSend(nameID='UDP2', DesIP='127.0.0.1', DesPort=PORT_BASE +1)
@@ -269,7 +269,6 @@ if __name__ == "__main__":
       print 'status: %s' %(SPEC)
     print 'Loading protocol: %s' %(lib)
     setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid, ImgA=Img_pipe)
-    #SETUP= False
     SETUP = True
     setup.enOut(ELEC_EN)
     prot = protocol.Protocol(setup)

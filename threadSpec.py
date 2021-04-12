@@ -288,10 +288,14 @@ class Flame(BT.BasicThread):
         #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
         d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         if self.SPS != None:
-            #dndata = self.SPS.denoising(self.data)
-            peak_int, peak_wvl = self.SPS.findallpeaks(self.wavelengths, self.data)
-            dndata = self.data
-            d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peak_wvl':peak_wvl,'Peak_int':peak_int, 'Gate':self.SPS.gateI , 'DatDn':dndata}
+            try:
+                dndata = self.SPS.denoising(self.data)
+                peak_int, peak_wvl = self.SPS.findallpeaks(self.wavelengths, self.data)
+                #dndata = self.data
+                full_gate = self.SPS.gateI + self.SPS.gateL
+                d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peak_wvl':peak_wvl,'Peak_int':peak_int, 'Gate':full_gate , 'DatDn':dndata}
+            except:
+                print('something wrong')
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
@@ -408,6 +412,7 @@ class Processing(BT.BasicThread):
         BT.BasicThread.__init__(self, nameID=nameID, Period=Period, viewer={})
         self.gpio = gpio
         self.gateI = intensity_gate
+        self.gateL = wavelength_gate
         self.SAVE = AutoSave
         self.output_file = output_file
         self.denoise = False
@@ -417,7 +422,6 @@ class Processing(BT.BasicThread):
         self.wlen = PeakWlen
         self.dist = PeakThreshold
         self.type = DenoiseType
-        self.gateL = wavelength_gate
         self.electhread = Elec
         self.pin_ct = Pin_cte
         self.pin_pulse = Pin_pulse
@@ -448,18 +452,21 @@ class Processing(BT.BasicThread):
         SG, Savitzky-Golay filter
         '''
         self.denoise = True
-        if self.type == 'BW':
-            N  = 3 # Filter polynomial order
-            Wn = 0.1 # Cutoff frequency
-            B, A = sps.butter(N, Wn, output='ba')
-            yf = sps.filtfilt(B, A, y)
-        if self.type == 'SG':
-            W = 5 # wl window size
-            P = 3 # Flter polynomial order
-            yf = sps.savgol_filter(y, 51, 3)
-        else:
-            print('Type needs to be BW or SG')
-        return yf
+        try:
+            if self.type == 'BW':
+                N  = 3 # Filter polynomial order
+                Wn = 0.1 # Cutoff frequency
+                B, A = sps.butter(N, Wn, output='ba')
+                yf = sps.filtfilt(B, A, y)
+            elif self.type == 'SG':
+                W = 5 # wl window size
+                P = 3 # Flter polynomial order
+                yf = sps.savgol_filter(y, 51, 3)
+            return yf
+        except:
+            print('Type needs to be BW or SG. Can not perform denoising')
+            raise
+        
 
     def findallpeaks(self, x, y):
         '''x = wavelength list, y = Intensity list

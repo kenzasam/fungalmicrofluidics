@@ -102,14 +102,14 @@ class MainFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
         MAINbox = wx.BoxSizer(wx.VERTICAL)
-        self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
-        MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
+        #self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
+        #MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
         #
-        #self.foldpanel = fpb.FoldPanelBar(self, -1, agwStyle=fpb.FPB_VERTICAL)
-        #subpanel = self.foldpanel.AddFoldPanel("Pumps")
-        #panel= PumpPanel(self, pumpnrs, udpSend)
-        #self.foldpanel.AddFoldPanelWindow(subpanel,panel,fpb.FPB_ALIGN_WIDTH)
-        #MAINbox.Add(self.foldpanel, 1, wx.EXPAND)
+        panel_bar = fpb.FoldPanelBar(self, -1, agwStyle=fpb.FPB_VERTICAL)
+        subpanel1 = panel_bar.AddFoldPanel("Pumps")
+        pumppanel= PumpPanel(subpanel1, pumpnrs, udpSend)
+        panel_bar.AddFoldPanelWindow(subpanel1,pumppanel,fpb.FPB_ALIGN_WIDTH)
+        MAINbox.Add(panel_bar, 1, wx.EXPAND)
         #
         self.operationspanel = OperationsPanel(self, self.cvwr, udpSend)
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
@@ -152,7 +152,7 @@ class MainPanel(wx.Panel):
         sizer.Add(cmd_quit)
         self.SetSizer(sizer)
 """
-class PumpPanel(wx.Panel):
+class PumpPanel(fpb.FoldPanelItem):
     """ panel class for Nemesys pump operation"""
     def __init__(self, parent, pumpnrs,udpSend):
         super(PumpPanel, self).__init__(parent, pumpnrs)
@@ -912,16 +912,17 @@ if __name__ == "__main__":
     #setup.enOut(True)
     app = wx.App(False)
     frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, ip=options.ip, port=options.port)
+    frame.Centre()
     '''Show splash screen'''
     bitmap = wx.Bitmap('GUI-splash-01.png')
     splash = wx.adv.SplashScreen(
                     bitmap, 
-                    wx.adv.SPLASH_CENTER_ON_PARENT|wx.adv.SPLASH_TIMEOUT, 2000, frame)
+                    wx.adv.SPLASH_CENTER_ON_SCREEN|wx.adv.SPLASH_TIMEOUT, 2000, frame)
     splash.Show()
     '''Show main frame'''
     time.sleep(4)
     frame.Show()
     #inspection tool for GUI troubleshooting
-    #wx.lib.inspection.InspectionTool().Show()
+    wx.lib.inspection.InspectionTool().Show()
     #
     app.MainLoop()
