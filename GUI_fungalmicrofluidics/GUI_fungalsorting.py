@@ -103,15 +103,28 @@ class MainFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
         MAINbox = wx.BoxSizer(wx.VERTICAL)
-        #self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
-        #MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
         #
+        """
         panel_bar = fpb.FoldPanelBar(self, -1, agwStyle=fpb.FPB_VERTICAL)
         subpanel1 = panel_bar.AddFoldPanel("Pumps")
         pumppanel= PumpPanel(subpanel1, pumpnrs, udpSend)
-        panel_bar.AddFoldPanelWindow(subpanel1,pumppanel,fpb.FPB_ALIGN_WIDTH)
-        MAINbox.Add(panel_bar, 1, wx.EXPAND)
+        panel_bar.AddFoldPanelWindow(subpanel1,pumppanel)
+        subpanel2 = panel_bar.AddFoldPanel("Operations")
+        operationspanel= OperationsPanel(subpanel2, self.cvwr, udpSend)
+        panel_bar.AddFoldPanelWindow(subpanel2,operationspanel)
+        subpanel3 = panel_bar.AddFoldPanel("Incubation")
+        incubationpanel= IncubationPanel(subpanel3, menubar, udpSend)
+        panel_bar.AddFoldPanelWindow(subpanel3,incubationpanel)
+        subpanel4 = panel_bar.AddFoldPanel("Operations")
+        sortingpanel= SortingPanel(subpanel4, menubar, udpSend)
+        panel_bar.AddFoldPanelWindow(subpanel4,sortingpanel)
+        
+        MAINbox.Add(panel_bar, 1, wx.EXPAND|wx.ALL, 4)
+        """
         #
+        MAINbox2 = wx.BoxSizer(wx.VERTICAL)
+        self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
+        MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
         self.operationspanel = OperationsPanel(self, self.cvwr, udpSend)
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
@@ -120,13 +133,15 @@ class MainFrame(wx.Frame):
         MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
         #sortingpanel = SortingPanel(panel, self.svwr, udpSend)
         self.sortingpanel = SortingPanel(self, menubar, udpSend)
-        MAINbox.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
+        MAINbox2.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         self.SetMenuBar(menubar)
 
         #
-        #self.SetSizer(MAINbox)
-        self.SetSizerAndFit(MAINbox)
-        #panel.SetSizerAndFit(MAINbox)
+        appbox = wx.BoxSizer(wx.HORIZONTAL)
+        appbox.Add(MAINbox, 1, wx.EXPAND|wx.ALL, 2)
+        appbox.Add(MAINbox2, 1, wx.EXPAND|wx.ALL, 2)
+        self.SetSizerAndFit(appbox)
+        #self.SetSizerAndFit(MAINbox)
         #self.Centre()
         #foldingpanel bar see https://wxpython.org/Phoenix/docs/html/wx.lib.agw.foldpanelbar.html
         
@@ -150,7 +165,7 @@ class MainPanel(wx.Panel):
         sizer.Add(cmd_quit)
         self.SetSizer(sizer)
 """
-class PumpPanel(fpb.FoldPanelItem):
+class PumpPanel(wx.Panel):
     """ panel class for Nemesys pump operation"""
     def __init__(self, parent, pumpnrs,udpSend):
         super(PumpPanel, self).__init__(parent, pumpnrs)
@@ -582,7 +597,7 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
             
     def toggledbutton(self, event):
-        status=self.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -598,7 +613,7 @@ class SortingPanel(wx.Panel):
                 self.StartSortBtn.SetBackgroundColour((152,251,152))
 
     def onSetSort(self, event):
-        status=self.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -618,7 +633,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s2)
 
     def onSetIntt(self, event):
-        status=self.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -648,7 +663,7 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
 
     def onPlaySpec(self,event):
-        status=self.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -658,7 +673,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onPauseSpec(self,event):
-        status=self.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -668,7 +683,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onStopSpec(self,event):
-        status=self.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -678,7 +693,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onSaveSpec(self,event):
-        status=self.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -859,7 +874,7 @@ if __name__ == '__main__':
     def fileChooser():
         root = Tkinter.Tk()
         root.withdraw()
-        filename = tkFileDialog.askopenfilename(title = 'GUI Fungal uFluidics: Select ArduBridge Protocol file', filetypes = (('python files','*.py'),('all files','*.*'')))
+        filename = tkFileDialog.askopenfilename(title = 'GUI Fungal uFluidics: Select ArduBridge Protocol file', filetypes = (('python files','*.py'),('all files','*.*')))
         return filename
     ver = '3.1.2'
     date = time.strftime("%Y-%m-%d %H:%M")
@@ -905,15 +920,18 @@ if __name__ == '__main__':
     setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False, PID=False, ImgA=False)
     #setup.enOut(True)
     app = wx.App(False)
+    #frame =wx.Frame()
+    #panel= MainFrame(frame)
+    """Main frame"""
     frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, imgViewer=options.ivwr, ip=options.ip, port=options.port)
     frame.Centre()
-    """Show splash screen"""
-    bitmap = wx.Bitmap('GUI-splash-01.png')
+    """Splash screen"""
+    bitmap = wx.Bitmap('GUI-splash-01.bmp')
     splash = wx.adv.SplashScreen(
                     bitmap, 
                     wx.adv.SPLASH_CENTER_ON_SCREEN|wx.adv.SPLASH_TIMEOUT, 2000, frame)
+    """Show """
     splash.Show()
-    """Show main frame"""
     time.sleep(4)
     frame.Show()
     #inspection tool for GUI troubleshooting
