@@ -78,7 +78,7 @@ if __name__ == "__main__":
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = False #<-- False for simulation
-    PID = True #<-- True / False to build a PID controller.
+    PID = False #<-- True / False to build a PID controller.
     MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
     SPEC = True #<-- True when user wants to use a spectrometer thread.
@@ -146,13 +146,16 @@ if __name__ == "__main__":
         ardu.gpio.pinMode(7,0) # Initialize pin to 0
         print 'type PID.start() to start the PID thread process\n'
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
+    else:
+        Pid = None
+
     '''
     Setting up micromanager core and image processing
     '''
     print 'MM_PROC status: %s' %(MM_PROC)
     if MM_PROC == True:
         print('imaging.')
-        Img_pipe=True
+        Img_pipe = True
         '''
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -164,6 +167,8 @@ if __name__ == "__main__":
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
         '''
+    else:
+        Img_pipe = None
 
     '''
     Setting up spectrometer thread and server.
