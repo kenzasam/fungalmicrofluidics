@@ -23,17 +23,20 @@ FLAME spectrometer (Ocean Optics) operation, TEC/Peltier operation with PID temp
 
 Credits:
 Code written by Kenza Samlali
-shih.ico: Steve C.C. SHIH
+shih.ico: by Steve C.C. SHIH
 pause.png, play.png, stop.png: Freepik (CC license)
+Splash screen: designed by Kenza Samlali
 #-------------------------------------------------------------------
 ## >>> VERSIONS <<< ##
-# v 0.1.0 - copy from Laura (LLGUI, ArduBridge, GPLv3), adding extra function buildButtons
-# v 1.0.0 - Droplet Generation buttons and functions, Droplet operations buttons and FUNCTIONS
-# v 1.1.0 - Bug Fixes (error window popups when buttons pressed, integrating KeepAll in KeepAllBut)
-# v 2.0.0 - Nemesys integration
-# v 2.1.0 - Full pump integration
-# v 2.2.0 - Add up to 5 pumps
-# v 3.0.0 - Reorganized code architecture, split up in classes
+# v 0.1. - copy from Laura (LLGUI, ArduBridge, GPLv3), adding extra function buildButtons
+# v 1.0. - Droplet Generation buttons and functions, Droplet operations buttons and FUNCTIONS
+# v 1.1. - Bug Fixes (error window popups when buttons pressed, integrating KeepAll in KeepAllBut)
+# v 2.0. - Nemesys integration
+# v 2.1. - Full pump integration
+# v 2.2. - Add up to 5 pumps
+# v 3.0. - Reorganized code architecture, split up in classes
+# v 3.1. - Spectrometer, PID/incubation integration
+# v 3.1. - 
 #-------------------------------------------------------------------
 """
 import wx
@@ -657,7 +660,8 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
 
     def onBckgrSpec(self,event):
-        s = 'setup.spec.background()'
+        if 
+        s = 'setup.spec.background()' #setup.spec.have_darkness_correction boolean changes! Togglebutton??
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
