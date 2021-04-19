@@ -26,7 +26,6 @@ the parameters in the "PARAMETER BLOCK" in the __main__ section.
 Also, if PID/PUMPS/SPEC are set to True, please see
 repective instances to modify appropriate variables.
 """
-########## RUN ANY GUI, AFTER RUNNING THIS FILE ##########
 #Basic modules to load
 import time
 import sys
@@ -39,10 +38,6 @@ import Nemesys_Bridge
 import TCP_Send
 import threadPID_KS
 import threadSpec
-#from GSOF_ArduBridge import threadFLAME
-##qmixsdk_dir = "C:/QmixSDK" #path to Qmix SDK
-#sys.path.append(qmixsdk_dir + "/lib/python")
-#os.environ['PATH'] += os.pathsep + qmixsdk_dir
 
 def extEval(s):
     '''
@@ -77,8 +72,8 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = False #<-- False for simulation
-    PID = False #<-- True / False to build a PID controller.
+    ELEC_EN = True #<-- False for simulation
+    PID = True #<-- True / False to build a PID controller.
     MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
     SPEC = True #<-- True when user wants to use a spectrometer thread.

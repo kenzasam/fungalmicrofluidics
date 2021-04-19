@@ -329,6 +329,7 @@ class Flame(BT.BasicThread):
         if self.enable: #self.run_measurement: # if currently running a measurement
             self.pause()
             self.measurement = 0
+        print('Paused. Acquiring data fro dark frames...')
         newData = self.spec.intensities()
         count = 1
         print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))

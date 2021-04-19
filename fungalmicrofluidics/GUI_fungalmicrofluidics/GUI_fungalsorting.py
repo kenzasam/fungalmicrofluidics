@@ -507,10 +507,13 @@ class SortingPanel(wx.Panel):
         titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(5)
-        self.BckgrBtn = wx.Button(self, label='Background', name='Sort()', size=(70,24)) #ADDED KS
-        self.BckgrBtn.Bind(wx.EVT_BUTTON, self.onBckgrSpec)
+        self.BckgrBtn = wx.ToggleButton(self, label='Background', name='background()', size=(90,24))
+        self.BckgrBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onBckgrToggle)
+        self.ResetBtn = wx.Button(self, label='Reset', name='reset()', size=(60,24))
+        self.ResetBtn.Bind(wx.EVT_BUTTON, self.onReset)
         box1 = wx.BoxSizer(wx.HORIZONTAL)
         box1.Add(self.BckgrBtn, flag=wx.RIGHT, border=8)
+        box1.Add(self.ResetBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         #play, pause, save
         self.PlayBtn=wx.Button(self, name='start()')
@@ -600,7 +603,7 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
             
     def toggledbutton(self, event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -616,7 +619,7 @@ class SortingPanel(wx.Panel):
                 self.StartSortBtn.SetBackgroundColour((152,251,152))
 
     def onSetSort(self, event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -629,14 +632,13 @@ class SortingPanel(wx.Panel):
             except:
                 wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
             s1 = 'setup.setGate(%d, %d, %d, %d)'%(lowerI, upperI, lowerL, upperL)
-            s2 = 'setDropTime(%d)'%(travelt)
-            pyperclip.copy(s)
+            s2 = 'setup.setDropTime(%d)'%(travelt)
             if self.udpSend != False:
                 self.udpSend.Send(s1)
                 self.udpSend.Send(s2)
 
     def onSetIntt(self, event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -659,15 +661,38 @@ class SortingPanel(wx.Panel):
         if self.udpSend != False:
             self.udpSend.Send(s)
 
-    def onBckgrSpec(self,event):
-        if 
-        s = 'setup.spec.background()' #setup.spec.have_darkness_correction boolean changes! Togglebutton??
+    def onReset(self,event):
+        #if:
+        self.BckgrBtn.Enable()
+        self.BckgrBtn.SetValue(False)
+        s = 'setup.spec.reset()'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
 
+    def onBckgrToggle(self,event):
+        status=MenuBar.SPEC_status(self.menu)
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            # Active State
+            if self.BckgrBtn.GetValue() == True:
+                self.onBckgrSpec()
+                obj=event.GetEventObject()
+                obj.Disable()
+                #self.StartSortBtn.SetLabel('Background')
+                
+            # Inactive State
+            #if self.StartSortBtn.GetValue() == False:
+            #    self.StartSortBtn.SetValue(False)
+
+    def onBckgrSpec(self):
+        s = 'setup.spec.background()' #setup.spec.have_darkness_correction boolean changes!
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
     def onPlaySpec(self,event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -677,7 +702,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onPauseSpec(self,event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -687,7 +712,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onStopSpec(self,event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -697,7 +722,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onSaveSpec(self,event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status(self.menu)
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -833,9 +858,10 @@ class MenuBar(wx.MenuBar):
                 self.udpSend.Send(s)
 
     def onPIDVwr(self,event):
-        cmd = [str(self.tvwr)]
+        #cmd = [str(self.tvwr)]
         #dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
         #os.system(dir)
+        print('Opening:'+ cmd)
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         """
         s = 'setup.PID.plot()'
@@ -859,11 +885,13 @@ class MenuBar(wx.MenuBar):
                 self.udpSend.Send(s)
 
     def onSpecVwr(self, event):
-        cmd = [str(self.svwr)]
+        cmd = str(self.svwr)
+        print('Opening:'+ cmd)
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onImgVwr(self, event):
-        cmd = [str(self.imgvwr)]
+        cmd = str(self.imgvwr)
+        print('Opening:'+ cmd)
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def SPEC_status(self):
@@ -887,13 +915,13 @@ if __name__ == '__main__':
     print 'Copyright: Kenza Samlali, 2020'
     #Command line option parser
     parser = OptionParser()
-    parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='E:/KENZA Folder/PYTHON/fungalmicrofluidics/protocol_KS_clr_sort_nem5_v2.py')
+    parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='E:/KENZA Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/protocol_KS_clr_sort_nem5_v2.py')
     parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=7010)
     parser.add_option('-i', '--ip', dest='ip', help='Remote ip (UDP client) to send the commands', type='string', default='127.0.0.1')
-    parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat')
-    parser.add_option('-y', '--tempvwr', dest='tvwr', help='PIDViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat')
-    parser.add_option('-z', '--specvwr', dest='svwr', help='SpecViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxSpecViewer_fungalmicrofluidics.bat')
-    parser.add_option('-w', '--imgvwr', dest='ivwr', help='imgViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxImgViewer_fungalmicrofluidics.bat')
+    parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat')
+    parser.add_option('-y', '--tempvwr', dest='tvwr', help='PIDViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat')
+    parser.add_option('-z', '--specvwr', dest='svwr', help='SpecViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxSpecViewer_fungalmicrofluidics.bat')
+    parser.add_option('-w', '--imgvwr', dest='ivwr', help='imgViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxImgViewer_fungalmicrofluidics.bat')
 
     (options, args) = parser.parse_args()
     path = os.path.split(options.prot)
