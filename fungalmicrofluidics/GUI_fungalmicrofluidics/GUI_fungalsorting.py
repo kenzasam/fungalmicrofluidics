@@ -65,7 +65,7 @@ Sortingpanel - Panel class to start sorting procedure
 class MainFrame(wx.Frame):
     '''Create MainFrame class.'''
     def __init__(self, setup, chipViewer, tempViewer, specViewer, imgViewer, port=-1, ip='127.0.0.1', columns=2):
-        super(MainFrame, self).__init__(None, wx.ID_ANY) #, size=(400,400)
+        super(MainFrame, self).__init__(None, wx.ID_ANY|wx.BORDER_RAISED) #, size=(400,400)
         #panel=wx.Panel(self, wx.ID_ANY)
         '''PARAMETERS'''
         pumpnrs=5
@@ -85,12 +85,12 @@ class MainFrame(wx.Frame):
         self.SetIcon(ico)
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
         '''Create and populate Panel.'''
-        #panel = wx.Panel(self)
-        menubar = MenuBar(pumpnrs, self.tvwr, self.svwr, udpSend)
+        menubar = MenuBar(pumpnrs, self.tvwr, self.svwr, self.cvwr, udpSend)
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onCloseAll, menubar.fileItem2)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
         self.Bind(wx.EVT_MENU, menubar.onRemoteClosePort, menubar.arduItem2)
+        self.Bind(wx.EVT_MENU, menubar.onChipVwr, menubar.arduItem3)
         self.Bind(wx.EVT_MENU, menubar.onOpenNem, menubar.nemItem1)
         self.Bind(wx.EVT_MENU, menubar.onCloseNem, menubar.nemItem2)
         self.Bind(wx.EVT_MENU, menubar.onStopPumps, menubar.stopAll)
@@ -128,7 +128,7 @@ class MainFrame(wx.Frame):
         MAINbox2 = wx.BoxSizer(wx.VERTICAL)
         self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
         MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
-        self.operationspanel = OperationsPanel(self, self.cvwr, udpSend)
+        self.operationspanel = OperationsPanel(self, udpSend)
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
         #incpanel = IncubationPanel(panel, self.tvwr, udpSend)
@@ -198,7 +198,7 @@ class PumpPanel(wx.Panel):
         self.combo3.Bind(wx.EVT_COMBOBOX, self.onCombo)
         boxNem3.Add(self.combo3, 0, wx.ALIGN_RIGHT)
         Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24))
-        Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
+        Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onStartFlow())
         boxNem3.Add(Btn3, 0, wx.ALIGN_RIGHT)
         ##Entry of Flowrate continuous aqueous
         boxNem4=wx.BoxSizer(wx.HORIZONTAL)
@@ -224,7 +224,7 @@ class PumpPanel(wx.Panel):
         boxNem0.Add(textPump0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.combo0 = wx.ComboBox(self, value=choices[0], choices=choices)
         self.combo0.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem0.Add(self.combo0, 0, wx.ALIGN_RIGHT)
+        boxNem0.Add(self.combo0, 0, wx.ALIGN_LEFT)
         Btn0=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn0.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem0.Add(Btn0, 0, wx.ALIGN_RIGHT)
@@ -238,7 +238,7 @@ class PumpPanel(wx.Panel):
         boxNem1.Add(textPump1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
         self.combo1 = wx.ComboBox(self , value=choices[0], choices=choices)
         self.combo1.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem1.Add(self.combo1, 0, wx.ALIGN_RIGHT)
+        boxNem1.Add(self.combo1, 0, wx.ALIGN_LEFT)
         Btn1=wx.ToggleButton( self, label='Start', name='', size=(50,24))
         Btn1.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem1.Add(Btn1, 0, wx.ALIGN_RIGHT)
@@ -257,14 +257,14 @@ class PumpPanel(wx.Panel):
         Btn2.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
         boxNem2.Add(Btn2, 0, wx.ALIGN_RIGHT)
         #
-        NemSizer.Add(boxNem3, flag=wx.LEFT, border=8)
-        NemSizer.Add(boxNem4, flag=wx.LEFT, border=8)
-        NemSizer.Add(boxNem0, flag=wx.LEFT, border=8)
+        NemSizer.Add(boxNem3, flag=wx.LEFT|wx.EXPAND, border=8)
+        NemSizer.Add(boxNem4, flag=wx.LEFT|wx.EXPAND, border=8)
+        NemSizer.Add(boxNem0, flag=wx.LEFT|wx.EXPAND, border=8)
         if pumpnrs  == 4:
-            NemSizer.Add(boxNem1, flag=wx.LEFT, border=8)
+            NemSizer.Add(boxNem1, flag=wx.LEFT|wx.EXPAND, border=8)
         elif pumpnrs  == 5:
-            NemSizer.Add(boxNem1, flag=wx.LEFT, border=8)
-            NemSizer.Add(boxNem2, flag=wx.LEFT, border=8)
+            NemSizer.Add(boxNem1, flag=wx.LEFT|wx.EXPAND, border=8)
+            NemSizer.Add(boxNem2, flag=wx.LEFT|wx.EXPAND, border=8)
 
         ##
         self.SetSizer(NemSizer)
@@ -272,30 +272,7 @@ class PumpPanel(wx.Panel):
         #self.SetBackgroundColour('#6f8089')
 
     def onOilFlow(self, event):
-        flrt=float(self.entryOilflrt.GetValue())
-        print flrt
-        pumpID=int(self.combo1.GetValue())
-        print pumpID
-        if flrt == 0.0:
-            wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        else:
-            state = event.GetEventObject().GetValue()
-            if state == True:
-               print "on"
-               event.GetEventObject().SetLabel("Stop")
-               s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
-               pyperclip.copy(s)
-               if self.udpSend != False:
-                   self.udpSend.Send(s)
-            else:
-               print "off"
-               event.GetEventObject().SetLabel("Start")
-               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
-               pyperclip.copy(s)
-               if self.udpSend != False:
-                   self.udpSend.Send(s)
-    def onAqFlow(self, event):
-        flrt=float(self.entryAqflrt.GetValue())
+        flrt=float(self.entryflrt3.GetValue())
         print flrt
         pumpID=int(self.combo3.GetValue())
         print pumpID
@@ -317,10 +294,58 @@ class PumpPanel(wx.Panel):
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
-    def onOtherFlow(self, event):
-        flrt=float(entryOtherflrt.GetValue())
+    def onAqFlow(self, event):
+        flrt=float(self.entryflrt4.GetValue())
         print flrt
-        pumpID=int(combo4.GetValue())
+        pumpID=int(self.combo4.GetValue())
+        print pumpID
+        if flrt == 0.0:
+            wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            state = event.GetEventObject().GetValue()
+            if state == True:
+               print "on"
+               event.GetEventObject().SetLabel("Stop")
+               s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
+               pyperclip.copy(s)
+               if self.udpSend != False:
+                   self.udpSend.Send(s)
+            else:
+               print "off"
+               event.GetEventObject().SetLabel("Start")
+               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
+               pyperclip.copy(s)
+               if self.udpSend != False:
+                   self.udpSend.Send(s)
+    
+    def onStartFlow(self, event, temp):
+        flrt=float(self.entryflrt0.GetValue())
+        print flrt
+        pumpID= int(self.combo0.GetValue())
+        print pumpID
+        if flrt == 0.0:
+            wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            state = event.GetEventObject().GetValue()
+            if state == True:
+               print "on"
+               event.GetEventObject().SetLabel("Stop")
+               s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
+               pyperclip.copy(s)
+               if self.udpSend != False:
+                   self.udpSend.Send(s)
+            else:
+               print "off"
+               event.GetEventObject().SetLabel("Start")
+               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
+               pyperclip.copy(s)
+               if self.udpSend != False:
+                   self.udpSend.Send(s)
+
+    def onOtherFlow(self, event):
+        flrt=float(self.entryflrt0.GetValue())
+        print flrt
+        pumpID=int(self.combo0.GetValue())
         print pumpID
         if flrt == 0.0:
             wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
@@ -345,11 +370,10 @@ class PumpPanel(wx.Panel):
 
 class OperationsPanel(wx.Panel):
     """Panel class for user set functions for electrode actuation"""
-    def __init__(self, parent, viewer, udpSend):
+    def __init__(self, parent, udpSend):
         super(OperationsPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend = udpSend
-        self.cvwr = viewer
         """Create and populate main sizer."""
         fnSizer = wx.BoxSizer(wx.VERTICAL)
         #
@@ -361,9 +385,9 @@ class OperationsPanel(wx.Panel):
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         fnSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         fnSizer.AddSpacer(10)
-        self.vwrBtn=wx.Button( self, label='Show chip viewer', name='wxChipViewer',style=wx.BU_EXACTFIT)
-        self.vwrBtn.Bind(wx.EVT_BUTTON, self.onVwr)
-        fnSizer.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
+        #self.vwrBtn=wx.Button( self, label='Show chip viewer', name='wxChipViewer',style=wx.BU_EXACTFIT)
+        #self.vwrBtn.Bind(wx.EVT_BUTTON, self.onVwr)
+        #fnSizer.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
         #sorting
         box=wx.BoxSizer(wx.HORIZONTAL)
         onTime=wx.StaticText(self,  wx.ID_ANY, label='onTime [s]')
@@ -389,10 +413,6 @@ class OperationsPanel(wx.Panel):
         fnSizer.AddSpacer(5)
         self.SetSizer(fnSizer)
         #self.SetBackgroundColour('#32a852')
-
-    def onVwr(self, event):
-        cmd = [str(self.cvwr)]
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onSort(self, event):
         t=int(self.entry.GetValue())
@@ -582,7 +602,7 @@ class SortingPanel(wx.Panel):
         self.SetSortBtn.Bind(wx.EVT_BUTTON, self.onSetSort)
         self.StartSortBtn = wx.ToggleButton(self, label='Start Auto-Sort', name='Sort()', size=(90,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
-        self.StartSortBtn.SetBackgroundColour((152,251,152))
+        #self.StartSortBtn.SetBackgroundColour((152,251,152))
         box5 = wx.BoxSizer(wx.HORIZONTAL)
         box5.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
         box5.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
@@ -611,12 +631,12 @@ class SortingPanel(wx.Panel):
             if self.StartSortBtn.GetValue() == True:
                 self.onStart()
                 self.StartSortBtn.SetLabel('Stop')
-                self.StartSortBtn.SetBackgroundColour((250,128,114))
+                #self.StartSortBtn.SetBackgroundColour((250,128,114))
             # Inactive State
             if self.StartSortBtn.GetValue() == False:
                 self.onStop()
                 self.StartSortBtn.SetLabel('Start')
-                self.StartSortBtn.SetBackgroundColour((152,251,152))
+                #self.StartSortBtn.SetBackgroundColour((152,251,152))
 
     def onSetSort(self, event):
         status=MenuBar.SPEC_status(self.menu)
@@ -734,12 +754,13 @@ class SortingPanel(wx.Panel):
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
-    def __init__(self, pumpnrs, tviewer, sviewer, udpSend):
+    def __init__(self, pumpnrs, tviewer, sviewer, cviewer, udpSend):
         wx.MenuBar.__init__(self)
         self.pumpnrs = pumpnrs
         self.udpSend = udpSend
         self.tvwr = tviewer
         self.svwr = sviewer
+        self.cvwr = cviewer
         self.PID = False
         self.SPEC = False
         Pumpnrs=list(range(self.pumpnrs))
@@ -750,7 +771,8 @@ class MenuBar(wx.MenuBar):
         arduMenu = wx.Menu()
         self.arduItem1 = arduMenu.Append(wx.ID_ANY,'Open Port', 'Open connection with Arduino. openPort()')
         self.arduItem2 = arduMenu.Append(wx.ID_ANY, 'Close Port', 'Close connection with Arduino. closePort()')
-        self.Append(arduMenu, 'Ardu')
+        self.arduItem3 = arduMenu.Append(wx.ID_ANY, 'Open ChipViewer', 'Opening wxChipViewer')
+        self.Append(arduMenu, 'Electrode Stack')
         nemMenu = wx.Menu()
         self.nemItem1 = nemMenu.Append(wx.ID_ANY, 'Open NeMESYS bus', 'Open connection with Nemesys. nem.bus_open()')
         self.nemItem2 = nemMenu.Append(wx.ID_ANY, 'Close NeMESYS bus', 'Close connection with Nemesys. nem.bus_close()')
@@ -836,6 +858,9 @@ class MenuBar(wx.MenuBar):
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
+    def onChipVwr(self, event):
+        cmd = [str(self.cvwr)]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onPIDstart(self, event):
         self.PID=True
