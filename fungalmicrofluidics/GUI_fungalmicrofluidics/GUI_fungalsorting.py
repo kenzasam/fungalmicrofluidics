@@ -198,7 +198,7 @@ class PumpPanel(wx.Panel):
         self.combo3.Bind(wx.EVT_COMBOBOX, self.onCombo)
         boxNem3.Add(self.combo3, 0, wx.ALIGN_RIGHT)
         Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24))
-        Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onStartFlow())
+        Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
         boxNem3.Add(Btn3, 0, wx.ALIGN_RIGHT)
         ##Entry of Flowrate continuous aqueous
         boxNem4=wx.BoxSizer(wx.HORIZONTAL)
