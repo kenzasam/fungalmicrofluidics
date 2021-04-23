@@ -258,7 +258,8 @@ class Flame(BT.BasicThread):
         self.enable = False
         print('%s: Terminated\n'%(self.name))
 
-    def draft_data(self):
+    @staticmethod
+    def draft_data():
         with open('Spectrometer Data/YData-20210208-T18h32m07s.dat' , 'r') as f:
             for line in f:
                 num=line
@@ -281,21 +282,22 @@ class Flame(BT.BasicThread):
         '''
         newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
         if (self.measurement == 0):
-            self.data = newData[2:]
+            self.data = newData[2:] #remove 2 first data points
         else:
             sumdata = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
-            self.data = sumdata[2:]
+            self.data = sumdata[2:] #remove 2 first data points
         #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
-        d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
-        if self.SPS != None:
+        
+        if self.SPS != None: # Processing is ON
             try:
-                dndata = self.SPS.denoising(self.data)
-                peak_int, peak_wvl = self.SPS.findallpeaks(self.wavelengths, self.data)
-                #dndata = self.data
-                full_gate = self.SPS.gateI + self.SPS.gateL
+                dndata = self.SPS.denoising(self.data) # denoised data
+                peak_int, peak_wvl = self.SPS.findallpeaks(self.wavelengths, self.data) # Peak data
+                full_gate = self.SPS.gateI + self.SPS.gateL # Gate data
                 d = {'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peak_wvl':peak_wvl,'Peak_int':peak_int, 'Gate':full_gate , 'DatDn':dndata}
             except:
-                print('something wrong')
+                print('Exception. Something wrong with Signal Processing.')
+        else: # Processing is OFF
+            d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data}
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
@@ -322,34 +324,38 @@ class Flame(BT.BasicThread):
                     #self.message.set('Ready.')
 
     def background(self):
-        if self.run_measurement:
-            self.run_measurement = False
-            #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
-            #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
-            #self.teleUpdate('Ready.')
+        """ Apply background substraction.
+        """
+        if self.enable: #self.run_measurement: # if currently running a measurement
+            self.pause()
             self.measurement = 0
-        else:
-            newData = self.spec.intensities()
-            count = 1
-            #self.message.set('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames.get()))
-            #self.root.update()
-            #print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))
-            while count < int(self.dark_frames.get()):
-                newData = list(map(lambda x,y:x+y, self.spec.intensities(), newData))
-                '''printouts whhile thread is running:
-                if (count % 100 == 0):
-                    print('O'),
-                elif (count % 10 == 0):
-                    print('o'),
-                else:
-                    print('.'),
-                '''
-                count += 1
-                #self.message.set('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames.get()))
-            self.darkness_correction = list(map(lambda x:x/count, newData))
-            self.have_darkness_correction = True # important for saving file
-            #self.axes.set_ylabel('Intensity [corrected count]')
-            #print(str(self.dark_frames) + ' dark frames scanned. Ready.')
+        print('Paused. Acquiring data fro dark frames...')
+        newData = self.spec.intensities()
+        count = 1
+        print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))
+        while count < int(self.dark_frames):
+            newData = list(map(lambda x,y:x+y, self.spec.intensities(), newData))
+            '''printouts whhile thread is running:
+            if (count % 100 == 0):
+                print('O'),
+            elif (count % 10 == 0):
+                print('o'),
+            else:
+                print('.'),
+            '''
+            count += 1
+        self.darkness_correction = list(map(lambda x:x/count, newData))
+        self.have_darkness_correction = True # important for saving file
+        #self.axes.set_ylabel('Intensity [corrected count]')
+        print(str(self.dark_frames) + ' dark frames scanned. Ready. Press Play (or >>> Spec.play() ). Spec.reset() to remove background substraction.')
+
+    def reset(self):
+        """Clear background substraction and reset all applied values.""" #New instance of Processing??
+        self.enable = False
+        self.darkness_correction = [0.0]*(len(self.rawwavelengths))
+        self.have_darkness_correction = False
+        print('Reset. Press Play to restart (or >>>Spec.play())')
+        
 
     def save(self):
         #try:
@@ -382,7 +388,7 @@ class Flame(BT.BasicThread):
         #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
 
     def send_df(self,d,c):
-        """Function to send data to TCP client
+        """ Function to send data to TCP client
         """
         #print 'sending...'
         self.viewer['TCPspec'].Send(d,c) #ardubridge defined specViewer, client
@@ -436,7 +442,8 @@ class Processing(BT.BasicThread):
         self.peaks= False #np.array([])
         self.autosort_status = False
 
-    def draft_data(self):
+    @staticmethod
+    def draft_data():
         ''' Use this function to test specSP functions on saved data (Spec.save())
         '''
         with open('Spectrometer data/YData-20210208-T18h32m07s.dat' , 'r') as f:
@@ -446,11 +453,11 @@ class Processing(BT.BasicThread):
         return a
 
     def denoising(self, y):
-        '''y = Intensity list
+        """y = Intensity list
         Function to denoise y-data.
         BW, Buterworth filter
         SG, Savitzky-Golay filter
-        '''
+        """
         self.denoise = True
         try:
             if self.type == 'BW':
@@ -466,12 +473,11 @@ class Processing(BT.BasicThread):
         except:
             print('Type needs to be BW or SG. Can not perform denoising')
             raise
-        
 
     def findallpeaks(self, x, y):
-        '''x = wavelength list, y = Intensity list
+        """x = wavelength list, y = Intensity list
         Function to find peaks using scipy signal processing library
-        '''
+        """
         self.peaks = True
         arr = np.asarray(y)
         peaks, properties = sps.find_peaks(arr,
@@ -486,10 +492,10 @@ class Processing(BT.BasicThread):
         return peak_int, peak_wvl
 
     def findpeaks(self, x, y):
-        '''x = wavelength list, y = Intensity list
+        """x = wavelength list, y = Intensity list
         Function to find all peaks above treshold using scipy
         signal processing library
-        '''
+        """
         self.peaks = True
         int = np.asarray(y)
         peaks, properties = sps.find_peaks(int,
@@ -504,14 +510,14 @@ class Processing(BT.BasicThread):
         return peak_int, peak_wvl
 
     def enIO(self,val):
-        ''' Function used in ArduBridge, to turn comm on 
-        '''
+        """Function used in ArduBridge, to turn comm on 
+        """
         self.enOut = True
     
     def start(self):
-        ''' Start the thread for peak detection and actuating 
+        """Start the thread for peak detection and actuating 
         electrode pattern for sorting, after 'wait' seconds 
-        '''
+        """
         print('Starting thread...')
         self.autosort_status = True
         #Make file for saving data
@@ -559,8 +565,8 @@ class Processing(BT.BasicThread):
             #stop thread???
 
     def stop(self):
-        '''Function stopping the thread and turning elecs off
-        '''
+        """Function stopping the thread and turning elecs off
+        """
         self.autosort_status = False
         self.gpio.pinWrite(self.pin_ct, 0)
         self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
@@ -581,7 +587,8 @@ class Processing(BT.BasicThread):
         BT.BasicThread.start(self)
         print('%s: Started ON line'%(self.name))   
 
-    def savepeaks(self, name, xdata, ydata):
+    @staticmethod
+    def savepeaks(name, xdata, ydata):
         """Append all detected peaks (wavelength, RFU) into one snapshot file.
         """
         #self.spec.save()
