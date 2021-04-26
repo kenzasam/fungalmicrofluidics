@@ -119,7 +119,7 @@ class Flame(BT.BasicThread):
                 #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
             print('No spec serial number listed. Picking first spec found.')
             dev = list_devices()
-            print dev
+            print(dev)
             self.spec = Spectrometer(dev[0])
             """
             else:
@@ -127,7 +127,7 @@ class Flame(BT.BasicThread):
                 self.spec = Spectrometer.from_serial_number(device)
             """
         except:
-            print('ERROR: Could not initialize device "' + device + '"!')
+            print(('ERROR: Could not initialize device "' + device + '"!'))
             if (sb is None):
                 print('SeaBreeze library not found!')
                 #sys.exit(1)
@@ -135,13 +135,13 @@ class Flame(BT.BasicThread):
                 print('Available devices:')
                 index = 0
                 for dev in list_devices():
-                    print(' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial)
+                    print((' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial))
                     index += 1
             if ('Y'.startswith(input('Simulate spectrometer device instead?  [Y/n] ').upper())):
                 self.spec = SBSimulator()
             else:
                 sys.exit(1)
-        print(self.spec)
+        print((self.spec))
 
     def init_variables(self,
                        autorepeat,
@@ -195,7 +195,7 @@ class Flame(BT.BasicThread):
             self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
             print('Connected and starting thread...')
             BT.BasicThread.start(self)
-            print('%s: Started ON line'%(self.name))
+            print(('%s: Started ON line'%(self.name)))
             #play()
         except:
             print('Something went wrong. Can not connect to client.')
@@ -223,7 +223,7 @@ class Flame(BT.BasicThread):
             #self.run_measurement = True
             self.enable=True
             BT.BasicThread.start(self)
-            print('%s: Started ON line'%(self.name))
+            print(('%s: Started ON line'%(self.name)))
         else:
             print('You need to Spec.start() first!')
 
@@ -256,7 +256,7 @@ class Flame(BT.BasicThread):
             else:
                 self.lock.release()
         self.enable = False
-        print('%s: Terminated\n'%(self.name))
+        print(('%s: Terminated\n'%(self.name)))
 
     @staticmethod
     def draft_data():
@@ -332,7 +332,7 @@ class Flame(BT.BasicThread):
         print('Paused. Acquiring data fro dark frames...')
         newData = self.spec.intensities()
         count = 1
-        print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))
+        print(('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames)))
         while count < int(self.dark_frames):
             newData = list(map(lambda x,y:x+y, self.spec.intensities(), newData))
             '''printouts whhile thread is running:
@@ -344,10 +344,10 @@ class Flame(BT.BasicThread):
                 print('.'),
             '''
             count += 1
-        self.darkness_correction = list(map(lambda x:x/count, newData))
+        self.darkness_correction = list([x/count for x in newData])
         self.have_darkness_correction = True # important for saving file
         #self.axes.set_ylabel('Intensity [corrected count]')
-        print(str(self.dark_frames) + ' dark frames scanned. Ready. Press Play (or >>> Spec.play() ). Spec.reset() to remove background substraction.')
+        print((str(self.dark_frames) + ' dark frames scanned. Ready. Press Play (or >>> Spec.play() ). Spec.reset() to remove background substraction.'))
 
     def reset(self):
         """Clear background substraction and reset all applied values.""" #New instance of Processing??
@@ -383,7 +383,7 @@ class Flame(BT.BasicThread):
         filename2 = time.strftime('YData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
         with open(filename2, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
             f.write(str(self.data))
-        print('Data saved to ' + filename + ', YData saved to ' + filename2)
+        print(('Data saved to ' + filename + ', YData saved to ' + filename2))
         #except:
         #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
 
@@ -529,10 +529,10 @@ class Processing(BT.BasicThread):
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
                 f.write('\n# Scan time per exposure [us]: ' + str(self.spec.scan_time))
                 f.write('\n Wavelength [nm], Intensity [RFU]\n')
-            print ('Saving all data under ' +filename)
+            print(('Saving all data under ' +filename))
         #turn bottom electrode on
         if self.electhread and self.enOut:
-            print('%s: Started ON line'%(self.name))
+            print(('%s: Started ON line'%(self.name)))
             self.gpio.pinWrite(self.pin_ct, 1)
             self.teleUpdate('%s, E%d: 1'%(self.name, self.pin_ct))
         # starting thread
@@ -543,8 +543,8 @@ class Processing(BT.BasicThread):
         try:
             #Find peaks
             p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
-            print p_int
-            print p_wvl
+            print(p_int)
+            print(p_wvl)
             #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
             if len(z) > 0: zz = True
@@ -560,8 +560,8 @@ class Processing(BT.BasicThread):
         except:
             print('Error...')
             exc_type, exc_value = sys.exc_info()[:2]
-            print '%s : Handling %s exception with message "%s"' % \
-                (self.name, exc_type.__name__, exc_value)
+            print('%s : Handling %s exception with message "%s"' % \
+                (self.name, exc_type.__name__, exc_value))
             #stop thread???
 
     def stop(self):
@@ -585,7 +585,7 @@ class Processing(BT.BasicThread):
         """
         self.autosort_status = True
         BT.BasicThread.start(self)
-        print('%s: Started ON line'%(self.name))   
+        print(('%s: Started ON line'%(self.name)))   
 
     @staticmethod
     def savepeaks(name, xdata, ydata):
@@ -595,5 +595,5 @@ class Processing(BT.BasicThread):
         fname = name
         with open(fname, 'a') as f:
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
-        print('Peak data added to ' + fname)
+        print(('Peak data added to ' + fname))
 

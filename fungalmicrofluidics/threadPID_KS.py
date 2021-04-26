@@ -94,9 +94,9 @@ class ArduPidThread(BT.BasicThread):
         self.T0 = time.time()
         BT.BasicThread.start(self)
         if self.enOut:
-            print('%s: Started ON line'%(self.name))
+            print(('%s: Started ON line'%(self.name)))
         else:
-            print('%s: Started OFF line'%(self.name))
+            print(('%s: Started OFF line'%(self.name)))
 
     def process(self):
         """
@@ -126,13 +126,13 @@ class ArduPidThread(BT.BasicThread):
         if self.ctrl_Rise == -1:
             if abs(feedback-self.ct) < self.Rise_tolerance:
                 self.ctrl_Rise = time.time() -self.ctrl_Z0
-                print('Rise-Time: %6.2f'%(self.ctrl_Rise))
+                print(('Rise-Time: %6.2f'%(self.ctrl_Rise)))
 
         #Measure settle-time
         elif self.ctrl_Settle == -1:
             if abs(feedback-self.ct) < self.Rise_tolerance:
                 self.ctrl_Settle = time.time() -self.ctrl_Z0
-                print('Settle-Time: %6.2f'%(self.ctrl_Settle))
+                print(('Settle-Time: %6.2f'%(self.ctrl_Settle)))
         ## /\  Code ends above  /\
 
     def stop(self):
@@ -167,7 +167,7 @@ class ArduPidThread(BT.BasicThread):
         #Steinhart formula
         Tbin = self.ardu.an.analogRead(self.fbPin)
         if (Tbin <= 0) or (Tbin >= 1023):
-            print('TempSensor out of range! Tbin == %d'%(Tbin))
+            print(('TempSensor out of range! Tbin == %d'%(Tbin)))
             Tbin = 950
             return self.ct
 

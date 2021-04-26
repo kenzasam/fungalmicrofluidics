@@ -46,7 +46,7 @@ import wx.lib.agw.foldpanelbar as fpb
 import time
 import os, sys
 import pyperclip
-import Tkinter, tkFileDialog
+import tkinter, tkinter.filedialog
 from optparse import OptionParser
 from GSOF_ArduBridge import UDP_Send
 import subprocess
@@ -296,22 +296,22 @@ class PumpPanel(wx.Panel):
 
     def onOilFlow(self, event):
         flrt=float(self.entryflrt3.GetValue())
-        print flrt
+        print(flrt)
         pumpID=int(self.combo3.GetValue())
-        print pumpID
+        print(pumpID)
         if flrt == 0.0:
             wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
             state = event.GetEventObject().GetValue()
             if state == True:
-               print "on"
+               print("on")
                event.GetEventObject().SetLabel("Stop")
                s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
             else:
-               print "off"
+               print("off")
                event.GetEventObject().SetLabel("Start")
                s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
                pyperclip.copy(s)
@@ -319,22 +319,22 @@ class PumpPanel(wx.Panel):
                    self.udpSend.Send(s)
     def onAqFlow(self, event):
         flrt=float(self.entryflrt4.GetValue())
-        print flrt
+        print(flrt)
         pumpID=int(self.combo4.GetValue())
-        print pumpID
+        print(pumpID)
         if flrt == 0.0:
             wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
             state = event.GetEventObject().GetValue()
             if state == True:
-               print "on"
+               print("on")
                event.GetEventObject().SetLabel("Stop")
                s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
             else:
-               print "off"
+               print("off")
                event.GetEventObject().SetLabel("Start")
                s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
                pyperclip.copy(s)
@@ -344,22 +344,22 @@ class PumpPanel(wx.Panel):
     
     def onStartFlow(self, event, pump):
         flrt=float(self.entryflrt0.GetValue())
-        print flrt
+        print(flrt)
         pumpID= int(self.combo0.GetValue())
-        print pumpID
+        print(pumpID)
         if flrt == 0.0:
             wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
             state = event.GetEventObject().GetValue()
             if state == True:
-               print "on"
+               print("on")
                event.GetEventObject().SetLabel("Stop")
                s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
             else:
-               print "off"
+               print("off")
                event.GetEventObject().SetLabel("Start")
                s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
                pyperclip.copy(s)
@@ -368,22 +368,22 @@ class PumpPanel(wx.Panel):
 
     def onOtherFlow(self, event):
         flrt=float(self.entryflrt0.GetValue())
-        print flrt
+        print(flrt)
         pumpID=int(self.combo0.GetValue())
-        print pumpID
+        print(pumpID)
         if flrt == 0.0:
             wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
             state = event.GetEventObject().GetValue()
             if state == True:
-               print "on"
+               print("on")
                event.GetEventObject().SetLabel("Stop")
                s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
             else:
-               print "off"
+               print("off")
                event.GetEventObject().SetLabel("Start")
                s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
                pyperclip.copy(s)
@@ -391,7 +391,7 @@ class PumpPanel(wx.Panel):
                    self.udpSend.Send(s)
     def onCombo(self, event):
         #pumpid = int(event.GetEventObject().GetValue())
-        print 'pump changed'
+        print('pump changed')
         #return pumpid 
 
 class OperationsPanel(wx.Panel):
@@ -912,7 +912,7 @@ class MenuBar(wx.MenuBar):
         #cmd = [str(self.tvwr)]
         #dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
         #os.system(dir)
-        print('Opening:'+ cmd)
+        print(('Opening:'+ cmd))
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         """
         s = 'setup.PID.plot()'
@@ -937,12 +937,12 @@ class MenuBar(wx.MenuBar):
 
     def onSpecVwr(self, event):
         cmd = str(self.svwr)
-        print('Opening:'+ cmd)
+        print(('Opening:'+ cmd))
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onImgVwr(self, event):
         cmd = str(self.imgvwr)
-        print('Opening:'+ cmd)
+        print(('Opening:'+ cmd))
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def SPEC_status(self):
@@ -955,15 +955,15 @@ class MenuBar(wx.MenuBar):
 
 if __name__ == '__main__':
     def fileChooser():
-        root = Tkinter.Tk()
+        root = tkinter.Tk()
         root.withdraw()
-        filename = tkFileDialog.askopenfilename(title = 'GUI Fungal uFluidics: Select ArduBridge Protocol file', filetypes = (('python files','*.py'),('all files','*.*')))
+        filename = tkinter.filedialog.askopenfilename(title = 'GUI Fungal uFluidics: Select ArduBridge Protocol file', filetypes = (('python files','*.py'),('all files','*.*')))
         return filename
     ver = '3.1.2'
     date = time.strftime("%Y-%m-%d %H:%M")
-    print 'GUI: Protocol GUI Ver:%s'%(ver)
-    print'Now:%s'%(date)
-    print 'Copyright: Kenza Samlali, 2020'
+    print('GUI: Protocol GUI Ver:%s'%(ver))
+    print('Now:%s'%(date))
+    print('Copyright: Kenza Samlali, 2020')
     #Command line option parser
     parser = OptionParser()
     parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='E:/KENZA Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/protocol_KS_clr_sort_nem5_v2.py')
@@ -978,22 +978,22 @@ if __name__ == '__main__':
     path = os.path.split(options.prot)
     #file chooser opens if no other file was specified in the additional text file
     if path[1] == 'Demoprotocol':
-        print 'Loading protocol specified file chooser.'
+        print('Loading protocol specified file chooser.')
         newPath = fileChooser()
         path = os.path.split(newPath)
     else:
-        print 'Loading protocol specified in accompanying address file.'
+        print('Loading protocol specified in accompanying address file.')
     #parser resumes
     lib = str(path[1])[:-3]
     path = path[0]
     sys.path.append(path)
     #lib = options.prot
-    print 'Importing: %s'%(lib)
-    print 'Using remote-ip:port -> %s:%d'%(options.ip, options.port)
+    print('Importing: %s'%(lib))
+    print('Using remote-ip:port -> %s:%d'%(options.ip, options.port))
     try:
         protocol = __import__(lib)
     except:
-        print 'File not found. Loading protocol from file chooser.'
+        print('File not found. Loading protocol from file chooser.')
         newPath = fileChooser()
         path = os.path.split(newPath)
         lib = str(path[1])[:-3]

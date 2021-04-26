@@ -57,18 +57,18 @@ class tcpControl():
         #We're now creating a socket for the Client
         try:
             self.tcpRx = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except socket.error, msg :
-            print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+        except socket.error as msg :
+            print('Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
             ok = False
         if ok: # Bind socket to local host and port
             try:
                 #self.udpRx.setblocking(1)
                 self.tcpRx.connect((self.DesIP,self.RxPort))
                 #self.udpRx.bind(('', self.RxPort))
-                print '%s: Ready on port %d\n'%(nameID, self.RxPort)
+                print('%s: Ready on port %d\n'%(nameID, self.RxPort))
                 self.active = True
-            except socket.error, msg:
-                print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+            except socket.error as msg:
+                print('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
                 self.active = False
             
 
@@ -89,10 +89,10 @@ class tcpControl():
         """ adjust to https://stackoverflow.com/questions/60417767/tcp-lost-packet-python """
         global HEADERSIZE
         global SIZE
-        print 'TCP (%s) - receiving...'%(self.nameID)
+        print('TCP (%s) - receiving...'%(self.nameID))
         while True:
             self.running = True
-            print '.',
+            print('.', end=' ')
             msglen= self.tcpRx.recv(HEADERSIZE).decode('utf-8')
             if len(msglen):
                 msglen=int(msglen)
@@ -116,7 +116,7 @@ class tcpControl():
             full_msg=b''
         """
         self.running = False
-        print 'TCP (%s) - stopped receiving...'%(self.nameID)
+        print('TCP (%s) - stopped receiving...'%(self.nameID))
 
 
     """

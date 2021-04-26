@@ -91,67 +91,67 @@ class Setup():
         """
         Initializing spectrometer thread.
         """
-        print '>>>  <<<'
-        print '>>>  Checking spectrometer  <<<'
+        print('>>>  <<<')
+        print('>>>  Checking spectrometer  <<<')
         if (Spec is None):
-            print "Spectrometer thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol."
+            print("Spectrometer thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol.")
             #sys.exit(1)
             #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.spec=Spec
-            print "ok."
+            print("ok.")
 
         if (SpecSP is None):
-            print "Spectrometer signal processing thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol."
+            print("Spectrometer signal processing thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol.")
             #sys.exit(1)
             #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.specsp=SpecSP
-            print "ok."
+            print("ok.")
 
     def init_pumps(self, Pumps):
         """
         Initializing NeMESYS syringe pump thread.
         """
-        print '>>>  <<<'
-        print '>>>  Checking syringe pumps  <<<'
+        print('>>>  <<<')
+        print('>>>  Checking syringe pumps  <<<')
         #self.nem=Nem(Nemesys=Nemesys, Deviceconfig=deviceconfig, Syringe_param=syringe_param)
         if (Pumps is None):
-            print "Pump bridge not found! No syringe pumps initiated. Syringe pumps are needed for this protocol."
+            print("Pump bridge not found! No syringe pumps initiated. Syringe pumps are needed for this protocol.")
         else:
             self.nem = Pumps
-            print "ok."
+            print("ok.")
 
     def init_incubation(self, PID):
         """
         Initializing PID thread.
         """
-        print '>>>  <<<'
-        print '>>>  Checking PID  <<<'
+        print('>>>  <<<')
+        print('>>>  Checking PID  <<<')
 
         if (PID is None):
-            print "PID bridge not found! No incubation thread initiated. PID control is needed for this protocol."
+            print("PID bridge not found! No incubation thread initiated. PID control is needed for this protocol.")
             #sys.exit(1)
         else:
             self.PID = PID
-            print "ok."
+            print("ok.")
             
     def init_img_algo(self, imgA):
         """
         Initializing imaging pipeline.
         """
-        print '>>>  <<<'
-        print '>>>  Checking imaging pipeline.  <<<'
+        print('>>>  <<<')
+        print('>>>  Checking imaging pipeline.  <<<')
         
         self.triggerpump = 0 #<-- Pump used for hardware trigger
         self.triggerflow = 0.01 #<-- flow in units as defined for pummps
 
         if (imgA is None):
-            print "No imaging algorithm."
+            print("No imaging algorithm.")
             #sys.exit(1)
         else:
             self.imgA = imgA
-            print "ok."
+            print("ok.")
 
 
     def init_elecs(self,gpio, ExtGpio,chipViewer):
@@ -198,7 +198,7 @@ class Setup():
         self.seqAdd(seqCategory, seqName, seqDesc, seqList, seqPeriod, seqOnTime, ExtGpio, chipViewer) #DON'T EDIT
 
     def catAdd(self, catName):
-        if not catName in self.categoryDict.keys():
+        if not catName in list(self.categoryDict.keys()):
             self.categoryDict[catName] = [] #initializes list for each category
 
     def seqAdd(self, seqCategory, seqName, seqDesc, seqList, seqPeriod, seqOnTime, ExtGpio, chipViewer):
@@ -217,15 +217,15 @@ class Setup():
         self.categoryDict[seqCategory].append(seqName)
 
     def seqPrint(self, val=True):
-        for seqName in self.seqDesc.keys():
-            print '%s -> %s'%(seqName, self.seqDesc[seqName])
+        for seqName in list(self.seqDesc.keys()):
+            print('%s -> %s'%(seqName, self.seqDesc[seqName]))
 
     def enOut(self, val=True):
-        for seqName in self.seq.keys():
+        for seqName in list(self.seq.keys()):
             self.seq[seqName].enOut = val
 
     def stop(self):
-        for seqName in self.seq.keys():
+        for seqName in list(self.seq.keys()):
             self.seq[seqName].stop()
 
     def startSeq(self, elecList, N=1, onTime=0.7, Period=1.0, moveSeq=False):
@@ -235,7 +235,7 @@ class Setup():
                 freeSeq = seq
         if freeSeq == False:
             seqName = 'genSeq%d'%(len(self.genSeq)+1)
-            print 'Building new genSeq %s'%(seqName)
+            print('Building new genSeq %s'%(seqName))
             if moveSeq == True:
                 self.genSeq.append(threadElectrodeSeq.MoveElecSeqThread(gpio=self.ExtGpio,
                                                                         nameID=seqName, #The name of the protocol
@@ -255,7 +255,7 @@ class Setup():
 
             freeSeq = self.genSeq[-1]
         else:
-            print 'Using %s'%(freeSeq.name)
+            print('Using %s'%(freeSeq.name))
             freeSeq.Period=Period #Total time [Sec]
             freeSeq.onTime=onTime #On time for each electrod [Sec]
             freeSeq.elecList=elecList #The list itself
@@ -278,7 +278,7 @@ class Setup():
         t = time in msec'''
         try:
             self.spec.set_int_time(t)
-            print ("Integration time set to %d ms") %(t)
+            print(("Integration time set to %d ms") %(t))
         except:
             print("Error. Can't set integrtion time.")
 
@@ -289,16 +289,16 @@ class Setup():
         nr = sequence number. See protocol file. '''
         self.seq['S%d'%(nr)].onTime = t
         self.seq['S%d'%(nr)].start(1)
-        print "....................."
+        print(".....................")
     
     def setGate(self, lowerI, upperI, lowerL, upperL):
         '''set lower intensity, upper intensity, 
         lower wavelength, upper wavelength'''
         try:
             self.specsp.gateI = [lowerI, upperI]
-            print ("Gate set to %d - %d [RFU] ") %(lowerI, upperI)
+            print(("Gate set to %d - %d [RFU] ") %(lowerI, upperI))
             self.specsp.gateL = [lowerL,upperL]
-            print ("Gate set to %d - %d [nm] ") %(lowerL, upperL)
+            print(("Gate set to %d - %d [nm] ") %(lowerL, upperL))
         except:
             print("Error. Can't set gate.")
 
@@ -308,7 +308,7 @@ class Setup():
          t = time in sec'''
         try:
             self.specsp.t_wait = t
-            print("Droplet travel time set to: %d sec ") %(t)
+            print(("Droplet travel time set to: %d sec ") %(t))
         except:
             print("Error. Can't set Droplet travel Time.")
 
@@ -318,7 +318,7 @@ class Setup():
         '''
         try:
             self.specsp.onTime = t
-            print("onTime set to: %d sec ")%(t)
+            print(("onTime set to: %d sec ")%(t))
         except:
             print("Error. Can't set onTime.")
 
@@ -330,7 +330,7 @@ class Setup():
         try:
             self.specsp.pin_ct = pin_ct
             self.specsp.pin_pulse = pin_pulse
-            print("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse)
+            print(("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse))
         except:
             print("Error. Can't set pint_cte or pin_pulse.")
 
@@ -346,7 +346,7 @@ class Setup():
         self.tempfeedbackstream(t,T,step=10)
     	#time.sleep(t)
         self.PID.stop()
-        print "....................."    
+        print(".....................")    
 
     def tempfeedbackstream(self,t, T, step=1):
         '''Continuous printout of measured temperatures.
@@ -357,7 +357,7 @@ class Setup():
             #print 'Incubating at target %d C, currently %d C  %s\r ' % (T, fbT, pad_str),
             #sys.stdout.flush()
             time.sleep(step)
-            print 'Done incubating for %d sec at %d C!' % ( t, T)
+            print('Done incubating for %d sec at %d C!' % ( t, T))
     
     ##### IMAGING ALGO ######
     def ImgTrigger(self):

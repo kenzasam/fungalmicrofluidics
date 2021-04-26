@@ -42,10 +42,10 @@ df = pd.DataFrame(data, columns=['File','Flowrate', 'start', 'stop'])
 df['Flowrate']=pd.to_numeric(df['Flowrate'])
 df['Speed'] = df.apply(lambda x: returnspeed(x['File'], x['start'], x['stop']), axis=1) 
 print (df)
-print data
+print(data)
 # saving the DataFrame as a CSV file 
 csv_data = df.to_csv('Speed_data.csv', index = False) 
-print('\nCSV String:\n', csv_data) 
+print(('\nCSV String:\n', csv_data)) 
 '''
 data['Speed']= list(lambda x: returnspeed(data['File'], data['start'], data['stop']))
 plt.figure()

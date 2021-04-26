@@ -55,11 +55,11 @@ class Nem():
         self.syringe_diam=syringe_diam
         self.syringe_stroke=syringe_stroke
 
-        print '>>>  <<<'
-        print '>>>  nemesys  <<<'
-        print '>>> Starting Nemesys Bridge communication... <<<'
+        print('>>>  <<<')
+        print('>>>  nemesys  <<<')
+        print('>>> Starting Nemesys Bridge communication... <<<')
         self.bus= qmixbus.Bus()
-        print 'Opening bus with deviceconfig', self.deviceconfig
+        print('Opening bus with deviceconfig', self.deviceconfig)
         self.bus.open(self.deviceconfig, 0)
         pumpNameList = [] #pump handles assignment
         if pumpNameList == []:
@@ -68,105 +68,105 @@ class Nem():
         self.pumpsObjList=[] #make pump objects
         for pumpName in pumpNameList:
             pump=qmixpump.Pump()
-            print '%s %s, obj.handle %s'%(pumpName, str(pump), str(pump.handle))
+            print('%s %s, obj.handle %s'%(pumpName, str(pump), str(pump.handle)))
             pump.lookup_by_name(pumpName)
-            print '%s %s, obj.handle %s'%(pumpName, str(pump), str(pump.handle))
+            print('%s %s, obj.handle %s'%(pumpName, str(pump), str(pump.handle)))
             self.pumpsObjList.append(pump)
-        print  '>>> Starting bus communication...<<<'
+        print('>>> Starting bus communication...<<<')
         try:
             self.bus.start()
             pumpfail=False
-            print "Bus started.... "
+            print("Bus started.... ")
         except:
-            print "Can't start bus. Skipping pump setup. Do NOT use pumps! .... "
+            print("Can't start bus. Skipping pump setup. Do NOT use pumps! .... ")
             pumpfail=True
         if pumpfail!=True:
-            print '>>> Enabling and configuring SI units, syringe diameter and stroke for all pumps<<<'
+            print('>>> Enabling and configuring SI units, syringe diameter and stroke for all pumps<<<')
             for i, pump in enumerate(self.pumpsObjList):
-                print 'pump: %d'%(i)
+                print('pump: %d'%(i))
                 self.syringe_enable(pump)
                 #print "Setting SI units..."
                 self.syringe_units(pump)
                 #print "Configuring syringe diameters..."
                 self.syringe_config(pump, self.syringe_diam[i], self.syringe_stroke[i])
                 pump.max_volume = pump.get_volume_max()
-                print "max_volume = %f"%(pump.max_volume)
+                print("max_volume = %f"%(pump.max_volume))
                 pump.max_flow = pump.get_flow_rate_max()
-                print "max_flow = %f"%(pump.max_flow)
-            print '>>> done <<<'
+                print("max_flow = %f"%(pump.max_flow))
+            print('>>> done <<<')
 
     def pumpID(self, pumpID):
         return self.pumpsObjList[pumpID]
 
     def syringe_enable(self, pump):
-        print pump
+        print(pump)
         if pump.is_in_fault_state():
             pump.clear_fault()
-            print 'error, pump fault %s'%(pump)
+            print('error, pump fault %s'%(pump))
         if not pump.is_enabled():
             pump.enable(True)
-            print 'pump %s enabled'%(pump)
+            print('pump %s enabled'%(pump))
 
     def syringe_config(self, pump, InnerDiam, stroke):
-        print "Configuring syringe %s..." %(pump)
+        print("Configuring syringe %s..." %(pump))
         pump.set_syringe_param(InnerDiam,stroke)
-        print "Reading syringe config..."
+        print("Reading syringe config...")
         syringe = pump.get_syringe_param()
-        print  "%s %.2f mm inner diameter" %(pump,syringe.inner_diameter_mm)
-        print "%s %d mm max piston stroke" %(pump,syringe.max_piston_stroke_mm)
+        print("%s %.2f mm inner diameter" %(pump,syringe.inner_diameter_mm))
+        print("%s %d mm max piston stroke" %(pump,syringe.max_piston_stroke_mm))
 
     def syringe_units(self, pump):
-        print "Setting SI units %s ..." %(pump)
+        print("Setting SI units %s ..." %(pump))
         pump.set_volume_unit(qmixpump.UnitPrefix.micro, qmixpump.VolumeUnit.litres)
         pump.set_flow_unit(qmixpump.UnitPrefix.micro, qmixpump.VolumeUnit.litres, qmixpump.TimeUnit.per_second)
         max_ul = pump.get_volume_max()
-        print"Max. volume: ", max_ul
+        print("Max. volume: ", max_ul)
         max_ul_s = pump.get_flow_rate_max()
-        print "Max. flow: ", max_ul_s
+        print("Max. flow: ", max_ul_s)
 
     def pump_generate_flow(self, pump, flow):
-        print "Generating flow from %s ..." %(pump)
+        print("Generating flow from %s ..." %(pump))
         pump.generate_flow(flow)
         time.sleep(1)
         flow_is = pump.get_flow_is()
-        print 'flow is:', flow_is
+        print('flow is:', flow_is)
         finished = self.wait_dosage_finished(pump, 2)
         if finished == True:
-            print 'done'
+            print('done')
 
     def pump_volume(self, pump, max_volume, max_flow):
         vlunit=pump.get_volume_unit()
         flunit=pump.get_flow_unit()
-        print "Pumping %f %s at %f %s from %s ..."%(max_volume,vlunit, max_flow, flunit, pump)
+        print("Pumping %f %s at %f %s from %s ..."%(max_volume,vlunit, max_flow, flunit, pump))
         pump.pump_volume(max_volume, max_flow)
         finished = self.wait_dosage_finished(pump, 10)
         if finished == True:
-            print 'done'
+            print('done')
 
     def pump_dispense(self, pump, max_volume, max_flow ):
         vlunit=pump.get_volume_unit()
         flunit=pump.get_flow_unit()
-        print "Dispensing %f %s at %f %s from %s ..."%(max_volume,vlunit, max_flow, flunit, pump)
+        print("Dispensing %f %s at %f %s from %s ..."%(max_volume,vlunit, max_flow, flunit, pump))
         pump.dispense(max_volume, max_flow)
         finished = self.wait_dosage_finished(pump, 2)
         if finished == True:
-            print 'done'
+            print('done')
 
     def pump_aspirate(self, pump, max_volume):
         print("Testing aspiration...")
         pump.aspirate(max_volume, pump.max_flow)
         finished = self.wait_dosage_finished(pump, 30)
         if finished == True:
-            print 'done'
+            print('done')
 
     def pump_stop(self, pump):
         pump.stop_pumping()
-        print'stopped pump %s ' %(pump)
+        print('stopped pump %s ' %(pump))
 
     def pump_stop_all(self):
         for pump in self.pumpsObjList:
           self.pump_stop(pump)
-        print'stopped all pumps'
+        print('stopped all pumps')
 
     def wait_dosage_finished(self, pump, timeout_seconds): #static method
         '''The function waits until the last dosage command has finished
@@ -177,7 +177,7 @@ class Nem():
         while (result == True) and not timer.is_expired():
             time.sleep(0.1)
             if message_timer.is_expired():
-                print "Fill level: ", pump.get_fill_level()
+                print("Fill level: ", pump.get_fill_level())
                 message_timer.restart()
             result = pump.is_pumping()
         return not result
@@ -193,8 +193,8 @@ class Nem():
         return result
 
     def pump_calibration(self, pump):
-        print "Calibrating pump..."
+        print("Calibrating pump...")
         pump.calibrate()
         time.sleep(0.2)
         calibration_finished = self.wait_calibration_finished(pump, 30)
-        print "Pump calibrated: ", calibration_finished
+        print("Pump calibrated: ", calibration_finished)

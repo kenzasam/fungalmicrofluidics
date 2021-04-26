@@ -53,16 +53,16 @@ def close():
     if SETUP != False:
         if PUMPS != False:
             setup.nem.bus.stop()
-            print 'Nemesys Bus closed...\n'
+            print('Nemesys Bus closed...\n')
         if PID != False and Pid.PIDstatus != False:
             PID.stop()
-            print 'PID thread stoped...\n'
+            print('PID thread stoped...\n')
         if SPEC != False and Spec.SPECstatus != False:
             Spec.stop()
-            print 'Spec thread stoped...\n'
+            print('Spec thread stoped...\n')
         setup.stop()
     ardu.OpenClosePort(0)
-    print 'Bye Bye...'
+    print('Bye Bye...')
 
 if __name__ == "__main__":
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
@@ -98,27 +98,27 @@ if __name__ == "__main__":
     udpConsol = False
     if REMOTE_CTRL_PORT > 1:
         udpConsol = udpControl.udpControl(nameID='udpIDLE', RxPort=REMOTE_CTRL_PORT, callFunc=extEval)
-        print 'Remote-Consol-Active on port %s\n'%(str(REMOTE_CTRL_PORT))
+        print('Remote-Consol-Active on port %s\n'%(str(REMOTE_CTRL_PORT)))
     '''
     Starting communications with electrode stack and Arduino
     '''
-    print 'Using port %s at %d'%(port, baudRate)
+    print('Using port %s at %d'%(port, baudRate))
     ardu = ArduBridge.ArduBridge( COM=port, baud=baudRate )
     if ONLINE:
         ardu.OpenClosePort(1)
-        print 'Connecting to Arduino ON-LINE.'
+        print('Connecting to Arduino ON-LINE.')
     else:
-        print 'Arduino OFF-LINE. Simulation mode'
+        print('Arduino OFF-LINE. Simulation mode')
     ardu.GetID()
     ExtGpio = ElectrodeGpioStack.ExtGpioStack(i2c=ardu.i2c, devList=STACK_BUILD, v=False)#True)
     ExtGpio.init()
     ExtGpio.init()
     ardu.Reset()
-    print 'Stack and Ardu ready...\n'
+    print('Stack and Ardu ready...\n')
     '''
     Setting up PID thread and server
     '''
-    print 'PID status: %s' %(PID)
+    print('PID status: %s' %(PID))
     if PID == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -139,7 +139,7 @@ if __name__ == "__main__":
         Pid.addViewer('UDPpid',pidViewer) #'UDP',udpSendPid1.Send)
         Pid.enIO(True) #PID.enOut = True
         ardu.gpio.pinMode(7,0) # Initialize pin to 0
-        print 'type PID.start() to start the PID thread process\n'
+        print('type PID.start() to start the PID thread process\n')
         #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
     else:
         Pid = None
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     '''
     Setting up micromanager core and image processing
     '''
-    print 'MM_PROC status: %s' %(MM_PROC)
+    print('MM_PROC status: %s' %(MM_PROC))
     if MM_PROC == True:
         print('imaging.')
         Img_pipe = True
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     Setting up spectrometer thread and server.
     This will allow you to retrieve data from a spectrometer and plot it.
     '''
-    print 'Spectrometer Thread status: %s' %(SPEC)
+    print('Spectrometer Thread status: %s' %(SPEC))
     if SPEC == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -188,7 +188,7 @@ if __name__ == "__main__":
         ######################################################################################
         specViewer=tcpSendSpec
         Spec.addViewer('TCPspec',specViewer)
-        print 'Type Spec.start() to start the spectrometer thread process\n'
+        print('Type Spec.start() to start the spectrometer thread process\n')
     else:
         Spec = None
 
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     This will allow you to analyze the spectrum from SPEC.
     A sorting thread autonomously sorts droplets above a treshold.
     '''
-    print 'Spectrometer Signal Processing status: %s' %(SPECSP)
+    print('Spectrometer Signal Processing status: %s' %(SPECSP))
     if SPEC and SPECSP == True:
     #if SPECSP == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
@@ -226,15 +226,15 @@ if __name__ == "__main__":
         SpecSP.enIO(True) # sets Spec.enOut to True
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
         SpecSP.spec = Spec
-        print 'Access Spec signal processing by typing "SpecSP.". Change sorting Gate and peakfinding properties accordingly before starting Auto-Sort.'
-        print 'Type "SpecSP.start() to start the auto-sort process."'
+        print('Access Spec signal processing by typing "SpecSP.". Change sorting Gate and peakfinding properties accordingly before starting Auto-Sort.')
+        print('Type "SpecSP.start() to start the auto-sort process."')
     else:
         SpecSP = None
 
     '''
     Setting up Nemesys syringe pump bridge.
     '''
-    print 'Pumps status: %s' %(PUMPS)
+    print('Pumps status: %s' %(PUMPS))
     if PUMPS == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -246,41 +246,41 @@ if __name__ == "__main__":
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
         #nem=nemesysprot.nemesys(cfg=deviceconfig)
-        print 'Syringe pumps ready...'
+        print('Syringe pumps ready...')
     else:
         Pumps = None
 
     '''
     Start printouts
     '''
-    print("/\  "*10)
-    print("  \/"*10)
-    print 'Now: %s'%(time.strftime("%Y-%m-%d %H:%M"))
-    print ''
-    print 'USER: %s'%(user)
-    print 'ASSIGNED PROTOCOL: using %s'%(lib)
-    print ''
+    print(("/\  "*10))
+    print(("  \/"*10))
+    print('Now: %s'%(time.strftime("%Y-%m-%d %H:%M")))
+    print('')
+    print('USER: %s'%(user))
+    print('ASSIGNED PROTOCOL: using %s'%(lib))
+    print('')
     if (lib =='protocol_KS_clr_sort_nem5_v2') :
-      print 'The protocol you are using, requires the NeMESYS syringe pump add-on'
-      print 'Change the device config file if needed'
-      print 'Change the NeMESYS to True or False to go online'
-      print 'status: %s' %(PUMPS)
-      print 'Change the SPEC spectrometer to True or False to go online'
-      print 'status: %s' %(SPEC)
-    print 'Loading protocol: %s' %(lib)
+      print('The protocol you are using, requires the NeMESYS syringe pump add-on')
+      print('Change the device config file if needed')
+      print('Change the NeMESYS to True or False to go online')
+      print('status: %s' %(PUMPS))
+      print('Change the SPEC spectrometer to True or False to go online')
+      print('status: %s' %(SPEC))
+    print('Loading protocol: %s' %(lib))
     setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid, ImgA=Img_pipe)
     SETUP = True
     setup.enOut(ELEC_EN)
     prot = protocol.Protocol(setup)
     #setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps)
-    print ''
+    print('')
     if GUI == True:
           gui=__import__('GUI_KS_Nemesys.GUI_KS_SC_nemesys')
-          print 'Start ChipViewer to control droplet movement.'
+          print('Start ChipViewer to control droplet movement.')
     '''
     else:
       setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send)
     '''
-    print("/\  "*10)
-    print("  \/"*10)
+    print(("/\  "*10))
+    print(("  \/"*10))
     #########################

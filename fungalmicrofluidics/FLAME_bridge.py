@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 import sys
 if sys.version_info[:2] < (3, 3):
     old_print = print
@@ -71,7 +71,7 @@ def StringIsInt(s):
 
 try:
     # for Python2
-    from Tkinter import *   ## notice capitalized T in Tkinter
+    from tkinter import *   ## notice capitalized T in Tkinter
     input = raw_input
 except ImportError:
     # for Python3
@@ -403,7 +403,7 @@ class SBGUI:
                 count += 1
                 self.message.set('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames.get()))
                 self.root.update()
-            self.darkness_correction = list(map(lambda x:x/count, newData))
+            self.darkness_correction = list([x/count for x in newData])
             self.have_darkness_correction = True
             self.axes.set_ylabel('Intensity [corrected count]')
             self.message.set(str(self.dark_frames.get()) + ' dark frames scanned. Ready.')

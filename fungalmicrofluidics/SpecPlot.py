@@ -55,9 +55,9 @@ class Spectogram(client.tcpControl):
                 ):
         """Initialize TCP client"""
         if RxPort > 1:
-            print 'Initiating client.'
+            print('Initiating client.')
             client.tcpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
-            print 'Remote-Consol-Active on port %s\n'%(str(RxPort))
+            print('Remote-Consol-Active on port %s\n'%(str(RxPort)))
         """Initialize instance variables"""
         #self.run_measurement = False
         self.enable_plot = enable_plot
@@ -184,8 +184,8 @@ if __name__== "__main__":
     IP = '127.0.0.1' # Client ip adress to which udpSend package is sent. See ArduBridge.
     VERSION = '1.0.0' # version
     #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
-    print 'GUI: Protocol GUI Ver:%s'%(VERSION)
-    print 'Copyright: Kenza Samlali, 2020-2021'
+    print('GUI: Protocol GUI Ver:%s'%(VERSION))
+    print('Copyright: Kenza Samlali, 2020-2021')
 
     """Command line option parser"""
     parser = OptionParser()
@@ -200,7 +200,7 @@ if __name__== "__main__":
    
     """Start client thread"""
     client.tcpControl.start(ag)
-    print 'TCP plotting thread started succesfully. Waiting for data from client.'
+    print('TCP plotting thread started succesfully. Waiting for data from client.')
 
     """Create a FuncAnimation object to make the animation. The arguments are:
            ag.figure: the current active figure
