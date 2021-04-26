@@ -75,7 +75,7 @@ if __name__ == "__main__":
     ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
     MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
-    PUMPS = False #<-- True when user wants to use Nemesys pump through python.
+    PUMPS = True #<-- True when user wants to use Nemesys pump through python.
     SPEC = True #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
@@ -214,6 +214,7 @@ if __name__ == "__main__":
                                         PeakThreshold = None, #100, # Vertical distance to neighbouring peaks
                                         PeakWidth = [15,200],    #<-- [min,max] width of the peak(s) in [nm]
                                         AutoSave = True,           #<-- Enable Auto-saving of Peak info during auto-sort
+                                        peak_events = 0,            #<-- number of events to record
                                         output_file = 'PeakData.dat' , #<-- File format for saved data.
                                         Elec = False,             #<-- Enable electrodes
                                         Pin_cte = 75, #37,       #<-- electrode nr to turn on constantly
