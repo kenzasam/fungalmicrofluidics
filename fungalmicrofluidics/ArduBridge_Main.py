@@ -214,6 +214,7 @@ if __name__ == "__main__":
                                         PeakThreshold = None, #100, # Vertical distance to neighbouring peaks
                                         PeakWidth = [15,200],    #<-- [min,max] width of the peak(s) in [nm]
                                         AutoSave = True,           #<-- Enable Auto-saving of Peak info during auto-sort
+                                        peak_events = 0,            #<-- number of events to record
                                         output_file = 'PeakData.dat' , #<-- File format for saved data.
                                         Elec = False,             #<-- Enable electrodes
                                         Pin_cte = 75, #37,       #<-- electrode nr to turn on constantly

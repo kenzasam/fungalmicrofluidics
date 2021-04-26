@@ -408,6 +408,7 @@ class Processing(BT.BasicThread):
                  PeakWidth,
                  PeakWlen,
                  AutoSave,
+                 peak_events,
                  output_file,
                  Elec,
                  Pin_cte,
@@ -420,6 +421,7 @@ class Processing(BT.BasicThread):
         self.gateI = intensity_gate
         self.gateL = wavelength_gate
         self.SAVE = AutoSave
+        self.pevents = peak_events
         self.output_file = output_file
         self.denoise = False
         self.noise = noise
