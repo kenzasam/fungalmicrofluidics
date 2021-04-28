@@ -152,14 +152,16 @@ if __name__ == "__main__":
         print('imaging.')
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
-        pumpnr = 0 #<-- Number of triggered pump in uL/s
-        flowrate = 5 #<-- Flowrate of triggered pump in uL/s
-        def imaging(pumpnr, flowrate):
-            x=[pumpnr, flowrate]
+        push_pumpnr = 4    #<-- Number of triggered pump for droplet transfer
+        push_flowrate = 20 #<-- Flowrate of triggered pump in uL/s
+        sort_pumpnr = 3    #<-- Flowrate of triggered pump for oil spacer in sorter
+        sort_flowrate = 20  #<-- Flowrate of triggered pump in uL/s
+        def imaging(push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate ):
+            x=[push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate]
             return x
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
-        Mimic = imaging(pumpnr, flowrate)
+        Mimic = imaging(push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate)
         
     else:
         Mimic = None
