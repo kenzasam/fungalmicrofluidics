@@ -3,14 +3,14 @@ Copyright, 2020, Guy  Soffer, Kenza Samlali
 """
 
 """
-This file is part of GSOF_ArduBridge.
+This file is part of ShihLab_ArduBridge.
 
-    GSOF_ArduBridge is free software: you can redistribute it and/or modify
+    ShihLab_ArduBridge is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GSOF_ArduBridge is distributed in the hope that it will be useful,
+    ShihLab_ArduBridge is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -29,15 +29,16 @@ repective instances to modify appropriate variables.
 #Basic modules to load
 import time
 import sys
-from GSOF_ArduBridge import udpControl
-from GSOF_ArduBridge import ArduBridge
-from GSOF_ArduBridge import ElectrodeGpioStack
-from GSOF_ArduBridge import threadPID
-from GSOF_ArduBridge import UDP_Send
-import Nemesys_Bridge
-import TCP_Send
-import threadPID_KS
+from smlardubridge import udpControl
+from smlardubridge import ArduBridge
+from smlardubridge import ElectrodeGpioStack
+from smlardubridge import UDP_Send
+#from smlardubridge import Nemesys_Bridge
+#import Nemesys_Bridge
+from smlardubridge import TCP_Send
+import threadPID_fungi
 import threadSpec
+
 
 def extEval(s):
     '''
@@ -150,20 +151,20 @@ if __name__ == "__main__":
     print('MM_PROC status: %s' %(MM_PROC))
     if MM_PROC == True:
         print('imaging.')
-        Img_pipe = True
-        '''
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
-        mmproc = capstoneMain(nameID='PID', #<-- proces name
-                                            triggerpump =, #<-- Pump used for hardware trigger
-                                            triggerflow = #<-- flow in units as defined for pummps
-                                             )
-        
+        push_pumpnr = 4    #<-- Number of triggered pump for droplet transfer
+        push_flowrate = 20 #<-- Flowrate of triggered pump in uL/s
+        sort_pumpnr = 3    #<-- Flowrate of triggered pump for oil spacer in sorter
+        sort_flowrate = 20  #<-- Flowrate of triggered pump in uL/s
+        def imaging(push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate):
+            x=[push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate]
+            return x
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
-        '''
+        Mimic = imaging(push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate)
     else:
-        Img_pipe = None
+        Mimic = None
 
     '''
     Setting up spectrometer thread and server.
@@ -269,7 +270,7 @@ if __name__ == "__main__":
       print('Change the SPEC spectrometer to True or False to go online')
       print('status: %s' %(SPEC))
     print('Loading protocol: %s' %(lib))
-    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid, ImgA=Img_pipe)
+    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid, ImgA=Mimic)
     SETUP = True
     setup.enOut(ELEC_EN)
     prot = protocol.Protocol(setup)
