@@ -36,7 +36,7 @@ from GSOF_ArduBridge import threadPID
 from GSOF_ArduBridge import UDP_Send
 import Nemesys_Bridge
 import TCP_Send
-import threadPID_KS
+import threadPID_fungi
 import threadSpec
 
 def extEval(s):
