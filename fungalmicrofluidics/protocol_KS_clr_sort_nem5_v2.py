@@ -142,9 +142,6 @@ class Setup():
         """
         print '>>>  <<<'
         print '>>>  Checking imaging pipeline.  <<<'
-        
-        self.triggerpump = 0 #<-- Pump used for hardware trigger
-        self.triggerflow = 0.01 #<-- flow in units as defined for pummps
 
         if (imgA is None):
             print "No imaging algorithm."
@@ -365,5 +362,6 @@ class Setup():
         '''
         print('Trigger received from Imaging pipeline.')
         self.PID.stop()
-        self.nem.pump_generate_flow(self.nem.pumpID(self.triggerpump), self.triggerflow)
+        self.nem.pump_generate_flow(self.nem.pumpID(self.imgA[0]), self.imgA[1])
+        #self.nem.pump_generate_flow(self.nem.pumpID(self.imgA.triggerpump), self.imgA.triggerflow)
         

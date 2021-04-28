@@ -75,9 +75,9 @@ if __name__ == "__main__":
     ELEC_EN = False #<-- False for simulation
     PID = True #<-- True / False to build a PID controller.
     MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
-    PUMPS = False #<-- True when user wants to use Nemesys pump through python.
-    SPEC = True #<-- True when user wants to use a spectrometer thread.
-    SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
+    PUMPS = True #<-- True when user wants to use Nemesys pump through python.
+    SPEC = False #<-- True when user wants to use a spectrometer thread.
+    SPECSP = False #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
@@ -150,20 +150,19 @@ if __name__ == "__main__":
     print 'MM_PROC status: %s' %(MM_PROC)
     if MM_PROC == True:
         print('imaging.')
-        Img_pipe = True
-        '''
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
-        mmproc = capstoneMain(nameID='PID', #<-- proces name
-                                            triggerpump =, #<-- Pump used for hardware trigger
-                                            triggerflow = #<-- flow in units as defined for pummps
-                                             )
-        
+        pumpnr = 0 #<-- Number of triggered pump in uL/s
+        flowrate = 5 #<-- Flowrate of triggered pump in uL/s
+        def imaging(pumpnr, flowrate):
+            x=[pumpnr, flowrate]
+            return x
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
-        '''
+        Mimic = imaging(pumpnr, flowrate)
+        
     else:
-        Img_pipe = None
+        Mimic = None
 
     '''
     Setting up spectrometer thread and server.
@@ -269,7 +268,7 @@ if __name__ == "__main__":
       print 'Change the SPEC spectrometer to True or False to go online'
       print 'status: %s' %(SPEC)
     print 'Loading protocol: %s' %(lib)
-    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid, ImgA=Img_pipe)
+    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid, ImgA=Mimic)
     SETUP = True
     setup.enOut(ELEC_EN)
     prot = protocol.Protocol(setup)
