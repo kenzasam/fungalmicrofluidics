@@ -132,7 +132,7 @@ class MainFrame(wx.Frame):
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
         #incpanel = IncubationPanel(panel, self.tvwr, udpSend)
-        self.incpanel = IncubationPanel(self, menubar, udpSend)
+        self.incpanel = IncubationPanel(self, menubar, self.imgvwr, udpSend)
         MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
         #sortingpanel = SortingPanel(panel, self.svwr, udpSend)
         self.sortingpanel = SortingPanel(self, menubar, udpSend)
@@ -200,7 +200,7 @@ class PumpPanel(wx.Panel):
             Btn.Bind(wx.EVT_TOGGLEBUTTON, lambda event, dropid=i, entry=entryflrt: self.onStartFlow(event, dropid, entry)) 
             boxNem.Add(Btn, 0, wx.ALIGN_RIGHT)
             NemSizer.Add(boxNem, flag=wx.LEFT|wx.EXPAND, border=8)
-
+        #
         self.SetSizer(NemSizer)
         NemSizer.AddSpacer(5)
     
@@ -281,11 +281,12 @@ class OperationsPanel(wx.Panel):
 class IncubationPanel(wx.Panel):
     """Panel class for setting incubation parameters (temperature, time, PID control)
     and imaging pipeline"""
-    def __init__(self, parent, menubar, udpSend):
+    def __init__(self, parent, menubar, imvwr, udpSend):
         super(IncubationPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend = udpSend
         self.menu = menubar
+        self.imgvwr = imvwr
         """Create and populate main sizer."""
         incSizer = wx.BoxSizer(wx.VERTICAL)
         #
@@ -324,17 +325,18 @@ class IncubationPanel(wx.Panel):
         #imaging pipeline
         box4=wx.BoxSizer(wx.HORIZONTAL)
         self.imgsetupBtn=wx.Button( self, label='Start imaging pipeline ...', name='PID.start()', style=wx.BU_EXACTFIT)
-        self.imgsetupBtn.Bind(wx.EVT_BUTTON, self.onShowPopup)
+        self.imgsetupBtn.Bind(wx.EVT_BUTTON, self.onShowMimic)
         box4.Add(self.imgsetupBtn, flag=wx.RIGHT, border=8)
         incSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
         incSizer.AddSpacer(5)
         self.SetSizer(incSizer)
         self.SetBackgroundColour('#c597c72')
 
-    def onShowPopup(self, event):
+    def onShowMimic(self, event):
         """Imaging pop-up window"""
-        win = popup()
-        win.Show(True)
+        cmd = str(self.imgvwr)
+        print('Opening:'+ cmd)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onIncubate(self, event):
         status= self.PID_status(self.menu)
@@ -771,11 +773,6 @@ class MenuBar(wx.MenuBar):
         print('Opening:'+ cmd)
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    def onImgVwr(self, event):
-        cmd = str(self.imgvwr)
-        print('Opening:'+ cmd)
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
     def SPEC_status(self):
         """check spec status"""
         return self.SPEC
@@ -803,7 +800,7 @@ if __name__ == '__main__':
     parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat')
     parser.add_option('-y', '--tempvwr', dest='tvwr', help='PIDViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat')
     parser.add_option('-z', '--specvwr', dest='svwr', help='SpecViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxSpecViewer_fungalmicrofluidics.bat')
-    parser.add_option('-w', '--imgvwr', dest='ivwr', help='imgViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxImgViewer_fungalmicrofluidics.bat')
+    parser.add_option('-w', '--imgvwr', dest='ivwr', help='imgViewer path', type='string', default='E:/Kenza Folder/PYTHON/mimic/mimic/GUI_mimic.bat')
 
     (options, args) = parser.parse_args()
     path = os.path.split(options.prot)
