@@ -186,90 +186,7 @@ class PumpPanel(wx.Panel):
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         NemSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         NemSizer.AddSpacer(10)
-        '''
-        #Entry of Oil consant flow rate
-        boxNem3=wx.BoxSizer(wx.HORIZONTAL)
-        flrt3=wx.StaticText(self,  wx.ID_ANY, label='Oil [uL/s]')
-        boxNem3.Add(flrt3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryflrt3=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem3.Add(self.entryflrt3, proportion=0.5, border=8)
-        textPump3=wx.StaticText(self, wx.ID_ANY, label='Pump')
-        boxNem3.Add(textPump3, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.combo3 = wx.ComboBox(self, value=choices[0], choices=choices)
-        self.combo3.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem3.Add(self.combo3, 0, wx.ALIGN_RIGHT)
-        Btn3=wx.ToggleButton( self, label='Start', name='', size=(50,24))
-        #Btn3.Bind(wx.EVT_TOGGLEBUTTON, self.onOilFlow)
-        flrt=float(self.entryflrt3.GetValue())
-        pumpID=int(self.combo3.GetValue())
-        self.Bind(wx.EVT_BUTTON, lambda event: self.onStartFlow(event, v, vv), self.Btn3) 
-        boxNem3.Add(Btn3, 0, wx.ALIGN_RIGHT)
-        ##Entry of Flowrate continuous aqueous
-        boxNem4=wx.BoxSizer(wx.HORIZONTAL)
-        flrt4=wx.StaticText(self,  wx.ID_ANY, label='Aq [uL/s]')
-        boxNem4.Add(flrt4, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryflrt4=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem4.Add(self.entryflrt4, proportion=0.5, border=8)
-        textPump4=wx.StaticText(self, wx.ID_ANY, label='Pump')
-        boxNem4.Add(textPump4, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.combo4 = wx.ComboBox(self, value=choices[0], choices=choices)
-        self.combo4.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem4.Add(self.combo4, 0, wx.ALIGN_RIGHT)
-        Btn4=wx.ToggleButton( self, label='Start', name='', size=(50,24))
-        Btn4.Bind(wx.EVT_TOGGLEBUTTON, self.onAqFlow)
-        boxNem4.Add(Btn4, 0, wx.ALIGN_RIGHT)
-        #Entry of OTHER flow rate
-        boxNem0=wx.BoxSizer(wx.HORIZONTAL)
-        flrt0=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNem0.Add(flrt0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryflrt0=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem0.Add(self.entryflrt0, proportion=0.5, border=8)
-        textPump0=wx.StaticText(self, wx.ID_ANY, label='Pump')
-        boxNem0.Add(textPump0, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.combo0 = wx.ComboBox(self, value=choices[0], choices=choices)
-        self.combo0.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem0.Add(self.combo0, 0, wx.ALIGN_LEFT)
-        Btn0=wx.ToggleButton( self, label='Start', name='', size=(50,24))
-        Btn0.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
-        boxNem0.Add(Btn0, 0, wx.ALIGN_RIGHT)
-        # pumpnrs  == 4:
-        boxNem1=wx.BoxSizer(wx.HORIZONTAL)
-        flrt1=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNem1.Add(flrt1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryflrt1=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem1.Add(self.entryflrt1, proportion=0.5, border=8)
-        textPump1=wx.StaticText(self, wx.ID_ANY, label='Pump')
-        boxNem1.Add(textPump1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.combo1 = wx.ComboBox(self , value=choices[0], choices=choices)
-        self.combo1.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem1.Add(self.combo1, 0, wx.ALIGN_LEFT)
-        Btn1=wx.ToggleButton( self, label='Start', name='', size=(50,24))
-        Btn1.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
-        boxNem1.Add(Btn1, 0, wx.ALIGN_RIGHT)
-        # pumpnrs == 5:
-        boxNem2=wx.BoxSizer(wx.HORIZONTAL)
-        flrt2=wx.StaticText(self,  wx.ID_ANY, label='Other [uL/s]')
-        boxNem2.Add(flrt2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryflrt2=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem2.Add(self.entryflrt2, proportion=0.5, border=8)
-        textPump2=wx.StaticText(self, wx.ID_ANY, label='Pump')
-        boxNem2.Add(textPump2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.combo2 = wx.ComboBox(self, value=choices[0], choices=choices)
-        self.combo2.Bind(wx.EVT_COMBOBOX, self.onCombo)
-        boxNem2.Add(self.combo2, 0, wx.ALIGN_RIGHT)
-        Btn2=wx.ToggleButton( self, label='Start', name='', size=(50,24))
-        Btn2.Bind(wx.EVT_TOGGLEBUTTON, self.onOtherFlow)
-        boxNem2.Add(Btn2, 0, wx.ALIGN_RIGHT)
-        #
-        NemSizer.Add(boxNem3, flag=wx.LEFT|wx.EXPAND, border=8)
-        NemSizer.Add(boxNem4, flag=wx.LEFT|wx.EXPAND, border=8)
-        NemSizer.Add(boxNem0, flag=wx.LEFT|wx.EXPAND, border=8)
-        if pumpnrs  == 4:
-            NemSizer.Add(boxNem1, flag=wx.LEFT|wx.EXPAND, border=8)
-        elif pumpnrs  == 5:
-            NemSizer.Add(boxNem1, flag=wx.LEFT|wx.EXPAND, border=8)
-            NemSizer.Add(boxNem2, flag=wx.LEFT|wx.EXPAND, border=8)
-        '''
+        # adding pumps
         for i in Pumpnrs:
             boxNem=wx.BoxSizer(wx.HORIZONTAL)
             flrt=wx.StaticText(self,  wx.ID_ANY, label='Flow [uL/s]')
@@ -280,83 +197,15 @@ class PumpPanel(wx.Panel):
             textPump = wx.StaticText(self, wx.ID_ANY, label=textpump)
             boxNem.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
             Btn = wx.ToggleButton( self, label='Start', name='', size=(50,24))
-            Btn.Bind(wx.EVT_BUTTON, lambda event,  dropid=i, entry=entryflrt: self.onStartFlow(event, dropid, entry)) 
+            Btn.Bind(wx.EVT_TOGGLEBUTTON, lambda event, dropid=i, entry=entryflrt: self.onStartFlow(event, dropid, entry)) 
             boxNem.Add(Btn, 0, wx.ALIGN_RIGHT)
             NemSizer.Add(boxNem, flag=wx.LEFT|wx.EXPAND, border=8)
-         
-        #NemSizer.Add(self.pumpsizer(i))
-        ##
+
         self.SetSizer(NemSizer)
         NemSizer.AddSpacer(5)
-        #self.SetBackgroundColour('#6f8089')
-
-    def pumpsizer(self, pumpID):
-        boxNem=wx.BoxSizer(wx.HORIZONTAL)
-        flrt=wx.StaticText(self,  wx.ID_ANY, label='Flow [uL/s]')
-        boxNem.Add(flrt, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entryflrt=wx.TextCtrl(self, wx.ID_ANY,'0.0', size=(45, -1))
-        boxNem.Add(self.entryflrt, proportion=0.5, border=8)
-        textpump = 'Pump #'+ str(pumpID)
-        textPump=wx.StaticText(self, wx.ID_ANY, label=textpump)
-        boxNem.Add(textPump, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.Btn=wx.ToggleButton( self, label='Start', name='', size=(50,24))
-        #flrt=float(self.entryflrt.GetValue())
-        #self.Bind(wx.EVT_BUTTON, lambda event: self.onStartFlow(event, pumpID, flrt), self.Btn) 
-        boxNem.Add(self.Btn, 0, wx.ALIGN_RIGHT)
-        return boxNem
-
-    def onOilFlow(self, event):
-        flrt=float(self.entryflrt3.GetValue())
-        print flrt
-        pumpID=int(self.combo3.GetValue())
-        print pumpID
-        if flrt == 0.0:
-            wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        else:
-            state = event.GetEventObject().GetValue()
-            if state == True:
-               print "on"
-               event.GetEventObject().SetLabel("Stop")
-               s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
-               pyperclip.copy(s)
-               if self.udpSend != False:
-                   self.udpSend.Send(s)
-            else:
-               print "off"
-               event.GetEventObject().SetLabel("Start")
-               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
-               pyperclip.copy(s)
-               if self.udpSend != False:
-                   self.udpSend.Send(s)
-    def onAqFlow(self, event):
-        flrt=float(self.entryflrt4.GetValue())
-        print flrt
-        pumpID=int(self.combo4.GetValue())
-        print pumpID
-        if flrt == 0.0:
-            wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        else:
-            state = event.GetEventObject().GetValue()
-            if state == True:
-               print "on"
-               event.GetEventObject().SetLabel("Stop")
-               s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
-               pyperclip.copy(s)
-               if self.udpSend != False:
-                   self.udpSend.Send(s)
-            else:
-               print "off"
-               event.GetEventObject().SetLabel("Start")
-               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
-               pyperclip.copy(s)
-               if self.udpSend != False:
-                   self.udpSend.Send(s)
-
     
     def onStartFlow(self, event, pump, entry):
-        print('ello')
         flrt = float(entry.GetValue())
-        print('ello')
         if flrt == 0.0:
             wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -375,34 +224,6 @@ class PumpPanel(wx.Panel):
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
-
-    def onOtherFlow(self, event):
-        flrt=float(self.entryflrt0.GetValue())
-        print flrt
-        pumpID=int(self.combo0.GetValue())
-        print pumpID
-        if flrt == 0.0:
-            wx.MessageDialog(self, "Enter a correct flowrate, and select a pump", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        else:
-            state = event.GetEventObject().GetValue()
-            if state == True:
-               print "on"
-               event.GetEventObject().SetLabel("Stop")
-               s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pumpID,flrt)
-               pyperclip.copy(s)
-               if self.udpSend != False:
-                   self.udpSend.Send(s)
-            else:
-               print "off"
-               event.GetEventObject().SetLabel("Start")
-               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pumpID) #\'%s\'
-               pyperclip.copy(s)
-               if self.udpSend != False:
-                   self.udpSend.Send(s)
-    def onCombo(self, event):
-        #pumpid = int(event.GetEventObject().GetValue())
-        print 'pump changed'
-        #return pumpid 
 
 class OperationsPanel(wx.Panel):
     """Panel class for user set functions for electrode actuation"""

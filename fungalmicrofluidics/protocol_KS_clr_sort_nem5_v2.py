@@ -366,5 +366,5 @@ class Setup():
         self.nem.pump_generate_flow(self.nem.pumpID(self.imgA[0]), self.imgA[1])
         #self.nem.pump_generate_flow(self.nem.pumpID(self.imgA.triggerpump), self.imgA.triggerflow)
         #start sorter, spacer oil
-        self.nem.pump_generate_flow(self.imgA[2]), self.imgA[3])
+        self.nem.pump_generate_flow(self.nem.pumpID(self.imgA[2]), self.imgA[3])
         
