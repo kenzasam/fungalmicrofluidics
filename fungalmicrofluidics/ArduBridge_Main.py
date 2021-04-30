@@ -123,7 +123,7 @@ if __name__ == "__main__":
     if PID == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
-        Pid = threadPID_KS.ArduPidThread(bridge=ardu,
+        Pid = threadPID_fungi.ArduPidThread(bridge=ardu,
                                       nameID='PID', #<-- proces name
                                       Period=0.5,   #<-- Period-time of the control-loop. PID calculation cycle time in sec.
                                       fbPin=1,      #<-- The analog pin (Ardu) of the temp sensor.

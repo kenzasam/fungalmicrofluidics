@@ -62,9 +62,9 @@ class tcpControl():
             ok = False
         if ok: # Bind socket to local host and port
             try:
-                #self.udpRx.setblocking(1)
-                self.tcpRx.connect((self.DesIP,self.RxPort))
-                #self.udpRx.bind(('', self.RxPort))
+                while self.tcpRx.connect_ex((self.DesIP,self.RxPort)) != 0: #raises error indicator 0 if server not available. For asynchronous connects
+                    print('Server not available. Trying to bind again in 5sec.')
+                    time.sleep(5)
                 print('%s: Ready on port %d\n'%(nameID, self.RxPort))
                 self.active = True
             except socket.error as msg:
