@@ -37,6 +37,7 @@ import numpy as np
 import scipy.signal as sps
 from GSOF_ArduBridge import threadBasic as BT
 import seabreeze
+from datetime import timedelta, datetime
 #seabreeze.use('pyseabreeze')
 import seabreeze.spectrometers as sb
 from seabreeze.spectrometers import Spectrometer, list_devices
@@ -401,6 +402,7 @@ class Processing(BT.BasicThread):
                  nameID,
                  intensity_gate,
                  wavelength_gate,
+                 pkcount,
                  noise,
                  DenoiseType,
                  PeakProminence,
@@ -420,6 +422,7 @@ class Processing(BT.BasicThread):
         self.gpio = gpio
         self.gateI = intensity_gate
         self.gateL = wavelength_gate
+        self.peakcnt = pkcount
         self.SAVE = AutoSave
         self.pevents = peak_events
         self.output_file = output_file
@@ -443,6 +446,8 @@ class Processing(BT.BasicThread):
         self.T0 = time.time()
         self.peaks= False #np.array([])
         self.autosort_status = False
+        self.cntr = 0
+        
 
     @staticmethod
     def draft_data():
@@ -522,10 +527,12 @@ class Processing(BT.BasicThread):
         """
         print('Starting thread...')
         self.autosort_status = True
+        global start_time
+        start_time = datetime.now()
         #Make file for saving data
         if self.SAVE:
             global filename
-            filename = time.strftime( 'experimental data/PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+            filename = time.strftime( 'Experimental/PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
             with open(filename, 'w') as f:
                 f.write('\n# Time of snapshot: ' + time.strftime(self.spec.timestamp, time.gmtime()))
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
@@ -539,19 +546,63 @@ class Processing(BT.BasicThread):
             self.teleUpdate('%s, E%d: 1'%(self.name, self.pin_ct))
         # starting thread
         BT.BasicThread.start(self)
+        
+    
+    def run(self):
+        """
+        The thread code that manages the periodic run, pause/play and stop.
+        BT.basicthread overwrite: 
+        - implement functionality with period = 0 
+        - IMPLEMENT COUNT
+        """
+        while (not(self.stopped())):
+            self.lock.acquire(True)
+            if self.enable:
+                ## \/ Code begins below \/
+                self.process()
+                ## /\  Code ends above  /\
+
+            ## *** Calculating how much time to wait until the next execution ***
+            if self.Period > 0:
+                self.T_Z[1] = self.T_Z[0]
+                self.T_Z[0] += self.Period
+                sleepTime = self.T_Z[0] - time.time()
+                if sleepTime < 0.05:
+                    while sleepTime < 0.05:
+                        self.T_Z[0] += self.Period
+                        sleepTime += self.Period
+                    s = '%s: Timing error - Skipping a cycle'%(self.name)
+                    #self.teleUpdate(s)
+                    print(s)
+                self.lock.release()
+                time.sleep(sleepTime)
+            else:
+                self.lock.release()
+        self.enable = False
+        print('%s: Terminated\n'%(self.name))
 
     def process(self):
         peakfound = False
+        #global pkcount
         try:
             #Find peaks
             p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
             print p_int
-            print p_wvl
             #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
             if len(z) > 0: zz = True
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
                     peakfound=True
+                    if self.cntr == self.peakcnt:
+                        self.lock.release()
+                        self.enable = False
+                        print('Final event.')
+                        end_time = datetime.now()
+                        print('Time elapsed:', end_time - start_time)
+                        self.stop()
+                    self.cntr += 1
+                    print('Peak '+str(self.cntr))
+                    print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
                     if self.SAVE: self.savepeaks(filename, p_wvl, p_int)
                     if self.electhread and self.enOut:
                         #wait, depending on distance between detection and electrodes
@@ -570,22 +621,27 @@ class Processing(BT.BasicThread):
         """Function stopping the thread and turning elecs off
         """
         self.autosort_status = False
+        self.cntr = 0 # reset counter
+        self.enable = False
+        print('Stopping thread...')
+        BT.BasicThread.stop(self)
         self.gpio.pinWrite(self.pin_ct, 0)
         self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
         self.enOut = False
-        print('Stopping thread...')
-        BT.BasicThread.stop(self)
+        
         
     
     def pause(self):
         """Pause the Threading process
         """
         self.autosort_status = False
+        self.enable = False
 
     def play(self):
         """Restart the Threading process
         """
         self.autosort_status = True
+        self.enable=True
         BT.BasicThread.start(self)
         print('%s: Started ON line'%(self.name))   
 
