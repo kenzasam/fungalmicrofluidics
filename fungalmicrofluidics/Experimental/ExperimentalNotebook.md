@@ -1,4 +1,27 @@
-# Mon, DD YYYY 
+# Mon, DD YYYY
+# Experiment details
+## Notes
+
+
+# Mon, DD YYYY
+# Experiment details
+## Notes
+
+
+# May, 4th 2021
+
+# Experiment details
+for 10uM: gate 4000-60.000, 500-600nm 500events
+for 5uM: gate 1500-60.000, 500-600nm, 500events
+for 50uM: gate 4000-80.000, 500-600nm, 500events
+
+## Notes
+- oil: 0.012
+- fluorescein 10uM / 5uM / 50uM: 0.004
+- oil spacer 0.06
+
+
+# Mon, DD YYYY
 
 ## Experiment details
 
@@ -40,8 +63,8 @@ Drops came in with too many resoruifin positive. How can I control the ratio of 
 
 ## To Do
 - [x] GUI splash screen
-- [ ] add time interval for sorting into GUI/
-- [ ] Know whether spec is on, from Ardubridge, npt GUI....
+- [x] add time interval for sorting into GUI/
+- [x] Know whether spec is on, from Ardubridge, npt GUI....
 
 # March, 9 2021
 
@@ -58,7 +81,7 @@ Plotting has delay when overlay.
 
 ## To Do
 - [x] Integration time
-- [ ] easily turn overlay off.
+- [x] easily turn overlay off.
 
 
 # March 4th, 2021
@@ -86,7 +109,7 @@ Took around 1 hr to set up: place new chip in holder, inserting fibers, taping f
 
 ## Notes
 Went ok. Good first try. Problem: outlet of +sorting channel was partially blockd, so not good flow. Also had no clue what ideal Vpp/oil settings were.
-But figured out SpecSP settings! 
+But figured out SpecSP settings!
 
 **Settings SApecSP:**
 
@@ -103,7 +126,7 @@ Peak_range = [520,680],  #<-- [min,max] wavelength of the peak(s) in nm
 Pin_cte = 75, #37,       #<-- electrode to turn on constantly
 Pin_pulse = 98, #38,     #<-- electrode to pulse for sorting
 Pin_onTime = 0.2,   #<-- pulse on time [s].
-t_wait=0.1 
+t_wait=0.1
 
 **Settings PID:**
 
@@ -122,7 +145,7 @@ Pid.RC_div_DT = 10.0 #<-- time constant, determining how fast you reach settle p
 - [x] save succesful settings and write in methods or results.
 
 
-# March,1 2021 
+# March,1 2021
 
 ## Experiment details
 Doing a bunch of coding and testing. The autonomoussorting is now ready for use!!
@@ -139,14 +162,14 @@ Vrms3=[3.97, 8.13, 12.1, 16.0, 20.0, 23.9, 27.9, 31.8, 35.7, 39.7, 43.7, 47.7, 5
 
 
 
-# Feb, 21 2021 
+# Feb, 21 2021
 
 ## Experiment details
 Saturday session!
 
 ## Notes
 
-broke fiber in chip. 
+broke fiber in chip.
 Used PDMS filled chip.
 Quick testing of auto sort.
 Auto sort is buggy: for some reason, always in each loop detects drop....
@@ -157,7 +180,7 @@ Auto sort is buggy: for some reason, always in each loop detects drop....
 - [x] for autosort, be able to tell range of wavelennth in between which you expect peak. e.g. in case background substraction doesn't work well...
 - [x] print for after setting treshold or Int time through GUI.
 
-# Mon, DD YYYY 
+# Mon, DD YYYY
 
 ## Experiment details
 
@@ -294,7 +317,7 @@ plt.show()
 - [ ] integration time resetting
 
 
-# Jan, 28 2021 
+# Jan, 28 2021
 
 ## Experiment details**
 Sorting of water in oil droplets. New elec config, fab on January 24th.
