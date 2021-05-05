@@ -410,7 +410,6 @@ class Processing(BT.BasicThread):
                  PeakWidth,
                  PeakWlen,
                  AutoSave,
-                 peak_events,
                  output_file,
                  Elec,
                  Pin_cte,
@@ -424,7 +423,6 @@ class Processing(BT.BasicThread):
         self.gateL = wavelength_gate
         self.peakcnt = pkcount
         self.SAVE = AutoSave
-        self.pevents = peak_events
         self.output_file = output_file
         self.denoise = False
         self.noise = noise
@@ -447,6 +445,10 @@ class Processing(BT.BasicThread):
         self.peaks= False #np.array([])
         self.autosort_status = False
         self.cntr = 0
+        if self.peakcnt == 0 or self.peakcnt == False:
+            self.COUNT = False
+        else:
+            self.COUNT = True
         
 
     @staticmethod
@@ -593,17 +595,19 @@ class Processing(BT.BasicThread):
             if len(z) > 0: zz = True
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
                     peakfound=True
-                    if self.cntr == self.peakcnt:
-                        self.lock.release()
-                        self.enable = False
-                        print('Final event.')
-                        end_time = datetime.now()
-                        print('Time elapsed:', end_time - start_time)
-                        self.stop()
-                    self.cntr += 1
-                    print('Peak '+str(self.cntr))
+                    if self.COUNT: 
+                        if self.cntr == self.peakcnt:
+                            self.lock.release()
+                            self.enable = False
+                            print('Final event.')
+                            end_time = datetime.now()
+                            print('Time elapsed:', end_time - start_time)
+                            self.stop()
+                        self.cntr += 1
+                        print('Peak '+str(self.cntr))
                     print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
-                    if self.SAVE: self.savepeaks(filename, p_wvl, p_int)
+                    if self.SAVE: 
+                        self.savepeaks(filename, p_wvl, p_int)
                     if self.electhread and self.enOut:
                         #wait, depending on distance between detection and electrodes
                         time.sleep(self.t_wait)

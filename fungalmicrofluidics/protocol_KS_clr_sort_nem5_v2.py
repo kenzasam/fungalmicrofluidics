@@ -330,7 +330,9 @@ class Setup():
             print("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse)
         except:
             print("Error. Can't set pint_cte or pin_pulse.")
-
+    def setEvents(self, nr):
+            self.specsp.pkcount = nr
+            
     ####### PID ##############
     def incubation(self,RC=0.5,T=37,t=30):
         '''Function to start the PID process, set it to a certain temperature,
