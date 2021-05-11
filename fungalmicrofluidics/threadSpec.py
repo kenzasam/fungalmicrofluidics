@@ -445,11 +445,14 @@ class Processing(BT.BasicThread):
         self.peaks= False #np.array([])
         self.autosort_status = False
         self.cntr = 0
-        if self.peakcnt == 0 or self.peakcnt == False:
-            self.COUNT = False
-        else:
-            self.COUNT = True
         
+    @staticmethod
+    def countevents(cnt):
+        if cnt == 0 or cnt == False:
+            COUNT = False
+        else:
+            COUNT = True
+        return COUNT
 
     @staticmethod
     def draft_data():
@@ -595,7 +598,7 @@ class Processing(BT.BasicThread):
             if len(z) > 0: zz = True
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
                     peakfound=True
-                    if self.COUNT: 
+                    if self.countevents(self.peakcnt): 
                         if self.cntr == self.peakcnt:
                             self.lock.release()
                             self.enable = False

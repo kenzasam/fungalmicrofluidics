@@ -136,6 +136,7 @@ class MainFrame(wx.Frame):
         MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
         #sortingpanel = SortingPanel(panel, self.svwr, udpSend)
         self.sortingpanel = SortingPanel(self, menubar, udpSend)
+        self.Bind(wx.EVT_CHECKBOX, self.sortingpanel.onCheck)
         MAINbox2.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         self.SetMenuBar(menubar)
 
@@ -367,6 +368,13 @@ class SortingPanel(wx.Panel):
         super(SortingPanel, self).__init__(parent)
         self.udpSend = udpSend
         self.menu = menubar
+
+        def spacer(sizer):
+            line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
+            sizer.AddSpacer(10)
+            sizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
+            sizer.AddSpacer(10)
+
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
         srtSizer.AddSpacer(5)
@@ -382,7 +390,7 @@ class SortingPanel(wx.Panel):
         titlebox2  = wx.BoxSizer(wx.HORIZONTAL)
         title2 = wx.StaticText(self, label='Spectral Measurement')
         font2 = wx.Font(9,wx.DEFAULT,wx.NORMAL,wx.NORMAL)
-        title2.SetFont(font2)
+        title2.SetFont(font)
         titlebox2.Add(title2, flag=wx.ALIGN_LEFT, border=8)
         srtSizer.Add(titlebox2, 0, wx.ALIGN_CENTER_VERTICAL)
         srtSizer.AddSpacer(5)
@@ -420,13 +428,13 @@ class SortingPanel(wx.Panel):
         box4.Add(self.entry2, proportion=1, border=8)
         box4.Add(self.SetInttBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
-        srtSizer.AddSpacer(10)
-        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        srtSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
+        spacer(srtSizer)
         #Sorting
         boxtop=wx.BoxSizer(wx.HORIZONTAL)
-        self.texttop = wx.StaticText(self,  wx.ID_ANY, label='Gating')
-        boxtop.Add(self.texttop, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        texttop = wx.StaticText(self,  wx.ID_ANY, label='Gating')
+        texttop.SetFont(font)
+        boxtop.Add(texttop, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
+        srtSizer.AddSpacer(10)
         srtSizer.Add(boxtop, flag=wx.ALIGN_CENTER_VERTICAL)
         box2=wx.BoxSizer(wx.HORIZONTAL)
         self.entry1 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
@@ -462,19 +470,22 @@ class SortingPanel(wx.Panel):
         box5 = wx.BoxSizer(wx.HORIZONTAL)
         box5.Add(self.SetSortBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box5, flag=wx.ALIGN_CENTER_VERTICAL)
-        self.texttitle = wx.StaticText(self,  wx.ID_ANY, label='Sort & Record Events')
+        spacer(srtSizer)
+        texttitle = wx.StaticText(self,  wx.ID_ANY, label='Sort and Record Events')
+        texttitle.SetFont(font)
         box8 = wx.BoxSizer(wx.HORIZONTAL)
-        box8.Add(self.texttitle, flag=wx.RIGHT, border=8)
+        box8.Add(texttitle, flag=wx.RIGHT, border=8)
         srtSizer.Add(box8, flag=wx.ALIGN_CENTER_VERTICAL)
         self.text6 = wx.StaticText(self,  wx.ID_ANY, label='event #')
         self.entry5 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
-        self.checkbox = wx.CheckBox(self, wx.ID_Any, wx.ALIGN_RIGHT, label='continuous', self.OnCheck)
+        self.checkbox = wx.CheckBox(self, wx.ID_ANY, label='continuous')
         self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(90,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
         #self.StartSortBtn.SetBackgroundColour((152,251,152))
         box7 = wx.BoxSizer(wx.HORIZONTAL)
         box7.Add(self.text6, flag=wx.RIGHT, border=8)
         box7.Add(self.entry5, flag=wx.RIGHT, border=8)
+        box7.Add(self.checkbox, flag=wx.RIGHT, border=8)
         srtSizer.Add(box7, flag=wx.ALIGN_CENTER_VERTICAL)
         box8 = wx.BoxSizer(wx.HORIZONTAL)
         box8.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
@@ -482,11 +493,19 @@ class SortingPanel(wx.Panel):
         self.SetSizer(srtSizer)
         #self.SetBackgroundColour('#f2dd88')
 
-    def OnCheck(self):
-        s = 'setup.specsp.COUNT = False'
+    def onCheck(self, event):
+        cb = event.GetEventObject() 
+        if cb.GetValue():
+            self.entry5.Disable()
+        else:
+            self.entry5.Enable()
+        #print cb.GetLabel(),' is clicked', cb.GetValue()
+        val = not cb.GetValue()
+        s = 'setup.specsp.COUNT = '+str(val)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+
     def onStart(self):
         s = 'setup.specsp.start()'
         pyperclip.copy(s)
@@ -736,12 +755,14 @@ class MenuBar(wx.MenuBar):
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
+
     def onChipVwr(self, event):
         cmd = [str(self.cvwr)]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onPIDstart(self, event):
         self.PID=True
+        #Enable PID sizer
         s = 'setup.Pid.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -755,6 +776,7 @@ class MenuBar(wx.MenuBar):
 
     def onPIDstop(self, event):
         self.PID = False
+        #Disable PID sizer
         s = 'setup.Pid.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -775,12 +797,14 @@ class MenuBar(wx.MenuBar):
 
     def onStartSpec(self, event):
         self.SPEC = True
+        #Enable Spec sizer
         s = 'setup.spec.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
                 self.udpSend.Send(s)
 
     def onStopSpec(self, event):
+        #disable sizer
         self.SPEC = False
         s = 'setup.spec.stop()'
         pyperclip.copy(s)
@@ -865,6 +889,6 @@ if __name__ == '__main__':
     time.sleep(4)
     frame.Show()
     #inspection tool for GUI troubleshooting
-    wx.lib.inspection.InspectionTool().Show()
+    #wx.lib.inspection.InspectionTool().Show()
     #
     app.MainLoop()
