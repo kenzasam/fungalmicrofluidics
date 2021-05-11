@@ -84,28 +84,6 @@ class MainFrame(wx.Frame):
         ico = wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
-        '''Create and populate Panel.'''
-        menubar = MenuBar(pumpnrs, self.tvwr, self.svwr, self.cvwr, udpSend)
-        self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
-        self.Bind(wx.EVT_MENU, menubar.onCloseAll, menubar.fileItem2)
-        self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
-        self.Bind(wx.EVT_MENU, menubar.onRemoteClosePort, menubar.arduItem2)
-        self.Bind(wx.EVT_MENU, menubar.onChipVwr, menubar.arduItem3)
-        self.Bind(wx.EVT_MENU, menubar.onOpenNem, menubar.nemItem1)
-        self.Bind(wx.EVT_MENU, menubar.onCloseNem, menubar.nemItem2)
-        self.Bind(wx.EVT_MENU, menubar.onStopPumps, menubar.stopAll)
-        self.Bind(wx.EVT_MENU, menubar.onPIDstart, menubar.pidItem1)
-        self.Bind(wx.EVT_MENU, menubar.onPIDpause, menubar.pidItem2)
-        self.Bind(wx.EVT_MENU, menubar.onPIDstop, menubar.pidItem3)
-        self.Bind(wx.EVT_MENU, menubar.onPIDVwr, menubar.pidItem4)
-        self.Bind(wx.EVT_MENU, menubar.onStartSpec, menubar.specItem1)
-        self.Bind(wx.EVT_MENU, menubar.onStopSpec, menubar.specItem2)
-        self.Bind(wx.EVT_MENU, menubar.onSpecVwr, menubar.specItem3)
-        Pumpnrs = list(range(pumpnrs))
-        for i in Pumpnrs:
-            self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
-            self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
-        MAINbox = wx.BoxSizer(wx.VERTICAL)
         #
         """
         panel_bar = fpb.FoldPanelBar(self, -1, agwStyle=fpb.FPB_VERTICAL)
@@ -125,6 +103,8 @@ class MainFrame(wx.Frame):
         MAINbox.Add(panel_bar, 1, wx.EXPAND|wx.ALL, 4)
         """
         #
+        '''Create and populate Panels.'''
+        MAINbox = wx.BoxSizer(wx.VERTICAL)
         MAINbox2 = wx.BoxSizer(wx.VERTICAL)
         self.pumppanel = PumpPanel(self, pumpnrs, udpSend)
         MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
@@ -132,14 +112,38 @@ class MainFrame(wx.Frame):
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
         #PID = self.PID_status(menubar)
         #incpanel = IncubationPanel(panel, self.tvwr, udpSend)
-        self.incpanel = IncubationPanel(self, menubar, self.imgvwr, udpSend)
+        self.incpanel = IncubationPanel(self, self.imgvwr, udpSend)
         MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
         #sortingpanel = SortingPanel(panel, self.svwr, udpSend)
-        self.sortingpanel = SortingPanel(self, menubar, udpSend)
+        self.sortingpanel = SortingPanel(self, udpSend)
         self.Bind(wx.EVT_CHECKBOX, self.sortingpanel.onCheck)
         MAINbox2.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
+        # Disable panels
+        self.sortingpanel.Disable()#
+        self.incpanel.Disable()#
+        '''Create and populate Menubar.'''
+        menubar = MenuBar(pumpnrs, self.tvwr, self.svwr, self.cvwr, udpSend, self.sortingpanel, self.incpanel)
+        self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
+        self.Bind(wx.EVT_MENU, menubar.onCloseAll, menubar.fileItem2)
+        self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
+        self.Bind(wx.EVT_MENU, menubar.onRemoteClosePort, menubar.arduItem2)
+        self.Bind(wx.EVT_MENU, menubar.onChipVwr, menubar.arduItem3)
+        self.Bind(wx.EVT_MENU, menubar.onOpenNem, menubar.nemItem1)
+        self.Bind(wx.EVT_MENU, menubar.onCloseNem, menubar.nemItem2)
+        self.Bind(wx.EVT_MENU, menubar.onStopPumps, menubar.stopAll)
+        self.Bind(wx.EVT_MENU, menubar.onPIDstart, menubar.pidItem1)
+        self.Bind(wx.EVT_MENU, menubar.onPIDpause, menubar.pidItem2)
+        self.Bind(wx.EVT_MENU, menubar.onPIDstop, menubar.pidItem3)
+        self.Bind(wx.EVT_MENU, menubar.onPIDVwr, menubar.pidItem4)
+        self.Bind(wx.EVT_MENU, menubar.onStartSpec, menubar.specItem1)
+        self.Bind(wx.EVT_MENU, menubar.onStopSpec, menubar.specItem2)
+        self.Bind(wx.EVT_MENU, menubar.onSpecVwr, menubar.specItem3)
+        Pumpnrs = list(range(pumpnrs))
+        for i in Pumpnrs:
+            self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
+            self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
+        
         self.SetMenuBar(menubar)
-
         #
         appbox = wx.BoxSizer(wx.HORIZONTAL)
         appbox.Add(MAINbox, 1, wx.EXPAND|wx.ALL, 2)
@@ -282,11 +286,11 @@ class OperationsPanel(wx.Panel):
 class IncubationPanel(wx.Panel):
     """Panel class for setting incubation parameters (temperature, time, PID control)
     and imaging pipeline"""
-    def __init__(self, parent, menubar, imvwr, udpSend):
+    def __init__(self, parent, imvwr, udpSend):
         super(IncubationPanel, self).__init__(parent)
         #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend = udpSend
-        self.menu = menubar
+        #self.menu = menubar
         self.imgvwr = imvwr
         """Create and populate main sizer."""
         incSizer = wx.BoxSizer(wx.VERTICAL)
@@ -340,7 +344,7 @@ class IncubationPanel(wx.Panel):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onIncubate(self, event):
-        status= self.PID_status(self.menu)
+        status= MenuBar.PID_status()
         if status != True:
             wx.MessageDialog(self, "Please first start the PID", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -364,10 +368,10 @@ class IncubationPanel(wx.Panel):
 
 class SortingPanel(wx.Panel):
     """ Panel class for droplet sorting: starting spectrometer, sorting electrode sequences"""
-    def __init__(self, parent, menubar, udpSend):
+    def __init__(self, parent, udpSend):
         super(SortingPanel, self).__init__(parent)
         self.udpSend = udpSend
-        self.menu = menubar
+        #self.menu = menubar
 
         def spacer(sizer):
             line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
@@ -519,7 +523,7 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
             
     def toggledbutton(self, event):
-        status=MenuBar.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -535,7 +539,7 @@ class SortingPanel(wx.Panel):
                 #self.StartSortBtn.SetBackgroundColour((152,251,152))
 
     def onSetSort(self, event):
-        status=MenuBar.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -588,7 +592,7 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
 
     def onBckgrToggle(self,event):
-        status=MenuBar.SPEC_status(self.menu)
+        status = MenuBar.SPEC_status()
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -651,13 +655,16 @@ class SortingPanel(wx.Panel):
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
-    def __init__(self, pumpnrs, tviewer, sviewer, cviewer, udpSend):
+    def __init__(self, pumpnrs, tviewer, sviewer, cviewer, udpSend, specpanel, pidpanel):
         wx.MenuBar.__init__(self)
         self.pumpnrs = pumpnrs
         self.udpSend = udpSend
         self.tvwr = tviewer
         self.svwr = sviewer
         self.cvwr = cviewer
+        self.specpanel = specpanel
+        self.pidpanel = pidpanel
+        #
         self.PID = False
         self.SPEC = False
         Pumpnrs=list(range(self.pumpnrs))
@@ -690,12 +697,12 @@ class MenuBar(wx.MenuBar):
         self.pidItem2 = pidMenu.Append(wx.ID_ANY, 'Pause PID', 'Pause PID thread. Pid.pause()')
         self.pidItem3 = pidMenu.Append(wx.ID_ANY, 'Close PID', 'Stop PID thread. Pid.stop()')
         self.pidItem4 = pidMenu.Append(wx.ID_ANY, 'View Live Temperature Plot', 'Start wxChipViewer')
-        self.Append(pidMenu, 'PID')
+        self.Append(pidMenu, 'Droplet Incubation')
         specMenu = wx.Menu()
         self.specItem1 = specMenu.Append(wx.ID_ANY, 'Open Spec', 'Start SPEC thread. Spec.start()')
         self.specItem2 = specMenu.Append(wx.ID_ANY, 'Close Spec', 'Stop SPEC thread. Spec.stop()')
         self.specItem3 = specMenu.Append(wx.ID_ANY, 'View Live Spectrum', 'Start wxSpecViewer')
-        self.Append(specMenu, 'Spectrometer')
+        self.Append(specMenu, 'Droplet Sorting')
 
     def onQuit(self,event):
         self.Close()
@@ -706,9 +713,9 @@ class MenuBar(wx.MenuBar):
         if self.udpSend != False:
             self.udpSend.Send(s)
 
-    def onCloseNem(self,event):
+    def onCloseNem(self,event): ### TO EDIT ###
         s= 'Pumps.bus.close()'
-        self.setup.pumpsObjList[pumpID]
+        #self.setup.pumpsObjList[pumpID]
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -763,6 +770,7 @@ class MenuBar(wx.MenuBar):
     def onPIDstart(self, event):
         self.PID=True
         #Enable PID sizer
+        self.pidpanel.Enable()
         s = 'setup.Pid.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -798,6 +806,7 @@ class MenuBar(wx.MenuBar):
     def onStartSpec(self, event):
         self.SPEC = True
         #Enable Spec sizer
+        self.specpanel.Enable()
         s = 'setup.spec.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
