@@ -632,8 +632,6 @@ class Processing(BT.BasicThread):
         self.gpio.pinWrite(self.pin_ct, 0)
         self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
         self.enOut = False
-        
-        
     
     def pause(self):
         """Pause the Threading process

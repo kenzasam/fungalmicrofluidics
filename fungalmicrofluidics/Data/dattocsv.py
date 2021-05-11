@@ -7,7 +7,7 @@ Py 2.7
 '''
 import pandas as pd
 
-filename = "experimental data\PeakData-20210324-T19h01m52s.dat"
+filename = "/Users/kenza/OneDrive - Concordia University - Canada/CASB-PhD/Gitbubble/fungalmicrofluidics_basement/fungalmicrofluidics/Experimental/PeakData-20210504-T20h50m24s.dat"
 
 # reading given csv file 
 # and creating dataframe
