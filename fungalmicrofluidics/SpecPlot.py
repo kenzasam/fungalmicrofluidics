@@ -37,6 +37,8 @@ import sys
 import numpy as np
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
+import matplotlib.patches as patches
+
 plot_animation = None
 # TCP client
 import socket
@@ -81,21 +83,19 @@ class Spectogram(client.tcpControl):
     def init_plot(self):
         """Initialize plotting subsystem"""
         # Plot setup
-        #self.figure = plot.figure()
-        #self.axes = self.figure.gca()
-        #self.graph, = self.axes.plot([], [])
         self.figure, (self.ax1, self.ax2) = plot.subplots(2, sharex='col', sharey='row')
+        #raw signal
         self.line1, = self.ax1.plot([], [])
         self.graph = self.line1
         if self.enable_sp == True:
+            #denoised signal
             self.line2, = self.ax2.plot([], [], 'b')
-            #self.graph3 = self.axes[1].plot([], [], 'bo')
-            #self.graph2 = self.ax2.scatter([], [], marker = "x")
-            self.line3 = self.ax2.axhline(y=self.ydata3[0], linewidth=3, color='r')
-            self.area = self.ax2.axhspan(self.ydata3[0], self.ydata3[1], facecolor='r', alpha=0.5)
-            #self.line,=self.axes.axhline(y=, xmin=0, xmax-1)
-            self.graph= [self.line1, self.line2, self.line3, self.area]
-            #self.graph= [self.line1, self.line2, self.line3, self.graph2]
+            #treshold line
+            #self.line3 = self.ax2.axhline(y=self.ydata3[0], linewidth=3, color='r')
+            #gating area
+            rect = patches.Rectangle((self.ydata3[2], self.ydata3[0]), self.ydata3[3]-self.ydata3[2], self.ydata3[1]-self.ydata3[0], fc='y', alpha=0.5)
+            self.area = self.ax2.add_patch(rect) 
+            self.graph = [self.line1, self.line2, self.area]
         self.figure.suptitle('No measurement taken so far.')
         '''
         for ax in [self.ax1, self.ax2]:
@@ -106,53 +106,49 @@ class Spectogram(client.tcpControl):
         self.ax1.set_xlabel('Wavelengths [nm]')
         self.ax1.set_ylabel('Intensity [count]')
         
-
     def animate(self,i): #,frame
-       #object=self.TCP.run()#(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload)
-       #print 'Decoding now...'
-       #print object
-       #self.decodingPayload(object) #once full message received
-       #self.measurement=object['Msr']
-       #xdata=object['L']
-       #ydata=object['Dat']
-       '''
-       if i==0:
-           print 'lll'
-           self.graph.set_data(self.xdata,self.ydata)
-           #return self.init()
-       '''
-       if (self.enable_plot > 0): #(self.measurement == self.scan_frames) or \
-           title = '%s /n Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
-           #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
-           self.figure.suptitle(title)
-           #plot.suptitle(title)
-           self.line1.set_data(self.xdata, self.ydata)
-           #self.graph.set_data(self.xdata, self.ydata)
-           #self.graph.set_ydata(self.ydata)
-           if self.enable_sp == True:
-               #denoised
-               self.line2.set_data(self.xdata, self.ydata1)
-               #peaks
-               #self.graph2.set_offsets(np.c_[self.xdata2, self.ydata2])
-               '''
-               for i,j in zip(self.xdata2, self.ydata2):
-                   self.ax2.annotate(str(j),xy=(i,j+0.5))
+        '''
+        #object=self.TCP.run()#(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload)
+        #print 'Decoding now...'
+        #print object
+        #self.decodingPayload(object) #once full message received
+        #self.measurement=object['Msr']
+        #xdata=object['L']
+        #ydata=object['Dat']
+        
+        if i==0:
+            print 'lll'
+            self.graph.set_data(self.xdata,self.ydata)
+            #return self.init()
+        '''
+        if (self.enable_plot > 0): #(self.measurement == self.scan_frames) or \
+            title = '%s /n Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
+            #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
+            self.figure.suptitle(title)
+            self.line1.set_data(self.xdata, self.ydata)
+            if self.enable_sp == True:
+                #DENOISED SIGNAL
+                self.line2.set_data(self.xdata, self.ydata1)
+                #PEAK INFO
                 '''
-               #print(peakwvl)
-               #gate https://www.python-course.eu/matplotlib_subplots.php
-               self.line3.set_ydata(self.ydata3[0])
-               #xmin, xmax = self.ax2.get_xlim() 
-               #v=([xmin, self.ydata3[0]] ,[xmin,self.ydata3[1]], [xmax, self.ydata3[0]], [xmax, self.ydata3[1]])
-               v=([self.ydata3[2], self.ydata3[0]] ,[self.ydata3[2],self.ydata3[1]], [self.ydata3[3], self.ydata3[0]], [self.ydata3[3], self.ydata3[1]])
-               #v=([self.ydata3[0],self.ydata3[1]])
-               self.area.set_xy(v)
-           for ax in [self.ax1, self.ax2]:
-               ax.relim()
-               ax.autoscale_view(True, True, True)
-           #self.ax1.relim()
-           #self.ax1.autoscale_view(True, True, True)
-           return self.graph
-           #return (self.graph, self.graph2, self.line)
+                self.graph2.set_offsets(np.c_[self.xdata2, self.ydata2])
+                for i,j in zip(self.xdata2, self.ydata2):
+                    self.ax2.annotate(str(j),xy=(i,j+0.5))
+                print(peakwvl)
+                ''' 
+                #GATE
+                x0 = self.ydata3[2]
+                y0 = self.ydata3[0]
+                w = self.ydata3[3]-self.ydata3[2] 
+                h = self.ydata3[1]-self.ydata3[0]
+                self.area.set_bounds(x0, y0, w, h)
+            for ax in [self.ax1, self.ax2]:
+                ax.relim()
+                ax.autoscale_view(True, True, True)
+            #self.ax1.relim()
+            #self.ax1.autoscale_view(True, True, True)
+            return self.graph
+            #return (self.graph, self.graph2, self.line)
 
     def decodingPayload(self, object):
         '''Object received from Server (tcpSend, threadSpec)

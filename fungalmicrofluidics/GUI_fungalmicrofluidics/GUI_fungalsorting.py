@@ -344,7 +344,7 @@ class IncubationPanel(wx.Panel):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onIncubate(self, event):
-        status= MenuBar.PID_status()
+        status = MenuBar.PID_status
         if status != True:
             wx.MessageDialog(self, "Please first start the PID", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -358,10 +358,6 @@ class IncubationPanel(wx.Panel):
             pyperclip.copy(s)
             if self.udpSend != False:
                 self.udpSend.Send(s)
-
-    def PID_status(self, menubar):
-            """checkPID status"""
-            return menubar.PID
 
     def onImage(self, event):
         return
@@ -523,7 +519,7 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
             
     def toggledbutton(self, event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -539,7 +535,7 @@ class SortingPanel(wx.Panel):
                 #self.StartSortBtn.SetBackgroundColour((152,251,152))
 
     def onSetSort(self, event):
-        status=MenuBar.SPEC_status()
+        status=MenuBar.SPEC_status
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -558,7 +554,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s2)
 
     def onSetIntt(self, event):
-        status=MenuBar.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -592,7 +588,7 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
 
     def onBckgrToggle(self,event):
-        status = MenuBar.SPEC_status()
+        status = MenuBar.SPEC_status
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -613,7 +609,7 @@ class SortingPanel(wx.Panel):
             self.udpSend.Send(s)
 
     def onPlaySpec(self,event):
-        status=MenuBar.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -623,7 +619,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onPauseSpec(self,event):
-        status=MenuBar.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -633,7 +629,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onStopSpec(self,event):
-        status=MenuBar.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -643,7 +639,7 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onSaveSpec(self,event):
-        status=MenuBar.SPEC_status(self.menu)
+        status=MenuBar.SPEC_status
         if status!= True:
             wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
         else:
@@ -655,6 +651,10 @@ class SortingPanel(wx.Panel):
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
+    #class vars
+    PID_status = False
+    SPEC_status = False
+    #instance vars
     def __init__(self, pumpnrs, tviewer, sviewer, cviewer, udpSend, specpanel, pidpanel):
         wx.MenuBar.__init__(self)
         self.pumpnrs = pumpnrs
@@ -665,8 +665,6 @@ class MenuBar(wx.MenuBar):
         self.specpanel = specpanel
         self.pidpanel = pidpanel
         #
-        self.PID = False
-        self.SPEC = False
         Pumpnrs=list(range(self.pumpnrs))
         fileMenu = wx.Menu()
         self.fileItem1 = fileMenu.Append(wx.ID_EXIT,'Quit')
@@ -732,7 +730,7 @@ class MenuBar(wx.MenuBar):
             self.udpSend.Send(s)
 
     def onStopOnePump(self,event):
-        item=self.GetMenuBar().FindItemById(event.GetId())
+        item = self.FindItemById(event.GetId())
         s = 'Pumps.pump_stop(setup.nem.pumpID(%s))' %(str(item.GetText()))
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -745,7 +743,7 @@ class MenuBar(wx.MenuBar):
             self.udpSend.Send(s)
 
     def onCalibratePump(self,event):
-        item=self.GetMenuBar().FindItemById(event.GetId())
+        item = self.FindItemById(event.GetId()) 
         s = 'Pumps.pump_calibration(setup.nem.pumpID(%s))' %(str(item.GetText()))
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -768,7 +766,8 @@ class MenuBar(wx.MenuBar):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def onPIDstart(self, event):
-        self.PID=True
+        MenuBar.PID_status = True
+        #self.PID=True
         #Enable PID sizer
         self.pidpanel.Enable()
         s = 'setup.Pid.start()'
@@ -783,8 +782,10 @@ class MenuBar(wx.MenuBar):
                 self.udpSend.Send(s)
 
     def onPIDstop(self, event):
-        self.PID = False
+        MenuBar.PID_status = False
+        #self.PID = False
         #Disable PID sizer
+        self.pidpanel.Disable()
         s = 'setup.Pid.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -804,7 +805,8 @@ class MenuBar(wx.MenuBar):
         """
 
     def onStartSpec(self, event):
-        self.SPEC = True
+        MenuBar.SPEC_status = True
+        #self.SPEC = True
         #Enable Spec sizer
         self.specpanel.Enable()
         s = 'setup.spec.start()'
@@ -814,7 +816,9 @@ class MenuBar(wx.MenuBar):
 
     def onStopSpec(self, event):
         #disable sizer
-        self.SPEC = False
+        #self.SPEC = False
+        MenuBar.SPEC_status = False
+        self.specpanel.Disable()
         s = 'setup.spec.stop()'
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -827,11 +831,13 @@ class MenuBar(wx.MenuBar):
 
     def SPEC_status(self):
         """check spec status"""
-        return self.SPEC
+        #return self.SPEC
+        return MenuBar.SPEC_status
 
     def PID_status(self): #(self, menubar) when placed in mainframe
         """checkPID status"""
-        return self.PID   #menubar.PID
+        #return self.PID   #menubar.PID
+        return MenuBar.PID_status
 
 if __name__ == '__main__':
     def fileChooser():

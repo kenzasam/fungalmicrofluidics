@@ -75,7 +75,7 @@ if __name__ == "__main__":
     ELEC_EN = True #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
     MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
-    PUMPS = False #<-- True when user wants to use Nemesys pump through python.
+    PUMPS = True #<-- True when user wants to use Nemesys pump through python.
     SPEC = True #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
@@ -207,7 +207,7 @@ if __name__ == "__main__":
                                         Period = 0.1 ,          #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
                                         nameID = 'Auto Sort',
                                         intensity_gate = [3200, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
-                                        wavelength_gate = [5/20,680],  #<-- [min,max] wavelength of the peak(s) in [nm]
+                                        wavelength_gate = [520,680],  #<-- [min,max] wavelength of the peak(s) in [nm]
                                         pkcount = 0,          #<-- number of events to record. 0 or False for infinite
                                         noise = 2500,           #<-- background noise level.
                                         DenoiseType = 'BW',     #<-- BW, Butterworth filter
