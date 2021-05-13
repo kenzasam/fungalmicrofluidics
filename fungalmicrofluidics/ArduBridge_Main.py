@@ -28,16 +28,17 @@ repective instances to modify appropriate variables.
 """
 #Basic modules to load
 import time
-import sys
+import os, sys
+import importlib
 from GSOF_ArduBridge import udpControl
 from GSOF_ArduBridge import ArduBridge
 from GSOF_ArduBridge import ElectrodeGpioStack
 from GSOF_ArduBridge import threadPID
 from GSOF_ArduBridge import UDP_Send
-import Nemesys_Bridge
-import TCP_Send
-import threadPID_fungi
-import threadSpec
+import build.Nemesys_Bridge as Nemesys_Bridge
+import build.TCP_Send as TCP_Send
+import build.threadPID_fungi as threadPID_fungi
+import build.threadSpec as threadSpec
 
 def extEval(s):
     '''
@@ -63,6 +64,14 @@ def close():
         setup.stop()
     ardu.OpenClosePort(0)
     print 'Bye Bye...'
+    
+def getProgramFolder():
+        moduleFile = __file__
+        moduleDir = os.path.split(os.path.abspath(moduleFile))[0]
+        programFolder = os.path.abspath(moduleDir)
+        return programFolder
+
+configPath = os.path.join(getProgramFolder(), "user_config")
 
 if __name__ == "__main__":
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
@@ -75,7 +84,7 @@ if __name__ == "__main__":
     ELEC_EN = True #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
     MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
-    PUMPS = True #<-- True when user wants to use Nemesys pump through python.
+    PUMPS = False #<-- True when user wants to use Nemesys pump through python.
     SPEC = True #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
     GUI = False #<-- True for running GUI through serial
@@ -87,7 +96,8 @@ if __name__ == "__main__":
     '''
     import user protocol
     '''
-    protocol = __import__(lib)
+    #protocol = __import__(lib)
+    protocol = importlib.import_module("user_config."+lib)
     SETUP=False
     '''
     Setting up Server and Clients (UDP and TCP networking protocols)
@@ -276,10 +286,9 @@ if __name__ == "__main__":
     prot = protocol.Protocol(setup)
     #setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps)
     print ''
+    '''
     if GUI == True:
           gui=__import__('GUI_KS_Nemesys.GUI_KS_SC_nemesys')
-          print 'Start ChipViewer to control droplet movement.'
-    '''
     else:
       setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send)
     '''

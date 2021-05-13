@@ -50,6 +50,7 @@ import Tkinter, tkFileDialog
 from optparse import OptionParser
 from GSOF_ArduBridge import UDP_Send
 import subprocess
+# for py3 use importlib.resources, https://realpython.com/python-import/#resource-imports
 '''
 CODE STRUCTURE
 ------------------
@@ -64,15 +65,17 @@ Sortingpanel - Panel class to start sorting procedure
 
 class MainFrame(wx.Frame):
     '''Create MainFrame class.'''
-    def __init__(self, setup, chipViewer, tempViewer, specViewer, imgViewer, port=-1, ip='127.0.0.1', columns=2):
+    def __init__(self, setup, imgViewer, path, port=-1, ip='127.0.0.1', columns=2):
         super(MainFrame, self).__init__(None, wx.ID_ANY|wx.BORDER_RAISED) #, size=(400,400)
         #panel=wx.Panel(self, wx.ID_ANY)
         '''PARAMETERS'''
         pumpnrs=5
+        global build
+        build = path
         self.Title = 'Fungal Sorting hybrid microfluidics GUI'
-        self.cvwr  = chipViewer # Path to Chip Viewer file
-        self.tvwr = tempViewer # Path to PID control temperature plotting file
-        self.svwr = specViewer #Path to spectrum plotting file
+        self.cvwr  = os.path.join(build,'wxChipViewer_fungalmicrofluidics.bat') # Path to Chip Viewer file
+        self.tvwr = os.path.join(buildPath,'wxTempViewer_fungalmicrofluidics.bat') # Path to PID control temperature plotting file
+        self.svwr = os.path.join(buildPath,'wxSpecViewer_fungalmicrofluidics.bat') #Path to spectrum plotting file
         self.imgvwr = imgViewer #Path to Imaging pipeline
         '''setup sending protocol for ArduBridge Shell.'''
         udpSend = False
@@ -81,7 +84,7 @@ class MainFrame(wx.Frame):
         '''setting up wx Main Frame window.'''
         self.setup=setup
         self.CreateStatusBar()
-        ico = wx.Icon('shih.ico', wx.BITMAP_TYPE_ICO)
+        ico = wx.Icon(os.path.join(build,'shih.ico'), wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
         #
@@ -404,11 +407,11 @@ class SortingPanel(wx.Panel):
         srtSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         #play, pause, save
         self.PlayBtn=wx.Button(self, name='start()')
-        bmp1 = wx.Bitmap('play.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
+        bmp1 = wx.Bitmap(os.path.join(build,'play.png'), wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
         self.PlayBtn.SetBitmap(bmp1)
         self.PlayBtn.Bind(wx.EVT_BUTTON, self.onPlaySpec)
         self.PauseBtn=wx.Button(self, name='pause()')
-        bmp2 = wx.Bitmap('pause.png', wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
+        bmp2 = wx.Bitmap(os.path.join(build,'pause.png'), wx.BITMAP_TYPE_ANY) # create wx.Bitmap object
         self.PauseBtn.SetBitmap(bmp2)
         self.PauseBtn.Bind(wx.EVT_BUTTON, self.onPauseSpec)
         self.SaveBtn=wx.Button(self, label='Save Data', name='save()')
@@ -499,14 +502,27 @@ class SortingPanel(wx.Panel):
             self.entry5.Disable()
         else:
             self.entry5.Enable()
+            #events    
+            nr=int(float(self.entry5.GetValue()))
+            f='specsp.setEvents('+str(nr)+')'
+            pyperclip.copy(f)
+            if self.udpSend != False:
+                self.udpSend.Send(f)
         #print cb.GetLabel(),' is clicked', cb.GetValue()
         val = not cb.GetValue()
-        s = 'setup.specsp.COUNT = '+str(val)
+        s = 'setup.specsp.countevents('+str(int(val))+')'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
+        
 
     def onStart(self):
+        nr=int(float(self.entry5.GetValue()))
+        f = 'specsp.setEvents('+str(nr)+')'
+        pyperclip.copy(f)
+        if self.udpSend != False:
+            self.udpSend.Send(f)
+
         s = 'setup.specsp.start()'
         pyperclip.copy(s)
         if self.udpSend != False:
@@ -547,8 +563,8 @@ class SortingPanel(wx.Panel):
                 travelt=float(self.entry4.GetValue())
             except:
                 wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-            s1 = 'setup.setGate(%d, %d, %d, %d)'%(lowerI, upperI, lowerL, upperL)
-            s2 = 'setup.setDropTime(%d)'%(travelt)
+            s1 = 'setup.specsp.setGate(%d, %d, %d, %d)'%(lowerI, upperI, lowerL, upperL)
+            s2 = 'setup.specsp.setDropTime(%d)'%(travelt)
             if self.udpSend != False:
                 self.udpSend.Send(s1)
                 self.udpSend.Send(s2)
@@ -563,7 +579,7 @@ class SortingPanel(wx.Panel):
             except:
                 wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
             sec=t*1000
-            s = 'setup.setInttime(%d)'%(sec)
+            s = 'setup.spec.set_int_time(%d)'%(sec)
             pyperclip.copy(s)
             if self.udpSend != False:
                 self.udpSend.Send(s)
@@ -573,7 +589,7 @@ class SortingPanel(wx.Panel):
                 t=float(self.entry4.GetValue())
         except:
             wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        s= 'setup.setDropTime(%d)'%(t)
+        s= 'setup.specsp.setDropTime(%d)'%(t)
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -845,6 +861,15 @@ if __name__ == '__main__':
         root.withdraw()
         filename = tkFileDialog.askopenfilename(title = 'GUI Fungal uFluidics: Select ArduBridge Protocol file', filetypes = (('python files','*.py'),('all files','*.*')))
         return filename
+
+    def getProgramFolder():
+        moduleFile = __file__
+        moduleDir = os.path.split(os.path.abspath(moduleFile))[0]
+        programFolder = os.path.abspath(moduleDir)
+        return programFolder
+
+    buildPath = os.path.join(getProgramFolder(), "build")
+
     ver = '3.1.2'
     date = time.strftime("%Y-%m-%d %H:%M")
     print 'GUI: Protocol GUI Ver:%s'%(ver)
@@ -852,13 +877,10 @@ if __name__ == '__main__':
     print 'Copyright: Kenza Samlali, 2020'
     #Command line option parser
     parser = OptionParser()
-    parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='E:/KENZA Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/protocol_KS_clr_sort_nem5_v2.py')
+    parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='E:/KENZA Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/user_config/protocol_KS_clr_sort_nem5_v2.py')
     parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=7010)
     parser.add_option('-i', '--ip', dest='ip', help='Remote ip (UDP client) to send the commands', type='string', default='127.0.0.1')
-    parser.add_option('-x', '--chipvwr', dest='cvwr', help='ChipViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxChipViewer_fungalmicrofluidics.bat')
-    parser.add_option('-y', '--tempvwr', dest='tvwr', help='PIDViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat')
-    parser.add_option('-z', '--specvwr', dest='svwr', help='SpecViewer path', type='string', default='E:/Kenza Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/wxSpecViewer_fungalmicrofluidics.bat')
-    parser.add_option('-w', '--imgvwr', dest='ivwr', help='imgViewer path', type='string', default='E:/Kenza Folder/PYTHON/mimic/mimic/GUI_mimic.bat')
+    parser.add_option('-v', '--imgvwr', dest='ivwr', help='imgViewer path', type='string', default='E:/Kenza Folder/PYTHON/mimic/mimic/GUI_mimic.bat')
 
     (options, args) = parser.parse_args()
     path = os.path.split(options.prot)
@@ -892,10 +914,10 @@ if __name__ == '__main__':
     #frame =wx.Frame()
     #panel= MainFrame(frame)
     """Main frame"""
-    frame = MainFrame(setup, chipViewer=options.cvwr, tempViewer=options.tvwr, specViewer=options.svwr, imgViewer=options.ivwr, ip=options.ip, port=options.port)
+    frame = MainFrame(setup, imgViewer=options.ivwr, path=buildPath, ip=options.ip, port=options.port)
     frame.Centre()
     """Splash screen"""
-    bitmap = wx.Bitmap('GUI-splash-01.bmp')
+    bitmap = wx.Bitmap(os.path.join(buildPath,'GUI-splash-01.bmp'))
     splash = wx.adv.SplashScreen(
                     bitmap, 
                     wx.adv.SPLASH_CENTER_ON_SCREEN|wx.adv.SPLASH_TIMEOUT, 2000, frame)

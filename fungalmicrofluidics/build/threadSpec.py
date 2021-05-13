@@ -177,9 +177,15 @@ class Flame(BT.BasicThread):
         self.client = None # TCP client, the Specplot.py
         self.SPS = None #Signal processing class instance set from Ardubridge
 
-    def set_int_time(self,time): #integration time in microseconds
-        self.spec.integration_time_micros(time)
-
+    def set_int_time(self,t):
+        '''Set the integration time of the FLAME spectrometer.
+        t = time in msec'''
+        try:
+            self.spec.integration_time_micros(t)
+            print ("Integration time set to %d ms") %(t)
+        except:
+            print("Error. Can't set integrtion time.")
+        
     def start(self):
         """Start the Threading process
         BT.basicthread overwrite: add Server
@@ -595,9 +601,16 @@ class Processing(BT.BasicThread):
             print p_int
             #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
-            if len(z) > 0: zz = True
+            zz = False
+            if len(z) > 1: 
+                '''Take this conditional statement and resp. exception away to sort even with 
+                multiple peaks.'''
+                raise ValueError('WARNING Multiple peaks within gate detected. Correct gate to sort.')
+                
+            if len(z) > 0: 
+                zz == True
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
-                    peakfound=True
+                    peakfound = True
                     if self.countevents(self.peakcnt): 
                         if self.cntr == self.peakcnt:
                             self.lock.release()
@@ -617,6 +630,8 @@ class Processing(BT.BasicThread):
                         #turn top elec on
                         self.gpio.pinPulse(self.pin_pulse, self.onTime)
                         self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
+        except ValueError as e:
+            print(e)
         except:
             print('Error...')
             exc_type, exc_value = sys.exc_info()[:2]
@@ -660,3 +675,54 @@ class Processing(BT.BasicThread):
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
         print('Peak data added to ' + fname)
 
+    def setGate(self, lowerI, upperI, lowerL, upperL):
+        '''set lower intensity, upper intensity, 
+        lower wavelength, upper wavelength'''
+        try:
+            self.gateI = [lowerI, upperI]
+            print ("Gate set to %d - %d [RFU] ") %(lowerI, upperI)
+            self.gateL = [lowerL,upperL]
+            print ("Gate set to %d - %d [nm] ") %(lowerL, upperL)
+        except:
+            print("Error. Can't set gate.")
+
+    def setDropTime(self,t):
+        '''Set the droplet travel time (how long it takes for a droplet to travel from
+         excitation point to sorting electrodes)
+         t = time in sec'''
+        try:
+            self.t_wait = t
+            print("Droplet travel time set to: %d sec ") %(t)
+        except:
+            print("Error. Can't set Droplet travel Time.")
+
+    def setOnTime(self, t):
+        '''Set the onTime for the pulsing electrode.
+        t = time in sec.
+        '''
+        try:
+            self.onTime = t
+            print("onTime set to: %d sec ")%(t)
+        except:
+            print("Error. Can't set onTime.")
+
+    def setElecs(self, pin_ct, pin_pulse):
+        '''Set the electrode numbers for your sorting configuration.
+        Set pin_ct = constant pin
+        pin_pulse = pulsing sorting pin
+        '''
+        try:
+            self.pin_ct = pin_ct
+            self.pin_pulse = pin_pulse
+            print("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse)
+        except:
+            print("Error. Can't set pint_cte or pin_pulse.")
+
+    def setEvents(self, nr):
+        ''' Set nr of events to record
+        '''
+        try:
+            self.pkcount = nr
+            print("Events to be recorded: "+nr)
+        except:
+            print("Error. Can't set events nr.")

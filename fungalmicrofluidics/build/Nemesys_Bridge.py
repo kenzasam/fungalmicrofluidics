@@ -198,3 +198,10 @@ class Nem():
         time.sleep(0.2)
         calibration_finished = self.wait_calibration_finished(pump, 30)
         print "Pump calibrated: ", calibration_finished
+
+    def pumpstartup(self,v=100):
+        '''startup function for pumps. Run to calibrate all pumps and aspirate v.
+        v = volume to aspirate'''
+        for i in range(5):
+            self.pump_calibration(self.nem.pumpID(i))
+            self.pump_aspirate(self.nem.pumpID(i), v)

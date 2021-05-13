@@ -3,10 +3,23 @@
 ## Notes
 
 
-# Mon, DD YYYY
+# May 13, 2021
 # Experiment details
-## Notes
+double droplet generator with independent oil flow.
+Much better, yay. nice ratio of around 30% fluo drops.
+Fluorescein 10mM: 0.0005 oil: 0.002
+H2O: 0.003 Oil: 0.008
+Droplets are a bit big. Ratio maybe too much.
 
+
+Fluorescein 10mM: 0.0005 oil: 0.003
+H2O: 0.003 Oil: 0.009
+Ratio around 10% or less. Droplets still a litle big.
+
+Restructured code and fixed relative imports
+
+## Notes
+To do, fix path for all of the data files, including PID.
 
 # May, 4th 2021
 

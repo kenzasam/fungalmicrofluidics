@@ -262,24 +262,7 @@ class Setup():
         for led in range(begin, end):
             self.ExtGpio.pinPulse(led, dt)
 
-    def pumpstartup(self,v=100):
-        '''startup function for pumps. Run to calibrate all pumps and aspirate v.
-        v = volume to aspirate'''
-        for i in range(5):
-            self.nem.pump_calibration(self.nem.pumpID(i))
-            self.nem.pump_aspirate(self.nem.pumpID(i), v)
-
-    ####### SPECTROMETER #############
-    def setInttime(self, t):
-        '''Set the integration time of the FLAME spectrometer.
-        t = time in msec'''
-        try:
-            self.spec.set_int_time(t)
-            print ("Integration time set to %d ms") %(t)
-        except:
-            print("Error. Can't set integrtion time.")
-
-    ####### SORTING ##############
+    ####### SORTING SEQ ##############
     def sortseq(self,nr, t):
         '''Function defining a sorting electrode sequence.
         t = onTime
@@ -288,50 +271,7 @@ class Setup():
         self.seq['S%d'%(nr)].start(1)
         print "....................."
     
-    def setGate(self, lowerI, upperI, lowerL, upperL):
-        '''set lower intensity, upper intensity, 
-        lower wavelength, upper wavelength'''
-        try:
-            self.specsp.gateI = [lowerI, upperI]
-            print ("Gate set to %d - %d [RFU] ") %(lowerI, upperI)
-            self.specsp.gateL = [lowerL,upperL]
-            print ("Gate set to %d - %d [nm] ") %(lowerL, upperL)
-        except:
-            print("Error. Can't set gate.")
 
-    def setDropTime(self,t):
-        '''Set the droplet travel time (how long it takes for a droplet to travel from
-         excitation point to sorting electrodes)
-         t = time in sec'''
-        try:
-            self.specsp.t_wait = t
-            print("Droplet travel time set to: %d sec ") %(t)
-        except:
-            print("Error. Can't set Droplet travel Time.")
-
-    def setOnTime(self, t):
-        '''Set the onTime for the pulsing electrode.
-        t = time in sec.
-        '''
-        try:
-            self.specsp.onTime = t
-            print("onTime set to: %d sec ")%(t)
-        except:
-            print("Error. Can't set onTime.")
-
-    def setElecs(self, pin_ct, pin_pulse):
-        '''Set the electrode numbers for your sorting configuration.
-        Set pin_ct = constant pin
-        pin_pulse = pulsing sorting pin
-        '''
-        try:
-            self.specsp.pin_ct = pin_ct
-            self.specsp.pin_pulse = pin_pulse
-            print("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse)
-        except:
-            print("Error. Can't set pint_cte or pin_pulse.")
-    def setEvents(self, nr):
-            self.specsp.pkcount = nr
             
     ####### PID ##############
     def incubation(self,RC=0.5,T=37,t=30):
