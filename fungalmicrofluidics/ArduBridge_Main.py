@@ -81,9 +81,9 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = False #<-- False for simulation
+    ELEC_EN = True #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
-    MM_PROC = True #<-- True / False to access micro manager core and perform image processing.
+    MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
     SPEC = True #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
@@ -216,8 +216,8 @@ if __name__ == "__main__":
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
                                         Period = 0.1 ,          #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
                                         nameID = 'Auto Sort',
-                                        intensity_gate = [3200, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
-                                        wavelength_gate = [520,680],  #<-- [min,max] wavelength of the peak(s) in [nm]
+                                        intensity_gate = [500, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
+                                        wavelength_gate = [510,600],  #<-- [min,max] wavelength of the peak(s) in [nm]
                                         pkcount = 0,          #<-- number of events to record. 0 or False for infinite
                                         noise = 2500,           #<-- background noise level.
                                         DenoiseType = 'BW',     #<-- BW, Butterworth filter
@@ -230,7 +230,7 @@ if __name__ == "__main__":
                                         Elec = True,           #<-- Enable electrodes
                                         Pin_cte = 75, #37,       #<-- electrode nr to turn on constantly
                                         Pin_pulse = 98, #38,     #<-- electrode nr to pulse for sorting
-                                        Pin_onTime = 0.5,   #<-- pulse on time [sec].
+                                        Pin_onTime = 0.3,   #<-- pulse on time [sec].
                                         t_wait=0.1          #<-- time between detection and electrode pulse [sec]
                                         )
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################

@@ -5,4 +5,4 @@ rem set VAR_3=True
 rem python .\SpecPlot.py -i %VAR_1% -c %VAR_2% -p %VAR_3% 
 rem python .\SpecPlot.py
 rem python E:\KENZA Folder\PYTHON\fungalmicrofluidics\SpecPlot.py
-python SpecPlot.py
+python SpecPlot.pyw

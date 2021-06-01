@@ -368,7 +368,9 @@ class Flame(BT.BasicThread):
         #try:
         #filename = 'Snapshot-%s.dat' %(time.strftime(self.timestamp, time.gmtime()))
         filename = time.strftime('Snapshot-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
-        with open(filename, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
+        loc='Spectrometer Data/'
+        file = loc+filename
+        with open(file, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
             f.write('# FLAME spectrum data format')
             f.write('\n# Time of snapshot: ' + time.strftime(self.timestamp, time.gmtime()))
             f.write('\n# Number of frames accumulated: ' + str(self.measurement))
@@ -388,9 +390,10 @@ class Flame(BT.BasicThread):
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), self.wavelengths, self.data)) + '\n')
             #f.write('\n# Dataframe sent over TCP: ' + d
         filename2 = time.strftime('YData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+        file2 = loc+filename2
         with open(filename2, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
             f.write(str(self.data))
-        print('Data saved to ' + filename + ', YData saved to ' + filename2)
+        print('Data saved to ' + file + ', YData saved to ' + file2)
         #except:
         #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
 
@@ -464,7 +467,7 @@ class Processing(BT.BasicThread):
     def draft_data():
         ''' Use this function to test specSP functions on saved data (Spec.save())
         '''
-        with open('Spectrometer data/YData-20210208-T18h32m07s.dat' , 'r') as f:
+        with open('Spectrometer Data/YData-20210208-T18h32m07s.dat' , 'r') as f:
             for line in f:
                 num=line
                 a = np.fromstring(num[1:-1], sep=',') #, dtype=np.float
@@ -543,13 +546,16 @@ class Processing(BT.BasicThread):
         #Make file for saving data
         if self.SAVE:
             global filename
-            filename = time.strftime( 'Experimental/PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
-            with open(filename, 'w') as f:
+            filename = time.strftime( 'PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+            global loc
+            loc='Spectrometer Data/'
+            file = loc+filename
+            with open(file, 'w') as f:
                 f.write('\n# Time of snapshot: ' + time.strftime(self.spec.timestamp, time.gmtime()))
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
                 f.write('\n# Scan time per exposure [us]: ' + str(self.spec.scan_time))
                 f.write('\n Wavelength [nm], Intensity [RFU]\n')
-            print ('Saving all data under ' +filename)
+            print ('Saving all data under ' +file)
         #turn bottom electrode on
         if self.electhread and self.enOut:
             print('%s: Started ON line'%(self.name))
@@ -598,19 +604,20 @@ class Processing(BT.BasicThread):
         try:
             #Find peaks
             p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
-            print p_int
+            #print p_wvl,p_int
             #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
+            print('Peak at:'+z) 
             zz = False
+            if len(z) > 0: 
+                zz == True
             if len(z) > 1: 
                 '''Take this conditional statement and resp. exception away to sort even with 
                 multiple peaks.'''
                 raise ValueError('WARNING Multiple peaks within gate detected. Correct gate to sort.')
-                
-            if len(z) > 0: 
-                zz == True
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
                     peakfound = True
+                    print('+++')
                     if self.countevents(self.peakcnt): 
                         if self.cntr == self.peakcnt:
                             self.lock.release()
@@ -623,7 +630,8 @@ class Processing(BT.BasicThread):
                         print('Peak '+str(self.cntr))
                     print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
                     if self.SAVE: 
-                        self.savepeaks(filename, p_wvl, p_int)
+                        file=loc+filename
+                        self.savepeaks(file, p_wvl, p_int)
                     if self.electhread and self.enOut:
                         #wait, depending on distance between detection and electrodes
                         time.sleep(self.t_wait)
@@ -648,6 +656,7 @@ class Processing(BT.BasicThread):
         print('Stopping thread...')
         BT.BasicThread.stop(self)
         self.gpio.pinWrite(self.pin_ct, 0)
+        self.gpio.pinWrite(self.pin_pulse, 0)
         self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
         self.enOut = False
     
@@ -656,6 +665,9 @@ class Processing(BT.BasicThread):
         """
         self.autosort_status = False
         self.enable = False
+        self.gpio.pinWrite(self.pin_ct, 0)
+        self.gpio.pinWrite(self.pin_pulse, 0)
+        self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
 
     def play(self):
         """Restart the Threading process

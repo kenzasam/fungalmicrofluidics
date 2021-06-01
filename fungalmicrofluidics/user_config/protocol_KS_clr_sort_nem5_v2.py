@@ -87,7 +87,7 @@ class Setup():
         self.init_img_algo(imgA=ImgA)
         self.init_elecs(gpio=gpio,ExtGpio = ExtGpio, chipViewer = chipViewer)
 
-    def init_spec(self, Spec, SpecSP):
+    def init_spec(self, Spec, SpecSP): #setup.init_spec(Spec, SpecSP)
         """
         Initializing spectrometer thread.
         """
@@ -151,7 +151,7 @@ class Setup():
             print "ok."
 
 
-    def init_elecs(self,gpio, ExtGpio,chipViewer):
+    def init_elecs(self,gpio, ExtGpio,chipViewer): 
         """
         Initializing electrode sequences.
         """

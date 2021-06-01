@@ -1,6 +1,23 @@
 # Mon, DD YYYY
 # Experiment details
+AUTO-SORT
+
+*droplet generation*
+Fluorescein 5uM: 0.0005 oil: 0.005
+H2O: 0.001 Oil: 0.001
+total flow = 
+
+*sorting*
+Spacer: 0.05
+Potential: 350, 10kHz
+Time: 0.2sec
+Gate:  1500-60.000, 500-600nm,
+Int time: 50msec
+pin ontime: 0.3s
 ## Notes
+
+When stopped in GUI, then start again : Thread terminated immediately
+Sorting went okayish. definitely not perfect. need to use dye in h20 in order to see better
 
 
 # May 13, 2021
