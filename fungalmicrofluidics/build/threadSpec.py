@@ -738,3 +738,12 @@ class Processing(BT.BasicThread):
             print("Events to be recorded: "+nr)
         except:
             print("Error. Can't set events nr.")
+
+    def setAutoSave(self, bool):
+        ''' Set peak saving on or off
+        '''
+        try:
+            self.SAVE = bool
+            print("Auto-save Peaks ON ")
+        except:
+            print("Error. Can't set Auto-Save.")

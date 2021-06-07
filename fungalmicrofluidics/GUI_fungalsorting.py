@@ -102,7 +102,7 @@ class MainFrame(wx.Frame):
         self.incpanel.Disable()#
         '''
         self.sortingpanel = SortingPanel(self, udpSend)
-        self.Bind(wx.EVT_CHECKBOX, self.sortingpanel.onCheck)
+        #self.Bind(wx.EVT_CHECKBOX, self.sortingpanel.onCheck)
         MAINbox2.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         self.sortingpanel.Disable()#
         
@@ -453,14 +453,18 @@ class SortingPanel(wx.Panel):
         srtSizer.Add(box8, flag=wx.ALIGN_CENTER_VERTICAL)
         self.text6 = wx.StaticText(self,  wx.ID_ANY, label='event #')
         self.entry5 = wx.TextCtrl(self, wx.ID_ANY,'0', size=(60, -1))
-        self.checkbox = wx.CheckBox(self, wx.ID_ANY, label='continuous')
+        self.checkbox1 = wx.CheckBox(self, wx.ID_ANY, label='continuous')
+        self.checkbox1.Bind(wx.EVT_CHECKBOX, self.onCheck1)
+        self.checkbox2 = wx.CheckBox(self, wx.ID_ANY, label='save')
+        self.checkbox2.Bind(wx.EVT_CHECKBOX, self.onCheck2)
         self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(90,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
         #self.StartSortBtn.SetBackgroundColour((152,251,152))
         box7 = wx.BoxSizer(wx.HORIZONTAL)
         box7.Add(self.text6, flag=wx.RIGHT, border=8)
         box7.Add(self.entry5, flag=wx.RIGHT, border=8)
-        box7.Add(self.checkbox, flag=wx.RIGHT, border=8)
+        box7.Add(self.checkbox1, flag=wx.RIGHT, border=8)
+        box7.Add(self.checkbox2, flag=wx.RIGHT, border=8)
         srtSizer.Add(box7, flag=wx.ALIGN_CENTER_VERTICAL)
         box8 = wx.BoxSizer(wx.HORIZONTAL)
         box8.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
@@ -468,7 +472,7 @@ class SortingPanel(wx.Panel):
         self.SetSizer(srtSizer)
         #self.SetBackgroundColour('#f2dd88')
 
-    def onCheck(self, event):
+    def onCheck1(self, event):
         cb = event.GetEventObject() 
         if cb.GetValue():
             self.entry5.Disable()
@@ -487,6 +491,13 @@ class SortingPanel(wx.Panel):
         if self.udpSend != False:
             self.udpSend.Send(s)
         
+    def onCheck2(self, event):
+        cb = event.GetEventObject() 
+        val = cb.GetValue()
+        s = 'setup.specsp.setAutoSave('+str(val)+')'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
 
     def onStart(self):
         nr=int(float(self.entry5.GetValue()))
