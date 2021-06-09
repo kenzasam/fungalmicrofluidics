@@ -138,7 +138,7 @@ class Flame(BT.BasicThread):
                 for dev in list_devices():
                     print(' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial)
                     index += 1
-            if ('Y'.startswith(input('Simulate spectrometer device instead?  [Y/n] ').upper())):
+            if raw_input('Simulate spectrometer device instead?  [Y/n] ') == 'Y': #.upper()
                 self.spec = SBSimulator()
             else:
                 sys.exit(1)
@@ -545,11 +545,12 @@ class Processing(BT.BasicThread):
         start_time = datetime.now()
         #Make file for saving data
         if self.SAVE:
-            global filename
-            filename = time.strftime( 'PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
-            global loc
+            #global filename
+            filename = time.strftime('PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
+            #global loc
             loc='Spectrometer Data/'
-            file = loc+filename
+            global file
+            file = loc+str(filename)
             with open(file, 'w') as f:
                 f.write('\n# Time of snapshot: ' + time.strftime(self.spec.timestamp, time.gmtime()))
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
@@ -607,7 +608,7 @@ class Processing(BT.BasicThread):
             #print p_wvl,p_int
             #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
-            print('Peak at:'+z) 
+            print('Peak at:'+str(z)) 
             zz = False
             if len(z) > 0: 
                 zz == True
@@ -624,13 +625,13 @@ class Processing(BT.BasicThread):
                             self.enable = False
                             print('Final event.')
                             end_time = datetime.now()
-                            print('Time elapsed:', end_time - start_time)
+                            #print('Time elapsed:', end_time - start_time)
                             self.stop()
                         self.cntr += 1
                         print('Peak '+str(self.cntr))
                     print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
                     if self.SAVE: 
-                        file=loc+filename
+                        #file=loc+filename
                         self.savepeaks(file, p_wvl, p_int)
                     if self.electhread and self.enOut:
                         #wait, depending on distance between detection and electrodes
@@ -638,6 +639,7 @@ class Processing(BT.BasicThread):
                         #turn top elec on
                         self.gpio.pinPulse(self.pin_pulse, self.onTime)
                         self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
+
         except ValueError as e:
             print(e)
         except:
@@ -646,7 +648,6 @@ class Processing(BT.BasicThread):
             print '%s : Handling %s exception with message "%s"' % \
                 (self.name, exc_type.__name__, exc_value)
             #stop thread???
-
     def stop(self):
         """Function stopping the thread and turning elecs off
         """

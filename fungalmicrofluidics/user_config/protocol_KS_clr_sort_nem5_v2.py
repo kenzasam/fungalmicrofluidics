@@ -150,7 +150,6 @@ class Setup():
             self.imgA = imgA
             print "ok."
 
-
     def init_elecs(self,gpio, ExtGpio,chipViewer): 
         """
         Initializing electrode sequences.

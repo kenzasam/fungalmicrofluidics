@@ -81,7 +81,7 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = True #<-- False for simulation
+    ELEC_EN = False #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
     MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
@@ -219,7 +219,7 @@ if __name__ == "__main__":
                                         intensity_gate = [500, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
                                         wavelength_gate = [510,600],  #<-- [min,max] wavelength of the peak(s) in [nm]
                                         pkcount = 0,          #<-- number of events to record. 0 or False for infinite
-                                        noise = 2500,           #<-- background noise level.
+                                        noise = 200,           #<-- background noise level.
                                         DenoiseType = 'BW',     #<-- BW, Butterworth filter
                                         PeakProminence = None, #
                                         PeakWlen = None, #
@@ -294,4 +294,7 @@ if __name__ == "__main__":
     '''
     print("/\  "*10)
     print("  \/"*10)
+
+    if raw_input('Run GUI? [y/n]') == 'y':
+        os.system('python GUI_fungalsorting.py')
     #########################
