@@ -288,12 +288,12 @@ class Flame(BT.BasicThread):
         else:
         '''
         newData = list(map(lambda x,y: x-y, self.spec.intensities(), self.darkness_correction)) # intensities - darkness correction
+        newData = [(i > 0) * i for i in newData] #remove all negative values
         if (self.measurement == 0):
             self.data = newData[2:] #remove 2 first data points
         else:
             sumdata = list(map(lambda x,y: x+y, self.data, newData)) #newdata= sum of old data + new data
             self.data = sumdata[2:] #remove 2 first data points
-        #d={'Msr':self.measurement, 'L':self.wavelengths, 'Dat':self.data, 'Peaks':peaks}
         
         if self.SPS != None: # Processing is ON
             try:
@@ -308,15 +308,6 @@ class Flame(BT.BasicThread):
         """sending data dictionary to client, by TCP"""
         self.send_df(d, self.client)
         self.measurement += 1
-        '''printouts during thread:
-        if ((self.measurement % 100) == 0):
-            print('O'), #py3: print ('O', end='', flush=True)
-        elif (self.measurement % 10) == 0:
-            print('o'), #py3: print('o', end='', flush=True)
-        else:
-            print('.'),
-            #py3: print('.', end='', flush=True)
-        '''
         if (self.scan_frames > 0):
             if self.measurement % self.scan_frames == 0: # all frames are summed
                 if self.autosave != 0:
@@ -336,13 +327,13 @@ class Flame(BT.BasicThread):
         if self.enable: #self.run_measurement: # if currently running a measurement
             self.pause()
             self.measurement = 0
-        print('Paused. Acquiring data fro dark frames...')
+        print('Paused. Acquiring data for dark frames...')
         newData = self.spec.intensities()
         count = 1
         print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))
         while count < int(self.dark_frames):
             newData = list(map(lambda x,y:x+y, self.spec.intensities(), newData))
-            '''printouts whhile thread is running:
+            '''printouts while thread is running:
             if (count % 100 == 0):
                 print('O'),
             elif (count % 10 == 0):
