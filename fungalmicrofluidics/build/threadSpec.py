@@ -384,7 +384,7 @@ class Flame(BT.BasicThread):
         file2 = loc+filename2
         with open(filename2, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
             f.write(str(self.data))
-        print('Data saved to ' + file + ', YData saved to ' + file2)
+        print('Data saved to ' + file2 + ', YData saved to ' + file2)
         #except:
         #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
 
@@ -540,14 +540,14 @@ class Processing(BT.BasicThread):
             filename = time.strftime('PeakData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
             #global loc
             loc='Spectrometer Data/'
-            global file
-            file = loc+str(filename)
-            with open(file, 'w') as f:
+            global filepk
+            filepk = loc+str(filename)
+            with open(filepk, 'w') as f:
                 f.write('\n# Time of snapshot: ' + time.strftime(self.spec.timestamp, time.gmtime()))
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
                 f.write('\n# Scan time per exposure [us]: ' + str(self.spec.scan_time))
                 f.write('\n Wavelength [nm], Intensity [RFU]\n')
-            print ('Saving all data under ' +file)
+            print ('Saving all data under ' +filepk)
         #turn bottom electrode on
         if self.electhread and self.enOut:
             print('%s: Started ON line'%(self.name))
@@ -595,41 +595,39 @@ class Processing(BT.BasicThread):
         #global pkcount
         try:
             #Find peaks
-            p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
+            p_wvl, p_int = self.findpeaks(self.spec.wavelengths, self.spec.data)
             #print p_wvl,p_int
             #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
-            print('Peak at:'+str(z)) 
-            zz = False
             if len(z) > 0: 
-                zz == True
-            if len(z) > 1: 
-                '''Take this conditional statement and resp. exception away to sort even with 
-                multiple peaks.'''
-                raise ValueError('WARNING Multiple peaks within gate detected. Correct gate to sort.')
+                zz = True
+                print('Peak at:'+str(z)) 
+            #if len(z) > 1: 
+            #    '''Take this conditional statement and resp. exception away to sort even with 
+            #    multiple peaks.'''
+            #    raise ValueError('WARNING Multiple peaks within gate detected. Correct gate to sort.')
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
-                    peakfound = True
-                    print('+++')
-                    if self.countevents(self.peakcnt): 
-                        if self.cntr == self.peakcnt:
-                            self.lock.release()
-                            self.enable = False
-                            print('Final event.')
-                            end_time = datetime.now()
-                            #print('Time elapsed:', end_time - start_time)
-                            self.stop()
-                        self.cntr += 1
-                        print('Peak '+str(self.cntr))
-                    print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
-                    if self.SAVE: 
-                        #file=loc+filename
-                        self.savepeaks(file, p_wvl, p_int)
-                    if self.electhread and self.enOut:
-                        #wait, depending on distance between detection and electrodes
-                        time.sleep(self.t_wait)
-                        #turn top elec on
-                        self.gpio.pinPulse(self.pin_pulse, self.onTime)
-                        self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
+                peakfound = True
+                print('+++')
+                if self.countevents(self.peakcnt): 
+                    if self.cntr == self.peakcnt:
+                        self.lock.release()
+                        self.enable = False
+                        print('Final event.')
+                        end_time = datetime.now()
+                        #print('Time elapsed:', end_time - start_time)
+                        self.stop()
+                    self.cntr += 1
+                    print('Peak '+str(self.cntr))
+                print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
+                if self.SAVE: 
+                    self.savepeaks(filepk, p_wvl, p_int)
+                if self.electhread and self.enOut:
+                    #wait, depending on distance between detection and electrodes
+                    time.sleep(self.t_wait)
+                    #turn top elec on
+                    self.gpio.pinPulse(self.pin_pulse, self.onTime)
+                    self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
 
         except ValueError as e:
             print(e)
