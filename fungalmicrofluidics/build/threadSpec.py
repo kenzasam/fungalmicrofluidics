@@ -595,10 +595,11 @@ class Processing(BT.BasicThread):
         #global pkcount
         try:
             #Find peaks
-            p_wvl, p_int = self.findpeaks(self.spec.wavelengths, self.spec.data)
+            p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
             #print p_wvl,p_int
             #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
+            zz = False
             if len(z) > 0: 
                 zz = True
                 print('Peak at:'+str(z)) 
@@ -655,9 +656,9 @@ class Processing(BT.BasicThread):
         """
         self.autosort_status = False
         self.enable = False
-        self.gpio.pinWrite(self.pin_ct, 0)
+        #self.gpio.pinWrite(self.pin_ct, 0)
         self.gpio.pinWrite(self.pin_pulse, 0)
-        self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
+        self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_pulse))
 
     def play(self):
         """Restart the Threading process

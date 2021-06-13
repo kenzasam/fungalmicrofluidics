@@ -81,7 +81,7 @@ if __name__ == "__main__":
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
-    ELEC_EN = False #<-- False for simulation
+    ELEC_EN = True #<-- False for simulation
     PID = False #<-- True / False to build a PID controller.
     MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
@@ -193,7 +193,7 @@ if __name__ == "__main__":
                                 enable_plot = True, #<-- Enable plotting
                                 output_file ='Snapshot.dat', #<-- File format for saved data.
                                 scan_frames = 1,    #<-- Number of frames averaged after which measurement resets.
-                                scan_time = 100000 #<-- Integration time in microseconds
+                                scan_time = 50000 #<-- Integration time in microseconds
                                 )
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
@@ -217,7 +217,7 @@ if __name__ == "__main__":
                                         Period = 0.1 ,          #<-- Period-time of the control-loop [s]. 1 runs it once. Defines plotting speed.
                                         nameID = 'Auto Sort',
                                         intensity_gate = [500, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
-                                        wavelength_gate = [510,600],  #<-- [min,max] wavelength of the peak(s) in [nm]
+                                        wavelength_gate = [510,550],  #<-- [min,max] wavelength of the peak(s) in [nm]
                                         pkcount = 0,          #<-- number of events to record. 0 or False for infinite
                                         noise = 200,           #<-- background noise level.
                                         DenoiseType = 'BW',     #<-- BW, Butterworth filter

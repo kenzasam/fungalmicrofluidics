@@ -1,5 +1,28 @@
 # Mon, DD YYYY
-# Experiment details
+## Experiment details
+Auto-sort, using 5uM fluorescein and 0.6% dye H2O
+
+*droplet generation*
+Fluorescein 5uM: 0.0005 oil: 0.005
+H2O: 0.001 Oil: 0.001
+Spacer:
+total flow = 60nL/s
+
+*sorting*
+Potential: 350, 10kHz
+Time: 0.2sec
+Gate:  1500-60.000, 500-600nm,
+Int time: 50msec
+pin ontime: 0.3s
+
+## Notes
+
+## To Do
+/
+
+
+# Mon, DD YYYY
+## Experiment details
 AUTO-SORT
 
 *droplet generation*
