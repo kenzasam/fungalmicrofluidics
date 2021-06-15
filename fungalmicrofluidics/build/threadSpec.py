@@ -620,7 +620,7 @@ class Processing(BT.BasicThread):
                         self.stop()
                     self.cntr += 1
                     print('Peak '+str(self.cntr))
-                print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
+                #print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
                 if self.SAVE: 
                     self.savepeaks(filepk, p_wvl, p_int)
                 if self.electhread and self.enOut:
