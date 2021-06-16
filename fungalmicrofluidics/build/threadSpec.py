@@ -695,7 +695,7 @@ class Processing(BT.BasicThread):
          t = time in sec'''
         try:
             self.t_wait = t
-            print("Droplet travel time set to: %d sec ") %(t)
+            print("Droplet travel time set to:" + str(t) )
         except:
             print("Error. Can't set Droplet travel Time.")
 
@@ -705,7 +705,7 @@ class Processing(BT.BasicThread):
         '''
         try:
             self.onTime = t
-            print("onTime set to: %d sec ")%(t)
+            print("onTime set to: %d sec "+ str(t) )
         except:
             print("Error. Can't set onTime.")
 
