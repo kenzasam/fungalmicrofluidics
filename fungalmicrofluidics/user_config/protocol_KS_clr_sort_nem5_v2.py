@@ -164,7 +164,7 @@ class Setup():
         seqCategory = 'Sorting'  #<-- EDIT THIS
         seqName = 'S1'  #<-- EDIT THIS
         seqDesc = ''  #<-- EDIT THIS
-        b=[[37,38]]
+        b=[[98]]
         seqList = b # <-- Electrodes 1 and 2 actuated at same time. 3 actuated after 1 and 2.
         seqOnTime= 0.9 # <-- How long is the electrode actuated [Sec]
         seqPeriod= 1 # <-- Keep this at least 0.2 seconds above onTime [Sec]
@@ -175,7 +175,7 @@ class Setup():
         seqCategory = 'Sorting'  #<-- EDIT THIS
         seqName = 'S2'  #<-- EDIT THIS
         seqDesc = ''  #<-- EDIT THIS
-        b=[[]]
+        b=[[75]]
         seqList = b # <-- Electrodes 1 and 2 actuated at same time. 3 actuated after 1 and 2.
         seqOnTime= 0.7 # <-- How long is the electrode actuated [Sec]
         seqPeriod= 1 # <-- Keep this at least 0.2 seconds above onTime [Sec]

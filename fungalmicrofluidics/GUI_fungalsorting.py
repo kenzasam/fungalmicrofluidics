@@ -252,8 +252,9 @@ class OperationsPanel(wx.Panel):
         #self.SetBackgroundColour('#32a852')
 
     def onSort(self, event):
-        t=int(self.entry.GetValue())
-        s = 'setup.sortseq(%d, %d)'%(event.GetId(), t)
+        t = float(self.entry.GetValue())
+        nr = event.GetId()
+        s = 'setup.sortseq('+str(nr)+','+str(t)+')'
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)

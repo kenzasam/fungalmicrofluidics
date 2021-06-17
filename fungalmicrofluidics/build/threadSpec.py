@@ -594,8 +594,10 @@ class Processing(BT.BasicThread):
         peakfound = False
         #global pkcount
         try:
-            #Find peaks
-            p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
+            #Find peaks within intesnity gate
+            #p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
+            #Find all peaks above noise
+            p_int, p_wvl = self.findallpeaks(self.spec.wavelengths, self.spec.data)
             #print p_wvl,p_int
             #Filter out peaks outside x range
             z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
@@ -622,7 +624,7 @@ class Processing(BT.BasicThread):
                     print('Peak '+str(self.cntr))
                 #print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
                 if self.SAVE: 
-                    self.savepeaks(filepk, p_wvl, p_int)
+                    self.savepeaks(filepk, p_wvl, p_int) #saves all peaks, including outside gate
                 if self.electhread and self.enOut:
                     #wait, depending on distance between detection and electrodes
                     time.sleep(self.t_wait)

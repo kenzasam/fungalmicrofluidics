@@ -7,8 +7,7 @@ Py 2.7
 '''
 import pandas as pd
 
-filename = "E:/KENZA Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/Experimental/Data/PeakData-20210611-T16h19m29s.dat"
-
+filename=r"E:\KENZA Folder\PYTHON\fungalmicrofluidics\fungalmicrofluidics\Experimental\Data\PeakData-20210617-T15h01m16s_chitin_wt_4d.dat"
 # reading given csv file 
 # and creating dataframe
 peakdata = pd.read_csv(filename

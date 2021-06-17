@@ -219,7 +219,7 @@ if __name__ == "__main__":
                                         intensity_gate = [500, 10000],   #<-- Gating peak intensity [RFU]: range for which trigger goes.
                                         wavelength_gate = [510,550],  #<-- [min,max] wavelength of the peak(s) in [nm]
                                         pkcount = 0,          #<-- number of events to record. 0 or False for infinite
-                                        noise = 200,           #<-- background noise level.
+                                        noise = 500,           #<-- background noise level.
                                         DenoiseType = 'BW',     #<-- BW, Butterworth filter
                                         PeakProminence = None, #
                                         PeakWlen = None, #
