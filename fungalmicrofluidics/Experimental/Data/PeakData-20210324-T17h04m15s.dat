@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 
 # Time of snapshot: 2021-03-24T17:04:15Eastern Standard Time
 # Number of frames accumulated: 0
 # Scan time per exposure [us]: 100000
 # Wavelength [nm], Intensity [count]:
+=======
+
+# Time of snapshot: 2021-03-24T17:04:15Eastern Standard Time
+# Number of frames accumulated: 0
+# Scan time per exposure [us]: 100000
+# Wavelength [nm], Intensity [count]:
+>>>>>>> ccc69ef02841cb91a3f553dce55ba1ddb4c1fe38
