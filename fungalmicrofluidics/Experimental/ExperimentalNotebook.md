@@ -1,3 +1,24 @@
+# Tues, 22 06 2021
+## Experiment details
+
+sort out mutants and wt at 26C and 34 C
+Detect ALL peaks above noise. filter later.
+
+flowrate oil: 0.35
+flowrate drops:0.1
+
+gate:
+noise: 500
+background subs
+50msec int time
+
+drop travel time:
+pulse time:
+
+
+until row 1749: mutants 1
+
+
 # Sun, 13 06 2021
 ## Experiment details
 Auto-sort, using 5uM fluorescein and 0.6% dye H2O
