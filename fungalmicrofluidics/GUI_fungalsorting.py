@@ -1,25 +1,25 @@
 """
-This file is part of GSOF_ArduBridge.
+This file is part of fungalmicrofluidics.
 
-    GSOF_ArduBridge is free software: you can redistribute it and/or modify
+    fungalmicrofluidics is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GSOF_ArduBridge is distributed in the hope that it will be useful,
+    fungalmicrofluidics is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GSOF_ArduBridge.  If not, see <https://www.gnu.org/licenses/>.
+    along with fungalmicrofluidics.  If not, see <https://www.gnu.org/licenses/>.
 """
 """
 SHIH Microfluidics lab, 2021
-GUI to be used with GSOF_ArduBridge Ardubrige and Protocol file
+GUI to be used with fungalmicrofluidics main and Protocol file
 
 A GUI to operate a microfluidic system: On-Demand electrode operations (see GSOF_Ardubridge), Nemesys low-pressure syringe pump (Cetoni GmBh) operation,
-FLAME spectrometer (Ocean Optics) operation, TEC/Peltier operation with PID temperature control.
+FLAME spectrometer (Ocean Optics) operation.
 
 Credits:
 Code written by Kenza Samlali
@@ -36,7 +36,7 @@ Splash screen: designed by Kenza Samlali
 # v 2.2. - Add up to 5 pumps
 # v 3.0. - Reorganized code architecture, split up in classes
 # v 3.1. - Spectrometer, PID/incubation integration
-# v 3.1. - 
+# v 3.2 - Spectrometer with gating, and other settings. No more PID / Imaging pipeline.
 #-------------------------------------------------------------------
 """
 import wx
@@ -59,13 +59,12 @@ MainFrame - MainFrame class; gathers all other panels, toolbars etc.
 Menubar - Menubar class
 Pumppanel - Panel class to operate syringe pumps
 Operationspanel - Panel class with electrode functions
-Incubationpanel - Panel class for incubation (time input, temperature input to run PID thread)
 Sortingpanel - Panel class to start sorting procedure
 '''
 
 class MainFrame(wx.Frame):
     '''Create MainFrame class.'''
-    def __init__(self, setup, imgViewer, path, port=-1, ip='127.0.0.1', columns=2):
+    def __init__(self, setup, path, port=-1, ip='127.0.0.1', columns=2):
         super(MainFrame, self).__init__(None, wx.ID_ANY|wx.BORDER_RAISED) #, size=(400,400)
         #panel=wx.Panel(self, wx.ID_ANY)
         '''PARAMETERS'''
@@ -74,9 +73,7 @@ class MainFrame(wx.Frame):
         build = path
         self.Title = 'Fungal Sorting hybrid microfluidics GUI'
         self.cvwr  = os.path.join(build,'wxChipViewer_fungalmicrofluidics.bat') # Path to Chip Viewer file
-        self.tvwr = os.path.join(buildPath,'wxTempViewer_fungalmicrofluidics.bat') # Path to PID control temperature plotting file
         self.svwr = os.path.join(buildPath,'wxSpecViewer_fungalmicrofluidics.bat') #Path to spectrum plotting file
-        self.imgvwr = imgViewer #Path to Imaging pipeline
         '''setup sending protocol for ArduBridge Shell.'''
         udpSend = False
         if port > 1:
@@ -107,8 +104,8 @@ class MainFrame(wx.Frame):
         self.sortingpanel.Disable()#
         
         '''Create and populate Menubar.'''
-        #menubar = MenuBar(pumpnrs, self.tvwr, self.svwr, self.cvwr, udpSend, self.sortingpanel, self.incpanel)
-        menubar = MenuBar(pumpnrs, self.tvwr, self.svwr, self.cvwr, udpSend, self.sortingpanel)
+
+        menubar = MenuBar(pumpnrs, self.svwr, self.cvwr, udpSend, self.sortingpanel)
 
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onCloseAll, menubar.fileItem2)
@@ -118,12 +115,6 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, menubar.onOpenNem, menubar.nemItem1)
         self.Bind(wx.EVT_MENU, menubar.onCloseNem, menubar.nemItem2)
         self.Bind(wx.EVT_MENU, menubar.onStopPumps, menubar.stopAll)
-        '''
-        self.Bind(wx.EVT_MENU, menubar.onPIDstart, menubar.pidItem1)
-        self.Bind(wx.EVT_MENU, menubar.onPIDpause, menubar.pidItem2)
-        self.Bind(wx.EVT_MENU, menubar.onPIDstop, menubar.pidItem3)
-        self.Bind(wx.EVT_MENU, menubar.onPIDVwr, menubar.pidItem4)
-        '''
         self.Bind(wx.EVT_MENU, menubar.onStartSpec, menubar.specItem1)
         self.Bind(wx.EVT_MENU, menubar.onStopSpec, menubar.specItem2)
         self.Bind(wx.EVT_MENU, menubar.onSpecVwr, menubar.specItem3)
@@ -258,85 +249,6 @@ class OperationsPanel(wx.Panel):
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
-
-class IncubationPanel(wx.Panel):
-    """Panel class for setting incubation parameters (temperature, time, PID control)
-    and imaging pipeline"""
-    def __init__(self, parent, imvwr, udpSend):
-        super(IncubationPanel, self).__init__(parent)
-        #wx.Panel.__init__(self,parent,udpSend)
-        self.udpSend = udpSend
-        #self.menu = menubar
-        self.imgvwr = imvwr
-        """Create and populate main sizer."""
-        incSizer = wx.BoxSizer(wx.VERTICAL)
-        #
-        incSizer.AddSpacer(5)
-        titlebox  = wx.BoxSizer(wx.HORIZONTAL)
-        title = wx.StaticText(self, label='Droplet Incubation')
-        font = wx.Font(9,wx.DEFAULT,wx.NORMAL, wx.BOLD)
-        title.SetFont(font)
-        titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
-        incSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
-        incSizer.AddSpacer(10)
-        #Temperature
-        box1=wx.BoxSizer(wx.HORIZONTAL)
-        self.text1=wx.StaticText(self,  wx.ID_ANY, label='Temperature [C]:')
-        box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box1.Add(self.entry1, proportion=1)
-        incSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
-        #Time
-        box2=wx.BoxSizer(wx.HORIZONTAL)
-        self.text2=wx.StaticText(self,  wx.ID_ANY, label='Max. Time [min]:')
-        box2.Add(self.text2, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry2=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box2.Add(self.entry2, proportion=1)
-        incSizer.Add(box2, flag=wx.ALIGN_CENTER_VERTICAL)
-        #incubate
-        box3=wx.BoxSizer(wx.HORIZONTAL)
-        self.IncBtn=wx.Button( self, label='Start incubation', name='', style=wx.BU_EXACTFIT)
-        self.IncBtn.Bind(wx.EVT_BUTTON, self.onIncubate)
-        box3.Add(self.IncBtn, flag=wx.RIGHT, border=8)
-        incSizer.Add(box3, flag=wx.ALIGN_CENTER_VERTICAL)
-        #spacer
-        #incSizer.AddSpacer(10)
-        line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
-        incSizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
-        #imaging pipeline
-        box4=wx.BoxSizer(wx.HORIZONTAL)
-        self.imgsetupBtn=wx.Button( self, label='Start imaging pipeline ...', name='PID.start()', style=wx.BU_EXACTFIT)
-        self.imgsetupBtn.Bind(wx.EVT_BUTTON, self.onShowMimic)
-        box4.Add(self.imgsetupBtn, flag=wx.RIGHT, border=8)
-        incSizer.Add(box4, flag=wx.ALIGN_CENTER_VERTICAL)
-        incSizer.AddSpacer(5)
-        self.SetSizer(incSizer)
-        self.SetBackgroundColour('#c597c72')
-
-    def onShowMimic(self, event):
-        """Imaging pop-up window"""
-        cmd = str(self.imgvwr)
-        print('Opening:'+ cmd)
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-    def onIncubate(self, event):
-        status = MenuBar.PID_status
-        if status != True:
-            wx.MessageDialog(self, "Please first start the PID", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-        else:
-            try:
-                temp=int(float(self.entry1.GetValue()))
-                time=int(float(self.entry2.GetValue()))
-                RC=0.5
-            except:
-                wx.MessageDialog(self, "Enter a valid temperature and time", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
-            s = 'setup.incubation(%d, %d, %d)'%(RC, temp,time)
-            pyperclip.copy(s)
-            if self.udpSend != False:
-                self.udpSend.Send(s)
-
-    def onImage(self, event):
-        return
 
 class SortingPanel(wx.Panel):
     """ Panel class for droplet sorting: starting spectrometer, sorting electrode sequences"""
@@ -692,15 +604,13 @@ class MenuBar(wx.MenuBar):
     PID_status = False
     SPEC_status = False
     #instance vars
-    def __init__(self, pumpnrs, tviewer, sviewer, cviewer, udpSend, specpanel): #, pidpanel
+    def __init__(self, pumpnrs, sviewer, cviewer, udpSend, specpanel):
         wx.MenuBar.__init__(self)
         self.pumpnrs = pumpnrs
         self.udpSend = udpSend
-        self.tvwr = tviewer
         self.svwr = sviewer
         self.cvwr = cviewer
         self.specpanel = specpanel
-        #self.pidpanel = pidpanel
         #
         Pumpnrs=list(range(self.pumpnrs))
         fileMenu = wx.Menu()
@@ -727,15 +637,6 @@ class MenuBar(wx.MenuBar):
             self.calibrateItem.append(calibrateMenu.Append(wx.ID_ANY, str(i), str(i)))
         nemMenu.Append(wx.ID_ANY, 'Calibrate', calibrateMenu)
         self.Append(nemMenu, 'Nemesys')
-        '''
-        #IncubationPanel
-        pidMenu = wx.Menu()
-        self.pidItem1 = pidMenu.Append(wx.ID_ANY, 'Open PID', 'Start PID thread. Pid.start()')
-        self.pidItem2 = pidMenu.Append(wx.ID_ANY, 'Pause PID', 'Pause PID thread. Pid.pause()')
-        self.pidItem3 = pidMenu.Append(wx.ID_ANY, 'Close PID', 'Stop PID thread. Pid.stop()')
-        self.pidItem4 = pidMenu.Append(wx.ID_ANY, 'View Live Temperature Plot', 'Start wxChipViewer')
-        self.Append(pidMenu, 'Droplet Incubation')
-        '''
         #sortingpanel
         specMenu = wx.Menu()
         self.specItem1 = specMenu.Append(wx.ID_ANY, 'Open Spec', 'Start SPEC thread. Spec.start()')
@@ -806,45 +707,6 @@ class MenuBar(wx.MenuBar):
         cmd = [str(self.cvwr)]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    def onPIDstart(self, event):
-        MenuBar.PID_status = True
-        #self.PID=True
-        #Enable PID sizer
-        self.pidpanel.Enable()
-        s = 'setup.Pid.start()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-                self.udpSend.Send(s)
-
-    def onPIDpause(self, event):
-        s = 'setup.Pid.pause()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-                self.udpSend.Send(s)
-
-    def onPIDstop(self, event):
-        MenuBar.PID_status = False
-        #self.PID = False
-        #Disable PID sizer
-        self.pidpanel.Disable()
-        s = 'setup.Pid.stop()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-                self.udpSend.Send(s)
-
-    def onPIDVwr(self,event):
-        #cmd = [str(self.tvwr)]
-        #dir='"E:/Kenza Folder/PYTHON/fungalmicrofluidics/wxTempViewer_fungalmicrofluidics.bat"'
-        #os.system(dir)
-        print('Opening:'+ cmd)
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        """
-        s = 'setup.PID.plot()'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
-        """
-
     def onStartSpec(self, event):
         MenuBar.SPEC_status = True
         #self.SPEC = True
@@ -875,11 +737,6 @@ class MenuBar(wx.MenuBar):
         #return self.SPEC
         return MenuBar.SPEC_status
 
-    def PID_status(self): #(self, menubar) when placed in mainframe
-        """checkPID status"""
-        #return self.PID   #menubar.PID
-        return MenuBar.PID_status
-
 if __name__ == '__main__':
     def fileChooser():
         root = Tkinter.Tk()
@@ -895,7 +752,7 @@ if __name__ == '__main__':
 
     buildPath = os.path.join(getProgramFolder(), "build")
 
-    ver = '3.1.2'
+    ver = '3.2'
     date = time.strftime("%Y-%m-%d %H:%M")
     print 'GUI: Protocol GUI Ver:%s'%(ver)
     print'Now:%s'%(date)
@@ -905,8 +762,6 @@ if __name__ == '__main__':
     parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='E:/KENZA Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/user_config/protocol_KS_clr_sort_nem5_v2.py')
     parser.add_option('-c', '--port', dest='port', help='Remote port to send the commands', type='int', default=7010)
     parser.add_option('-i', '--ip', dest='ip', help='Remote ip (UDP client) to send the commands', type='string', default='127.0.0.1')
-    parser.add_option('-v', '--imgvwr', dest='ivwr', help='imgViewer path', type='string', default='E:/Kenza Folder/PYTHON/mimic/mimic/GUI_mimic.bat')
-
     (options, args) = parser.parse_args()
     path = os.path.split(options.prot)
     #file chooser opens if no other file was specified in the additional text file
@@ -933,13 +788,12 @@ if __name__ == '__main__':
         path = path[0]
         sys.path.append(path)
         protocol = __import__(lib)
-    setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False, PID=False, ImgA=False)
-    #setup.enOut(True)
+    ######    \/\/\/ CHANGE THESE PARAMETERS \/\/\/     #####
+    setup = protocol.Setup(ExtGpio=False, gpio=False, chipViewer=False, Pumps=False, Spec=False, SpecSP=False)
+    ######    /\/\/\/\/\/\             /\/\/\/\/\/\    #####
     app = wx.App(False)
-    #frame =wx.Frame()
-    #panel= MainFrame(frame)
     """Main frame"""
-    frame = MainFrame(setup, imgViewer=options.ivwr, path=buildPath, ip=options.ip, port=options.port)
+    frame = MainFrame(setup, path=buildPath, ip=options.ip, port=options.port)
     frame.Centre()
     """Splash screen"""
     bitmap = wx.Bitmap(os.path.join(buildPath,'GUI-splash-01.bmp'))

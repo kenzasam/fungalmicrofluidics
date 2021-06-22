@@ -3,20 +3,20 @@ Copyright, 2020, Guy  Soffer, Kenza Samlali
 """
 
 """
-This file is part of GSOF_ArduBridge.
+This file is part of fungalmicrofluidics.
 
-    GSOF_ArduBridge is free software: you can redistribute it and/or modify
+    fungalmicrofluidics is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GSOF_ArduBridge is distributed in the hope that it will be useful,
+    fungalmicrofluidics is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GSOF_ArduBridge.  If not, see <https://www.gnu.org/licenses/>.
+    along with fungalmicrofluidics.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 """
@@ -33,11 +33,9 @@ import importlib
 from GSOF_ArduBridge import udpControl
 from GSOF_ArduBridge import ArduBridge
 from GSOF_ArduBridge import ElectrodeGpioStack
-from GSOF_ArduBridge import threadPID
 from GSOF_ArduBridge import UDP_Send
 import build.Nemesys_Bridge as Nemesys_Bridge
 import build.TCP_Send as TCP_Send
-import build.threadPID_fungi as threadPID_fungi
 import build.threadSpec as threadSpec
 
 def extEval(s):
@@ -55,11 +53,11 @@ def close():
         if PUMPS != False:
             setup.nem.bus.stop()
             print 'Nemesys Bus closed...\n'
-        if PID != False and Pid.PIDstatus != False:
-            PID.stop()
-            print 'PID thread stoped...\n'
         if SPEC != False and Spec.SPECstatus != False:
-            Spec.stop()
+            setup.spec.stop()
+            print 'Spec thread stoped...\n'
+        if SPECSP != False:
+            setup.specsp.stop()
             print 'Spec thread stoped...\n'
         setup.stop()
     ardu.OpenClosePort(0)
@@ -82,12 +80,9 @@ if __name__ == "__main__":
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
     ELEC_EN = True #<-- False for simulation
-    PID = False #<-- True / False to build a PID controller.
-    MM_PROC = False #<-- True / False to access micro manager core and perform image processing.
     PUMPS = False #<-- True when user wants to use Nemesys pump through python.
     SPEC = True #<-- True when user wants to use a spectrometer thread.
     SPECSP = True #<-- True when user wants to perform signal processing on spectrum .
-    GUI = False #<-- True for running GUI through serial
     STACK_BUILD = [0x40,0x41,0x42,0x43,0x44,0x45] #<-- Adresses for port expanders on optocoupler stack
     PORT_BASE = 7000
     REMOTE_CTRL_PORT = PORT_BASE + 10 #Client, ArduBridge on port 7010
@@ -102,7 +97,6 @@ if __name__ == "__main__":
     '''
     Setting up Server and Clients (UDP and TCP networking protocols)
     '''
-    udpSendPid = UDP_Send.udpSend(nameID='UDP1', DesIP='127.0.0.1', DesPort=PORT_BASE +0)
     udpSendChip = UDP_Send.udpSend(nameID='UDP2', DesIP='127.0.0.1', DesPort=PORT_BASE +1)
     tcpSendSpec = TCP_Send.tcpSend(nameID='TCP1', DesIP='127.0.0.1', DesPort=PORT_BASE +2)
     udpConsol = False
@@ -125,57 +119,7 @@ if __name__ == "__main__":
     ExtGpio.init()
     ardu.Reset()
     print 'Stack and Ardu ready...\n'
-    '''
-    Setting up PID thread and server
-    '''
-    print 'PID status: %s' %(PID)
-    if PID == True:
-        #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
-        ########################################################################################
-        Pid = threadPID_fungi.ArduPidThread(bridge=ardu,
-                                      nameID='PID', #<-- proces name
-                                      Period=0.5,   #<-- Period-time of the control-loop. PID calculation cycle time in sec.
-                                      fbPin=1,      #<-- The analog pin (Ardu) of the temp sensor.
-                                      outPin=10,    #<-- The output pin  of the driver (Ardu connection).
-                                      dirPin=7      #<-- The direction pin for the driver (Ardu connection).
-                                      )
-        Pid.PID.Kp = 30 #<-- proportional control of PID
-        Pid.PID.Ki = 1.2 #<-- integral of PID
-        Pid.PID.Kd = 0.0 #<-- rate of change of PID (derivative)
-        Pid.RC_div_DT = 10.0 #<-- time constant, determining how fast you reach settle point
-        #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
-        ######################################################################################
-        pidViewer=udpSendPid.Send
-        Pid.addViewer('UDPpid',pidViewer) #'UDP',udpSendPid1.Send)
-        Pid.enIO(True) #PID.enOut = True
-        ardu.gpio.pinMode(7,0) # Initialize pin to 0
-        print 'type PID.start() to start the PID thread process\n'
-        #moclo = thermalCycle.thermoCycler(pid=PID,pntList=tempList)
-    else:
-        Pid = None
-
-    '''
-    Setting up micromanager core and image processing
-    '''
-    print 'MM_PROC status: %s' %(MM_PROC)
-    if MM_PROC == True:
-        print('imaging.')
-        #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
-        ########################################################################################
-        push_pumpnr = 4    #<-- Number of triggered pump for droplet transfer
-        push_flowrate = 20 #<-- Flowrate of triggered pump in uL/s
-        sort_pumpnr = 3    #<-- Flowrate of triggered pump for oil spacer in sorter
-        sort_flowrate = 20  #<-- Flowrate of triggered pump in uL/s
-        def imaging(push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate ):
-            x=[push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate]
-            return x
-        #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
-        ######################################################################################
-        Mimic = imaging(push_pumpnr, push_flowrate, sort_pumpnr, sort_flowrate)
-        
-    else:
-        Mimic = None
-
+    
     '''
     Setting up spectrometer thread and server.
     This will allow you to retrieve data from a spectrometer and plot it.
@@ -280,18 +224,17 @@ if __name__ == "__main__":
       print 'Change the SPEC spectrometer to True or False to go online'
       print 'status: %s' %(SPEC)
     print 'Loading protocol: %s' %(lib)
-    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP, PID=Pid, ImgA=Mimic)
+    ###############
+    #\/\/\/ CHANGE THESE PARAMETERS \/\/\/#
+    ''' If adding new methods to the setup class, please ammend here for correct class instance.
+    '''
+    setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps, Spec=Spec, SpecSP=SpecSP)
+    ##
+    ###############
     SETUP = True
     setup.enOut(ELEC_EN)
     prot = protocol.Protocol(setup)
-    #setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send, Pumps=Pumps)
     print ''
-    '''
-    if GUI == True:
-          gui=__import__('GUI_KS_Nemesys.GUI_KS_SC_nemesys')
-    else:
-      setup = protocol.Setup(ExtGpio=ExtGpio, gpio=ardu.gpio, chipViewer=udpSendChip.Send)
-    '''
     print("/\  "*10)
     print("  \/"*10)
 

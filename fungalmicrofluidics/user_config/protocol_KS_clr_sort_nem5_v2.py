@@ -71,7 +71,7 @@ class Protocol(bt.BasicThread):
 Start of setup class
 """
 class Setup():
-    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, SpecSP, PID, ImgA):
+    def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, SpecSP):
         '''
         # >>>>>>> SETUP SPECIFIC PARAMETERS BLOCK <<<<<<< #
         deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308" #--> change path to device configuration folder
@@ -83,8 +83,6 @@ class Setup():
 
         self.init_pumps(Pumps=Pumps)
         self.init_spec(Spec=Spec, SpecSP=SpecSP)
-        self.init_incubation(PID=PID)
-        self.init_img_algo(imgA=ImgA)
         self.init_elecs(gpio=gpio,ExtGpio = ExtGpio, chipViewer = chipViewer)
 
     def init_spec(self, Spec, SpecSP): #setup.init_spec(Spec, SpecSP)
@@ -120,34 +118,6 @@ class Setup():
             print "Pump bridge not found! No syringe pumps initiated. Syringe pumps are needed for this protocol."
         else:
             self.nem = Pumps
-            print "ok."
-
-    def init_incubation(self, PID):
-        """
-        Initializing PID thread.
-        """
-        print '>>>  <<<'
-        print '>>>  Checking PID  <<<'
-
-        if (PID is None):
-            print "PID bridge not found! No incubation thread initiated. PID control is needed for this protocol."
-            #sys.exit(1)
-        else:
-            self.PID = PID
-            print "ok."
-            
-    def init_img_algo(self, imgA):
-        """
-        Initializing imaging pipeline.
-        """
-        print '>>>  <<<'
-        print '>>>  Checking imaging pipeline.  <<<'
-
-        if (imgA is None):
-            print "No imaging algorithm."
-            #sys.exit(1)
-        else:
-            self.imgA = imgA
             print "ok."
 
     def init_elecs(self,gpio, ExtGpio,chipViewer): 
@@ -268,46 +238,4 @@ class Setup():
         nr = sequence number. See protocol file. '''
         self.seq['S%d'%(nr)].onTime = t
         self.seq['S%d'%(nr)].start(1)
-        print "....................."
-    
-
-            
-    ####### PID ##############
-    def incubation(self,RC=0.5,T=37,t=30):
-        '''Function to start the PID process, set it to a certain temperature,
-         and leave it running for a specific amount of time.
-         Continuous printout of measured temperatures.
-        '''
-    	self.PID.start()
-        self.PID.RC_div_DT=RC
-    	self.PID.ctrl(T)
-        self.tempfeedbackstream(t,T,step=10)
-    	#time.sleep(t)
-        self.PID.stop()
-        print "....................."    
-
-    def tempfeedbackstream(self,t, T, step=1):
-        '''Continuous printout of measured temperatures.
-        '''
-        pad_str = ' ' * len('%d' % step)
-        fbT= self.PID.getFeedback()
-        for i in range(t, 0, -step):
-            #print 'Incubating at target %d C, currently %d C  %s\r ' % (T, fbT, pad_str),
-            #sys.stdout.flush()
-            time.sleep(step)
-            print 'Done incubating for %d sec at %d C!' % ( t, T)
-    
-    ##### IMAGING ALGO ######
-    def ImgTrigger(self):
-        '''Function to stop incubation, start pumps. Image aquisition based Hardware trigger.
-        '''
-        print('Trigger received from Imaging pipeline.')
-        self.PID.stop()
-        #push drops out
-        self.nem.pump_generate_flow(self.nem.pumpID(self.imgA[0]), self.imgA[1])
-        #self.nem.pump_generate_flow(self.nem.pumpID(self.imgA.triggerpump), self.imgA.triggerflow)
-        #start sorter, spacer oil
-        self.nem.pump_generate_flow(self.nem.pumpID(self.imgA[2]), self.imgA[3])
-        self.spec.start()
-
-        
+        print "....................."  
