@@ -407,6 +407,10 @@ class SortingPanel(wx.Panel):
         cb = event.GetEventObject() 
         if cb.GetValue():
             self.entry5.Disable()
+            f='specsp.setEvents(0)'
+            pyperclip.copy(f)
+            if self.udpSend != False:
+                self.udpSend.Send(f)
         else:
             self.entry5.Enable()
             #events    
@@ -415,12 +419,6 @@ class SortingPanel(wx.Panel):
             pyperclip.copy(f)
             if self.udpSend != False:
                 self.udpSend.Send(f)
-        #print cb.GetLabel(),' is clicked', cb.GetValue()
-        val = not cb.GetValue()
-        s = 'setup.specsp.countevents('+str(int(val))+')'
-        pyperclip.copy(s)
-        if self.udpSend != False:
-            self.udpSend.Send(s)
         
     def onCheck2(self, event):
         cb = event.GetEventObject() 

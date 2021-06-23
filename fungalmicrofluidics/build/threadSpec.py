@@ -469,6 +469,7 @@ class Processing(BT.BasicThread):
         Function to denoise y-data.
         BW, Buterworth filter
         SG, Savitzky-Golay filter
+        See SciPy signal processing library
         """
         self.denoise = True
         try:
@@ -592,46 +593,44 @@ class Processing(BT.BasicThread):
 
     def process(self):
         peakfound = False
-        #global pkcount
         try:
-            #Find peaks within intesnity gate
-            #p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
             #Find all peaks above noise
             p_int, p_wvl = self.findallpeaks(self.spec.wavelengths, self.spec.data)
-            #print p_wvl,p_int
-            #Filter out peaks outside x range
-            z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
+            #Filter out peaks outside gate
+            wvl_list = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
+            int_list = [i for i in p_int if (self.gateI[0]< i <self.gateI[1])]
             zz = False
-            if len(z) > 0: 
+            if len(wvl_list) > 0: 
                 zz = True
-                print('Peak at:'+str(z)) 
-            #if len(z) > 1: 
+                print('Peak at:'+str(wvl_list)) 
+            #if len(wvl_list) > 1: 
             #    '''Take this conditional statement and resp. exception away to sort even with 
             #    multiple peaks.'''
             #    raise ValueError('WARNING Multiple peaks within gate detected. Correct gate to sort.')
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
-                peakfound = True
-                print('+++')
-                if self.countevents(self.peakcnt): 
-                    if self.cntr == self.peakcnt:
-                        self.lock.release()
-                        self.enable = False
-                        print('Final event.')
-                        end_time = datetime.now()
-                        #print('Time elapsed:', end_time - start_time)
-                        self.stop()
-                    self.cntr += 1
-                    print('Peak '+str(self.cntr))
-                #print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
                 if self.SAVE: 
                     self.savepeaks(filepk, p_wvl, p_int) #saves all peaks, including outside gate
-                if self.electhread and self.enOut:
-                    #wait, depending on distance between detection and electrodes
-                    time.sleep(self.t_wait)
-                    #turn top elec on
-                    self.gpio.pinPulse(self.pin_pulse, self.onTime)
-                    self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
-
+                    #self.savepeaks(filepk, wvl_list, int_list) #saves only peaks within gate 
+                if len(wvl_list)>0 and len(int_list)>0:
+                    peakfound = True
+                    print('+++')
+                    print(str(wvl_list)+'nm, '+str(int_list)+'A.U')
+                    if self.countevents(self.peakcnt): 
+                        if self.cntr == self.peakcnt:
+                            self.lock.release()
+                            self.enable = False
+                            print('Final event.')
+                            end_time = datetime.now()
+                            #print('Time elapsed:', end_time - start_time)
+                            self.stop()
+                        self.cntr += 1
+                        print('Peak '+str(self.cntr))
+                    if self.electhread and self.enOut:
+                        #wait, depending on distance between detection and electrodes
+                        time.sleep(self.t_wait)
+                        #turn top elec on
+                        self.gpio.pinPulse(self.pin_pulse, self.onTime)
+                        self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
         except ValueError as e:
             print(e)
         except:
@@ -680,6 +679,8 @@ class Processing(BT.BasicThread):
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
         print('Peak data added to ' + fname)
 
+    ''' Following are functions to set values from GUI
+    '''
     def setGate(self, lowerI, upperI, lowerL, upperL):
         '''set lower intensity, upper intensity, 
         lower wavelength, upper wavelength'''
