@@ -407,7 +407,7 @@ class SortingPanel(wx.Panel):
         cb = event.GetEventObject() 
         if cb.GetValue():
             self.entry5.Disable()
-            f='specsp.setEvents(0)'
+            f='setup.specsp.setEvents(0)'
             pyperclip.copy(f)
             if self.udpSend != False:
                 self.udpSend.Send(f)
@@ -415,7 +415,7 @@ class SortingPanel(wx.Panel):
             self.entry5.Enable()
             #events    
             nr=int(float(self.entry5.GetValue()))
-            f='specsp.setEvents('+str(nr)+')'
+            f='setup.specsp.setEvents('+str(nr)+')'
             pyperclip.copy(f)
             if self.udpSend != False:
                 self.udpSend.Send(f)
