@@ -1,3 +1,40 @@
+# Sat, 03 07 2021
+## Experiment details
+
+### Auto-sort, using 5uM fluorescein and 0.6% dye H2O
+
+see screenshot 
+*droplet generation* 
+- Fluorescein 5uM: 0.0005 oil: 0.0035
+- H2O: 0.0085 Oil: 0.006
+- Spacer: 0.05 (but leak at fiber)
+- total flow = 
+
+*sorting*
+- Potential: 420, 10kHz
+- Time: 0.1sec
+- Gate:  , 500-550nm,
+- Int time: 100msec
+- pin ontime: 0.4s
+
+pos outlet
+10 blue out of 57 pos
+47 fluo out of 57
+
+### Sort out mutants at 36 C
+Detect ALL peaks above noise. filter later.
+
+flowrate oil: 0.35
+flowrate drops:0.1
+gate:
+noise: 500
+background subs
+50msec int time
+drop travel time:
+pulse time:
+
+
+
 # Tues, 22 06 2021
 ## Experiment details
 
@@ -23,7 +60,8 @@ until row 1749: mutants 1
 ## Experiment details
 Auto-sort, using 5uM fluorescein and 0.6% dye H2O
 
-*droplet generation* PERFECT
+*droplet generation* 
+PERFECT
 Fluorescein 5uM: 0.00085 oil: 0.003
 H2O: 0.002 Oil: 0.008
 Spacer: 0.03
