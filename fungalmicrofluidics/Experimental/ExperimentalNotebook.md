@@ -1,9 +1,19 @@
+# Fri, 29 07 2021
+## Experiment details
+FDGlu 4d CCMM
+gatingplot
+
+didn't go great, only few peaks....
+Poisson yes
+see excel
+
 # Sat, 03 07 2021
 ## Experiment details
 
 ### Auto-sort, using 5uM fluorescein and 0.6% dye H2O
 
 see screenshot 
+
 *droplet generation* 
 - Fluorescein 5uM: 0.0005 oil: 0.0035
 - H2O: 0.0085 Oil: 0.006
