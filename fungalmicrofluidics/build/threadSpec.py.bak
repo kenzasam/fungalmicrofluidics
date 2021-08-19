@@ -120,7 +120,7 @@ class Flame(BT.BasicThread):
                 #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
             print('No spec serial number listed. Picking first spec found.')
             dev = list_devices()
-            print(dev)
+            print dev
             self.spec = Spectrometer(dev[0])
             """
             else:
@@ -128,7 +128,7 @@ class Flame(BT.BasicThread):
                 self.spec = Spectrometer.from_serial_number(device)
             """
         except:
-            print(('ERROR: Could not initialize device "' + device + '"!'))
+            print('ERROR: Could not initialize device "' + device + '"!')
             if (sb is None):
                 print('SeaBreeze library not found!')
                 #sys.exit(1)
@@ -136,13 +136,13 @@ class Flame(BT.BasicThread):
                 print('Available devices:')
                 index = 0
                 for dev in list_devices():
-                    print((' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial))
+                    print(' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial)
                     index += 1
-            if input('Simulate spectrometer device instead?  [Y/n] ') == 'Y': #.upper()
+            if raw_input('Simulate spectrometer device instead?  [Y/n] ') == 'Y': #.upper()
                 self.spec = SBSimulator()
             else:
                 sys.exit(1)
-        print((self.spec))
+        print(self.spec)
 
     def init_variables(self,
                        autorepeat,
@@ -182,7 +182,7 @@ class Flame(BT.BasicThread):
         t = time in msec'''
         try:
             self.spec.integration_time_micros(t)
-            print(("Integration time set to %d ms") %(t))
+            print ("Integration time set to %d ms") %(t)
         except:
             print("Error. Can't set integrtion time.")
         
@@ -202,7 +202,7 @@ class Flame(BT.BasicThread):
             self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
             print('Connected and starting thread...')
             BT.BasicThread.start(self)
-            print(('%s: Started ON line'%(self.name)))
+            print('%s: Started ON line'%(self.name))
             #play()
         except:
             print('Something went wrong. Can not connect to client.')
@@ -230,7 +230,7 @@ class Flame(BT.BasicThread):
             #self.run_measurement = True
             self.enable=True
             BT.BasicThread.start(self)
-            print(('%s: Started ON line'%(self.name)))
+            print('%s: Started ON line'%(self.name))
         else:
             print('You need to Spec.start() first!')
 
@@ -263,7 +263,7 @@ class Flame(BT.BasicThread):
             else:
                 self.lock.release()
         self.enable = False
-        print(('%s: Terminated\n'%(self.name)))
+        print('%s: Terminated\n'%(self.name))
 
     @staticmethod
     def draft_data():
@@ -330,7 +330,7 @@ class Flame(BT.BasicThread):
         print('Paused. Acquiring data for dark frames...')
         newData = self.spec.intensities()
         count = 1
-        print(('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames)))
+        print('Scanning dark frame ' + str(count) + '/' + str(self.dark_frames))
         while count < int(self.dark_frames):
             newData = list(map(lambda x,y:x+y, self.spec.intensities(), newData))
             '''printouts while thread is running:
@@ -342,10 +342,10 @@ class Flame(BT.BasicThread):
                 print('.'),
             '''
             count += 1
-        self.darkness_correction = list([x/count for x in newData])
+        self.darkness_correction = list(map(lambda x:x/count, newData))
         self.have_darkness_correction = True # important for saving file
         #self.axes.set_ylabel('Intensity [corrected count]')
-        print((str(self.dark_frames) + ' dark frames scanned. Ready. Press Play (or >>> Spec.play() ). Spec.reset() to remove background substraction.'))
+        print(str(self.dark_frames) + ' dark frames scanned. Ready. Press Play (or >>> Spec.play() ). Spec.reset() to remove background substraction.')
 
     def reset(self):
         """Clear background substraction and reset all applied values.""" #New instance of Processing??
@@ -384,7 +384,7 @@ class Flame(BT.BasicThread):
         file2 = loc+filename2
         with open(filename2, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
             f.write(str(self.data))
-        print(('Data saved to ' + file2 + ', YData saved to ' + file2))
+        print('Data saved to ' + file2 + ', YData saved to ' + file2)
         #except:
         #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
 
@@ -548,10 +548,10 @@ class Processing(BT.BasicThread):
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
                 f.write('\n# Scan time per exposure [us]: ' + str(self.spec.scan_time))
                 f.write('\n Wavelength [nm], Intensity [RFU]\n')
-            print(('Saving all data under ' +filepk))
+            print ('Saving all data under ' +filepk)
         #turn bottom electrode on
         if self.electhread and self.enOut:
-            print(('%s: Started ON line'%(self.name)))
+            print('%s: Started ON line'%(self.name))
             self.gpio.pinWrite(self.pin_ct, 1)
             self.teleUpdate('%s, E%d: 1'%(self.name, self.pin_ct))
         # starting thread
@@ -589,7 +589,7 @@ class Processing(BT.BasicThread):
             else:
                 self.lock.release()
         self.enable = False
-        print(('%s: Terminated\n'%(self.name)))
+        print('%s: Terminated\n'%(self.name))
 
     def process(self):
         peakfound = False
@@ -602,7 +602,7 @@ class Processing(BT.BasicThread):
             zz = False
             if len(wvl_list) > 0: 
                 zz = True
-                print(('Peak at:'+str(wvl_list))) 
+                print('Peak at:'+str(wvl_list)) 
             #if len(wvl_list) > 1: 
             #    '''Take this conditional statement and resp. exception away to sort even with 
             #    multiple peaks.'''
@@ -614,7 +614,7 @@ class Processing(BT.BasicThread):
                 if len(wvl_list)>0 and len(int_list)>0:
                     peakfound = True
                     print('+++')
-                    print((str(wvl_list)+'nm, '+str(int_list)+'A.U'))
+                    print(str(wvl_list)+'nm, '+str(int_list)+'A.U')
                     if self.countevents(self.peakcnt): 
                         if self.cntr == self.peakcnt:
                             self.lock.release()
@@ -624,7 +624,7 @@ class Processing(BT.BasicThread):
                             #print('Time elapsed:', end_time - start_time)
                             self.stop()
                         self.cntr += 1
-                        print(('Peak '+str(self.cntr)))
+                        print('Peak '+str(self.cntr))
                     if self.electhread and self.enOut:
                         #wait, depending on distance between detection and electrodes
                         time.sleep(self.t_wait)
@@ -636,8 +636,8 @@ class Processing(BT.BasicThread):
         except:
             print('Error...')
             exc_type, exc_value = sys.exc_info()[:2]
-            print('%s : Handling %s exception with message "%s"' % \
-                (self.name, exc_type.__name__, exc_value))
+            print '%s : Handling %s exception with message "%s"' % \
+                (self.name, exc_type.__name__, exc_value)
             #stop thread???
     def stop(self):
         """Function stopping the thread and turning elecs off
@@ -667,7 +667,7 @@ class Processing(BT.BasicThread):
         self.autosort_status = True
         self.enable=True
         BT.BasicThread.start(self)
-        print(('%s: Started ON line'%(self.name)))   
+        print('%s: Started ON line'%(self.name))   
 
     @staticmethod
     def savepeaks(name, xdata, ydata):
@@ -677,7 +677,7 @@ class Processing(BT.BasicThread):
         fname = name
         with open(fname, 'a') as f:
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
-        print(('Peak data added to ' + fname))
+        print('Peak data added to ' + fname)
 
     ''' Following are functions to set values from GUI
     '''
@@ -686,9 +686,9 @@ class Processing(BT.BasicThread):
         lower wavelength, upper wavelength'''
         try:
             self.gateI = [lowerI, upperI]
-            print(("Gate set to %d - %d [RFU] ") %(lowerI, upperI))
+            print ("Gate set to %d - %d [RFU] ") %(lowerI, upperI)
             self.gateL = [lowerL,upperL]
-            print(("Gate set to %d - %d [nm] ") %(lowerL, upperL))
+            print ("Gate set to %d - %d [nm] ") %(lowerL, upperL)
         except:
             print("Error. Can't set gate.")
 
@@ -698,7 +698,7 @@ class Processing(BT.BasicThread):
          t = time in sec'''
         try:
             self.t_wait = t
-            print(("Droplet travel time set to:" + str(t) ))
+            print("Droplet travel time set to:" + str(t) )
         except:
             print("Error. Can't set Droplet travel Time.")
 
@@ -708,7 +708,7 @@ class Processing(BT.BasicThread):
         '''
         try:
             self.onTime = t
-            print(("onTime set to: %d sec "+ str(t) ))
+            print("onTime set to: %d sec "+ str(t) )
         except:
             print("Error. Can't set onTime.")
 
@@ -720,7 +720,7 @@ class Processing(BT.BasicThread):
         try:
             self.pin_ct = pin_ct
             self.pin_pulse = pin_pulse
-            print(("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse))
+            print("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse)
         except:
             print("Error. Can't set pint_cte or pin_pulse.")
 
@@ -729,7 +729,7 @@ class Processing(BT.BasicThread):
         '''
         try:
             self.pkcount = nr
-            print(("Events to be recorded: "+nr))
+            print("Events to be recorded: "+nr)
         except:
             print("Error. Can't set events nr.")
 

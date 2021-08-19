@@ -55,10 +55,10 @@ class tcpSend():
             self.tcpTx = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.tcpTx.bind((self.DesIP, self.DesPort))
             #c, addr = self.udpTx.accept()
-            print('%s: TCP Ready to send to %s:%d\n'%(nameID, self.DesIP, self.DesPort))
+            print '%s: TCP Ready to send to %s:%d\n'%(nameID, self.DesIP, self.DesPort)
             #    self.c, self.addr = self.udpTx.accept()
-        except socket.error as msg :
-            print('Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+        except socket.error, msg :
+            print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
     '''
     def Connect(self):
         self.udpTx.listen(5) #stream 5 at a time

@@ -46,7 +46,7 @@ import wx.lib.agw.foldpanelbar as fpb
 import time
 import os, sys
 import pyperclip
-import tkinter, tkinter.filedialog
+import Tkinter, tkFileDialog
 from optparse import OptionParser
 from GSOF_ArduBridge import UDP_Send
 import subprocess
@@ -182,14 +182,14 @@ class PumpPanel(wx.Panel):
         else:
             state = event.GetEventObject().GetValue()
             if state == True:
-               print("on")
+               print "on"
                event.GetEventObject().SetLabel("Stop")
                s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pump,flrt)
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
             else:
-               print("off")
+               print "off"
                event.GetEventObject().SetLabel("Start")
                s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pump) #\'%s\'
                pyperclip.copy(s)
@@ -727,7 +727,7 @@ class MenuBar(wx.MenuBar):
 
     def onSpecVwr(self, event):
         cmd = str(self.svwr)
-        print(('Opening:'+ cmd))
+        print('Opening:'+ cmd)
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def SPEC_status(self):
@@ -737,9 +737,9 @@ class MenuBar(wx.MenuBar):
 
 if __name__ == '__main__':
     def fileChooser():
-        root = tkinter.Tk()
+        root = Tkinter.Tk()
         root.withdraw()
-        filename = tkinter.filedialog.askopenfilename(title = 'GUI Fungal uFluidics: Select ArduBridge Protocol file', filetypes = (('python files','*.py'),('all files','*.*')))
+        filename = tkFileDialog.askopenfilename(title = 'GUI Fungal uFluidics: Select ArduBridge Protocol file', filetypes = (('python files','*.py'),('all files','*.*')))
         return filename
 
     def getProgramFolder():
@@ -752,9 +752,9 @@ if __name__ == '__main__':
 
     ver = '3.2'
     date = time.strftime("%Y-%m-%d %H:%M")
-    print('GUI: Protocol GUI Ver:%s'%(ver))
-    print('Now:%s'%(date))
-    print('Copyright: Kenza Samlali, 2020')
+    print 'GUI: Protocol GUI Ver:%s'%(ver)
+    print'Now:%s'%(date)
+    print 'Copyright: Kenza Samlali, 2020'
     #Command line option parser
     parser = OptionParser()
     parser.add_option('-p', '--protocol', dest='prot', help='TBD', type='string', default='E:/KENZA Folder/PYTHON/fungalmicrofluidics/fungalmicrofluidics/user_config/protocol_KS_clr_sort_nem5_v2.py')
@@ -764,22 +764,22 @@ if __name__ == '__main__':
     path = os.path.split(options.prot)
     #file chooser opens if no other file was specified in the additional text file
     if path[1] == 'Demoprotocol':
-        print('Loading protocol specified file chooser.')
+        print 'Loading protocol specified file chooser.'
         newPath = fileChooser()
         path = os.path.split(newPath)
     else:
-        print('Loading protocol specified in accompanying address file.')
+        print 'Loading protocol specified in accompanying address file.'
     #parser resumes
     lib = str(path[1])[:-3]
     path = path[0]
     sys.path.append(path)
     #lib = options.prot
-    print('Importing: %s'%(lib))
-    print('Using remote-ip:port -> %s:%d'%(options.ip, options.port))
+    print 'Importing: %s'%(lib)
+    print 'Using remote-ip:port -> %s:%d'%(options.ip, options.port)
     try:
         protocol = __import__(lib)
     except:
-        print('File not found. Loading protocol from file chooser.')
+        print 'File not found. Loading protocol from file chooser.'
         newPath = fileChooser()
         path = os.path.split(newPath)
         lib = str(path[1])[:-3]
