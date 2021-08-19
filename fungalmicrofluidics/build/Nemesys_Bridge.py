@@ -85,9 +85,7 @@ class Nem():
             for i, pump in enumerate(self.pumpsObjList):
                 print('pump: %d'%(i))
                 self.syringe_enable(pump)
-                #print "Setting SI units..."
                 self.syringe_units(pump)
-                #print "Configuring syringe diameters..."
                 self.syringe_config(pump, self.syringe_diam[i], self.syringe_stroke[i])
                 pump.max_volume = pump.get_volume_max()
                 print("max_volume = %f"%(pump.max_volume))

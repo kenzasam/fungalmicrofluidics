@@ -110,14 +110,10 @@ class Flame(BT.BasicThread):
                            scan_frames = scan_frames,
                            scan_time = scan_time)
         self.set_int_time(self.scan_time)
-        #self.spec.integration_time_micros(self.scan_time)
 
     def init_device(self, device=''):
         #Initialize spectrometer device
         try:
-            #if (device =='#0'):
-                #print('allo')
-                #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
             print('No spec serial number listed. Picking first spec found.')
             dev = list_devices()
             print(dev)
@@ -166,7 +162,6 @@ class Flame(BT.BasicThread):
         self.enable = False
         self.have_darkness_correction = False
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
-        #self.total_exposure = int(self.scan_frames) * int(self.scan_time)
         # Initialize variables
         self.measurement = 0
         self.rawwavelengths = self.spec.wavelengths()
@@ -191,19 +186,15 @@ class Flame(BT.BasicThread):
         BT.basicthread overwrite: add Server
         """
         self.SPECstatus = True
-        #self.T0 = time.time()
         self.enable=True
-        #self.run_measurement = True
         try:
             print('Listening for client...')
             self.viewer['TCPspec'].tcpTx.listen(5) #stream 5 at a time
-            #while True:
             print('Please run spec viewer. Accepting connection ...')
             self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
             print('Connected and starting thread...')
             BT.BasicThread.start(self)
-            print(('%s: Started ON line'%(self.name)))
-            #play()
+            print(('%s: Started ON line'%(self.name))))
         except:
             print('Something went wrong. Can not connect to client.')
 
@@ -212,12 +203,10 @@ class Flame(BT.BasicThread):
         BT.basicthread overwrite:
         """
         self.SPECstatus = False
-        #self.run_measurement = False
         self.enable = False
         BT.BasicThread.stop(self)
 
     def pause(self):
-        #self.run_measurement = False
         if self.SPECstatus:
             self.enable = False
         else:
@@ -227,7 +216,6 @@ class Flame(BT.BasicThread):
         """restart the Threading process
         """
         if self.SPECstatus:
-            #self.run_measurement = True
             self.enable=True
             BT.BasicThread.start(self)
             print(('%s: Started ON line'%(self.name)))
@@ -256,7 +244,6 @@ class Flame(BT.BasicThread):
                         self.T_Z[0] += self.Period
                         sleepTime += self.Period
                     s = '%s: Timing error - Skipping a cycle'%(self.name)
-                    #self.teleUpdate(s)
                     print(s)
                 self.lock.release()
                 time.sleep(sleepTime)
@@ -316,10 +303,6 @@ class Flame(BT.BasicThread):
                 self.measurement = 0
                 if self.autorepeat == 0:
                     self.enable = False
-                    #self.run_measurement = False
-                    #self.button_startpause_text.set(self.button_startpause_texts[self.run_measurement])
-                    #self.button_stopdarkness_text.set(self.button_stopdarkness_texts[self.run_measurement])
-                    #self.message.set('Ready.')
 
     def background(self):
         """ Apply background substraction.
@@ -344,7 +327,6 @@ class Flame(BT.BasicThread):
             count += 1
         self.darkness_correction = list([x/count for x in newData])
         self.have_darkness_correction = True # important for saving file
-        #self.axes.set_ylabel('Intensity [corrected count]')
         print((str(self.dark_frames) + ' dark frames scanned. Ready. Press Play (or >>> Spec.play() ). Spec.reset() to remove background substraction.'))
 
     def reset(self):
@@ -356,8 +338,6 @@ class Flame(BT.BasicThread):
         
 
     def save(self):
-        #try:
-        #filename = 'Snapshot-%s.dat' %(time.strftime(self.timestamp, time.gmtime()))
         filename = time.strftime('Snapshot-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
         loc='Spectrometer Data/'
         file = loc+filename
@@ -379,15 +359,12 @@ class Flame(BT.BasicThread):
             '''
             f.write('\n# Wavelength [nm], Intensity [count]:\n')
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), self.wavelengths, self.data)) + '\n')
-            #f.write('\n# Dataframe sent over TCP: ' + d
         filename2 = time.strftime('YData-%Y%m%d-T%Hh%Mm%Ss.dat', time.gmtime())
         file2 = loc+filename2
         with open(filename2, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
             f.write(str(self.data))
         print(('Data saved to ' + file2 + ', YData saved to ' + file2))
-        #except:
-        #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
-
+        
     def send_df(self,d,c):
         """ Function to send data to TCP client
         """
@@ -499,7 +476,6 @@ class Processing(BT.BasicThread):
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
-        #peak_ht = properties['peak_heights']
         peak_int = arr[peaks] #peaks is an index
         peak_wvl = x[peaks]
         return peak_int, peak_wvl
@@ -517,7 +493,6 @@ class Processing(BT.BasicThread):
                                          prominence = self.prom,
                                          width = self.width,
                                          wlen = self.wlen)
-        #peak_ht = properties['peak_heights']
         peak_int = int[peaks] 
         peak_wvl = x[peaks]
         return peak_int, peak_wvl
@@ -603,14 +578,9 @@ class Processing(BT.BasicThread):
             if len(wvl_list) > 0: 
                 zz = True
                 print(('Peak at:'+str(wvl_list))) 
-            #if len(wvl_list) > 1: 
-            #    '''Take this conditional statement and resp. exception away to sort even with 
-            #    multiple peaks.'''
-            #    raise ValueError('WARNING Multiple peaks within gate detected. Correct gate to sort.')
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
                 if self.SAVE: 
                     self.savepeaks(filepk, p_wvl, p_int) #saves all peaks, including outside gate
-                    #self.savepeaks(filepk, wvl_list, int_list) #saves only peaks within gate 
                 if len(wvl_list)>0 and len(int_list)>0:
                     peakfound = True
                     print('+++')
@@ -621,7 +591,6 @@ class Processing(BT.BasicThread):
                             self.enable = False
                             print('Final event.')
                             end_time = datetime.now()
-                            #print('Time elapsed:', end_time - start_time)
                             self.stop()
                         self.cntr += 1
                         print(('Peak '+str(self.cntr)))
@@ -638,7 +607,6 @@ class Processing(BT.BasicThread):
             exc_type, exc_value = sys.exc_info()[:2]
             print('%s : Handling %s exception with message "%s"' % \
                 (self.name, exc_type.__name__, exc_value))
-            #stop thread???
     def stop(self):
         """Function stopping the thread and turning elecs off
         """
@@ -657,7 +625,6 @@ class Processing(BT.BasicThread):
         """
         self.autosort_status = False
         self.enable = False
-        #self.gpio.pinWrite(self.pin_ct, 0)
         self.gpio.pinWrite(self.pin_pulse, 0)
         self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_pulse))
 
@@ -673,7 +640,6 @@ class Processing(BT.BasicThread):
     def savepeaks(name, xdata, ydata):
         """Append all detected peaks (wavelength, RFU) into one snapshot file.
         """
-        #self.spec.save()
         fname = name
         with open(fname, 'a') as f:
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')

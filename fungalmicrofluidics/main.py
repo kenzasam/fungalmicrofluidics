@@ -74,8 +74,8 @@ configPath = os.path.join(getProgramFolder(), "user_config")
 if __name__ == "__main__":
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
     ########################################################################################
-    user= 'Kenza Samlali'
-    lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
+    user= 'user name'
+    lib = 'protocol.py' #<--CHANGE PROTOCOL file name
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
@@ -91,7 +91,6 @@ if __name__ == "__main__":
     '''
     import user protocol
     '''
-    #protocol = __import__(lib)
     protocol = importlib.import_module("user_config."+lib)
     SETUP=False
     '''
@@ -154,7 +153,6 @@ if __name__ == "__main__":
     '''
     print('Spectrometer Signal Processing status: %s' %(SPECSP))
     if SPEC and SPECSP == True:
-    #if SPECSP == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
@@ -201,7 +199,6 @@ if __name__ == "__main__":
                                 )
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
-        #nem=nemesysprot.nemesys(cfg=deviceconfig)
         print('Syringe pumps ready...')
     else:
         Pumps = None
@@ -216,13 +213,12 @@ if __name__ == "__main__":
     print('USER: %s'%(user))
     print('ASSIGNED PROTOCOL: using %s'%(lib))
     print('')
-    if (lib =='protocol_KS_clr_sort_nem5_v2') :
-      print('The protocol you are using, requires the NeMESYS syringe pump add-on')
-      print('Change the device config file if needed')
-      print('Change the NeMESYS to True or False to go online')
-      print('status: %s' %(PUMPS))
-      print('Change the SPEC spectrometer to True or False to go online')
-      print('status: %s' %(SPEC))
+    print('The protocol you are using, requires the NeMESYS syringe pump add-on')
+    print('Change the device config file if needed')
+    print('Change the NeMESYS to True or False to go online')
+    print('status: %s' %(PUMPS))
+    print('Change the SPEC spectrometer to True or False to go online')
+    print('status: %s' %(SPEC))
     print('Loading protocol: %s' %(lib))
     ###############
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/#

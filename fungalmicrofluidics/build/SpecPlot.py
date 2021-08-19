@@ -52,8 +52,6 @@ class Spectogram(client.tcpControl):
                 callFunc,
                 enable_plot,
                 enable_sp
-                #scan_frames,
-                #scan_time
                 ):
         """Initialize TCP client"""
         if RxPort > 1:
@@ -61,12 +59,8 @@ class Spectogram(client.tcpControl):
             client.tcpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
             print('Remote-Consol-Active on port %s\n'%(str(RxPort)))
         """Initialize instance variables"""
-        #self.run_measurement = False
         self.enable_plot = enable_plot
         self.enable_sp = enable_sp
-        #self.output_file = output_file
-        #self.scan_frames = scan_frames
-        #self.scan_time = scan_time
         self.timestamp = '%Y-%m-%dT%H:%M:%S%z'
         #init VARIABLES#
         self.ydata = [] 
@@ -90,8 +84,6 @@ class Spectogram(client.tcpControl):
         if self.enable_sp == True:
             #denoised signal
             self.line2, = self.ax2.plot([], [], 'b')
-            #treshold line
-            #self.line3 = self.ax2.axhline(y=self.ydata3[0], linewidth=3, color='r')
             #gating area
             rect = patches.Rectangle((self.ydata3[2], self.ydata3[0]), self.ydata3[3]-self.ydata3[2], self.ydata3[1]-self.ydata3[0], fc='y', alpha=0.5)
             self.area = self.ax2.add_patch(rect) 
@@ -106,36 +98,14 @@ class Spectogram(client.tcpControl):
         self.ax1.set_xlabel('Wavelengths [nm]')
         self.ax1.set_ylabel('Intensity [count]')
         
-    def animate(self,i): #,frame
-        '''
-        #object=self.TCP.run()#(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload)
-        #print 'Decoding now...'
-        #print object
-        #self.decodingPayload(object) #once full message received
-        #self.measurement=object['Msr']
-        #xdata=object['L']
-        #ydata=object['Dat']
-        
-        if i==0:
-            print 'lll'
-            self.graph.set_data(self.xdata,self.ydata)
-            #return self.init()
-        '''
+    def animate(self,i):
         if (self.enable_plot > 0): #(self.measurement == self.scan_frames) or \
             title = '%s /n Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
-            #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
             self.figure.suptitle(title)
             self.line1.set_data(self.xdata, self.ydata)
             if self.enable_sp == True:
                 #DENOISED SIGNAL
                 self.line2.set_data(self.xdata, self.ydata1)
-                #PEAK INFO
-                '''
-                self.graph2.set_offsets(np.c_[self.xdata2, self.ydata2])
-                for i,j in zip(self.xdata2, self.ydata2):
-                    self.ax2.annotate(str(j),xy=(i,j+0.5))
-                print(peakwvl)
-                ''' 
                 #GATE
                 x0 = self.ydata3[2]
                 y0 = self.ydata3[0]
@@ -145,19 +115,14 @@ class Spectogram(client.tcpControl):
             for ax in [self.ax1, self.ax2]:
                 ax.relim()
                 ax.autoscale_view(True, True, True)
-            #self.ax1.relim()
-            #self.ax1.autoscale_view(True, True, True)
             return self.graph
-            #return (self.graph, self.graph2, self.line)
 
     def decodingPayload(self, object):
         '''Object received from Server (tcpSend, threadSpec)
         In this case, a dictionary d={'Msr':self.measurement,'Dat':self.data}
         '''
         self.received == True
-        #print 'Received.',
         self.measurement=object['Msr']
-        #self.scan_frames=object['Fr']
         self.ydata = object['Dat']
         self.xdata = object['L']
         if 'Peak_wvl' in object:
@@ -168,9 +133,6 @@ class Spectogram(client.tcpControl):
             self.ydata3 = object['Gate']
         if 'DatDn' in object:
             self.ydata1 = object['DatDn']
-        #print 'Msrmt #'
-        #print self.measurement
-        #print self.ydata
 
 if __name__== "__main__":
     #\\\\\\\\\\\\\\\\USER SET VARIABLES\\\\\\\\\\\\\\\\\#
@@ -202,7 +164,5 @@ if __name__== "__main__":
            ag.figure: the current active figure
            ag.animate: function which updates the plot from one frame to the next. Is looped continuously.
     """
-    #if ag.received==True: #we should check this conditions beforehand. But I tried and somehow the plot remains empty.....
-    #plot_animation= animation.FuncAnimation(ag.figure, ag.animate, blit=False) #frames=gen_function, init_func=self.init_plot
     plot_animation= animation.FuncAnimation(ag.figure, ag.animate, blit=True)
     plot.show()

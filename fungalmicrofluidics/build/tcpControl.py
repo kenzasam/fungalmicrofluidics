@@ -82,7 +82,6 @@ class tcpControl():
         """Function to call external function, in client class."""
         if self.callFunc != False:
             self.callFunc(self,object)
-        #print 'updated'
 
     def run(self):
         """Threading process"""
@@ -117,31 +116,3 @@ class tcpControl():
         """
         self.running = False
         print('TCP (%s) - stopped receiving...'%(self.nameID))
-
-
-    """
-    def run(self):
-        global HEADERSIZE
-        global SIZE
-        full_msg = b''
-        new_msg = True
-        while True: #loop forever
-            self.running = True
-            msg= self.tcpRx.recv(SIZE) #size of message received each loop.
-            if new_msg:
-                if msg=='':
-                    continue
-                else:
-                    msglen = int(msg[:HEADERSIZE])
-                    new_msg = False
-            full_msg += msg
-            print len(full_msg)
-            if len(full_msg)- HEADERSIZE == msglen:
-                msg_obj=pickle.loads(full_msg[HEADERSIZE:]) #pickle to convert message
-                self.update(msg_obj)
-                new_msg = True
-                full_msg = b''
-
-        self.running = False
-        print 'TCP-stopped...'
-    """

@@ -25,7 +25,6 @@ Compared to GSOF_ArduBridgeV1 udpControl, this script builds a server that can
 receive any sized Object as payload/message, and not just strings. It's TCP and not UDP.
 """
 __version__ = "1.0.0"
-
 __author__ = "Kenza Samlali"
 __copyright__ = "Copyright 2020"
 __credits__ = [""]
@@ -54,9 +53,7 @@ class tcpSend():
         try: # We're now creating a Server socket
             self.tcpTx = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.tcpTx.bind((self.DesIP, self.DesPort))
-            #c, addr = self.udpTx.accept()
             print('%s: TCP Ready to send to %s:%d\n'%(nameID, self.DesIP, self.DesPort))
-            #    self.c, self.addr = self.udpTx.accept()
         except socket.error as msg :
             print('Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
     '''
@@ -73,28 +70,17 @@ class tcpSend():
         Using this function, you can send objects as a message to your client.
         """
         self.active = True
-        #self.run(d,c)
-        #def run(self, data, client):
         global HEADERSIZE
         self.running = True
-        #while self.active:
         self.tcpTx.settimeout(10)
         try:
-            #print 'listening...'
-            #self.udpTx.listen(5) #stream 5 at a time
-            #print 'waiting for connection...'
-            #c, addr = self.udpTx.accept()
-            #print d
             msg = pickle.dumps(data) #converts object into bytes
             lmsg='{:<10}'.format(str(len(msg))) #10=HEADERSIZE
             msg = str(lmsg)+msg #py3:  bytes(f"{len(msg):<{HEADERSIZE}}", 'utf-8')+msg
             """Adding a header to our payload.
             The header contains the length in bytes of our payload.
             This will  help us adjust to the buffer size. (See client)"""
-            #print msg
-            client.send(msg)
-            #print 'Data sent to %s:%d\n'%(self.DesIP, self.DesPort)
-            #self.udpTx.close()
+            client.send(msg)  
         except socket.timeout:
             msg=''
         self.running=False

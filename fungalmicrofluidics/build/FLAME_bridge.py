@@ -7,9 +7,7 @@ if sys.version_info[:2] < (3, 3):
         old_print(*args, **kwargs)
         if flush:
             file = kwargs.get('file', sys.stdout)
-            # Why might file=None? IDK, but it works for print(i, file=None)
             file.flush() if file is not None else sys.stdout.flush()
-########################
 
 """
     This file is part of GSOF_ArduBridge.
@@ -31,10 +29,7 @@ if sys.version_info[:2] < (3, 3):
 Class to view spectrum from Ocean Optics spectrometer as a thread.
 Based on and adapted from SpectrOMat, copyright Tobias Dusa.
 """
-
-
 __version__ = "1.0.0"
-
 __author__ = "Kenza Samlali"
 __copyright__ = "Copyright 2020"
 __credits__ = [""]
@@ -46,12 +41,6 @@ __status__ = "Production"
 import math, time
 import numpy
 
-'''
-#import seabreeze
-#seabreeze.use('pyseabreeze')
-import seabreeze.spectrometers as sb
-from sb import Spectrometer, list_devices
-'''
 try:
     import seabreeze
     #seabreeze.use('pyseabreeze')
@@ -68,7 +57,6 @@ def StringIsInt(s):
     except ValueError:
         return False
 
-
 try:
     # for Python2
     from tkinter import *   ## notice capitalized T in Tkinter
@@ -82,7 +70,6 @@ import matplotlib.pyplot as plot
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 SBGUI_animation = None
 
-# SeaBreeze spectrograph simulator
 class SBSimulator:
     """SeaBreeze specrograph simulator class"""
     def __init__(self,
@@ -112,11 +99,7 @@ class SBSimulator:
     def wavelengths(self):
         return(self._wavelengths)
 
-
-
 class SBGUI:
-    """
-    """
     def __init__(self,
                 device,
                 inttime,
@@ -151,8 +134,6 @@ class SBGUI:
             if ('SIMULATOR'.startswith(device.upper())):
                 self.spec = SBSimulator()
             elif (device == ''):
-                #print('allo')
-                #self.spec = sb.Spectrometer(sb.list_devices()[int(device[1:])])
                 print('No spec serial number listed. Picking first spec found.')
                 dev=list_devices()
                 self.spec = Spectrometer(dev[0])
@@ -312,7 +293,6 @@ class SBGUI:
             newTime = int(self.total_exposure / newValue)
             print('v', newValue)
             print('t: ', newTime)
-            #self.scan_time.set(newTime)
             self.scale_scan_time.set(newTime)
         self.scan_frames.set(newValue)
         self.dark_frames.set(newValue)
@@ -483,7 +463,6 @@ class SBGUI:
                 print('.', end='', flush=True)
             if (scan_frames > 0):
                 if self.measurement % scan_frames == 0:
-                    #print(time.strftime(self.timestamp, time.gmtime()), self.data)
                     if self.autosave.get() != 0:
                         self.save()
                     self.measurement = 0

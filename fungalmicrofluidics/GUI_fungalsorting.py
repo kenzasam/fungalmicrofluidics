@@ -66,7 +66,6 @@ class MainFrame(wx.Frame):
     '''Create MainFrame class.'''
     def __init__(self, setup, path, port=-1, ip='127.0.0.1', columns=2):
         super(MainFrame, self).__init__(None, wx.ID_ANY|wx.BORDER_RAISED) #, size=(400,400)
-        #panel=wx.Panel(self, wx.ID_ANY)
         '''PARAMETERS'''
         pumpnrs=5
         global build
@@ -84,7 +83,6 @@ class MainFrame(wx.Frame):
         ico = wx.Icon(os.path.join(build,'shih.ico'), wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
-        #
         '''Create and populate Panels.'''
         MAINbox = wx.BoxSizer(wx.VERTICAL)
         MAINbox2 = wx.BoxSizer(wx.VERTICAL)
@@ -92,21 +90,11 @@ class MainFrame(wx.Frame):
         MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
         self.operationspanel = OperationsPanel(self, udpSend)
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
-        #PID = self.PID_status(menubar)
-        '''
-        self.incpanel = IncubationPanel(self, self.imgvwr, udpSend)
-        MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
-        self.incpanel.Disable()#
-        '''
         self.sortingpanel = SortingPanel(self, udpSend)
-        #self.Bind(wx.EVT_CHECKBOX, self.sortingpanel.onCheck)
         MAINbox2.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
-        self.sortingpanel.Disable()#
-        
+        self.sortingpanel.Disable()
         '''Create and populate Menubar.'''
-
         menubar = MenuBar(pumpnrs, self.svwr, self.cvwr, udpSend, self.sortingpanel)
-
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onCloseAll, menubar.fileItem2)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
@@ -122,17 +110,11 @@ class MainFrame(wx.Frame):
         for i in Pumpnrs:
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
-        
         self.SetMenuBar(menubar)
-        #
         appbox = wx.BoxSizer(wx.HORIZONTAL)
         appbox.Add(MAINbox, 1, wx.EXPAND|wx.ALL, 2)
         appbox.Add(MAINbox2, 1, wx.EXPAND|wx.ALL, 2)
         self.SetSizerAndFit(appbox)
-        #self.SetSizerAndFit(MAINbox)
-        #self.Centre()
-        #foldingpanel bar see https://wxpython.org/Phoenix/docs/html/wx.lib.agw.foldpanelbar.html
-        
 
     def on_quit_click(self, event):
         """Handle close event."""
@@ -148,7 +130,6 @@ class PumpPanel(wx.Panel):
         Pumpnrs=list(range(self.pumpnrs))
         choices=[str(i) for i in Pumpnrs]
         NemSizer = wx.BoxSizer(wx.VERTICAL)
-        #
         NemSizer.AddSpacer(5)
         titlebox = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Pumps')
@@ -171,7 +152,6 @@ class PumpPanel(wx.Panel):
             Btn.Bind(wx.EVT_TOGGLEBUTTON, lambda event, dropid=i, entry=entryflrt: self.onStartFlow(event, dropid, entry)) 
             boxNem.Add(Btn, 0, wx.ALIGN_RIGHT)
             NemSizer.Add(boxNem, flag=wx.LEFT|wx.EXPAND, border=8)
-        #
         self.SetSizer(NemSizer)
         NemSizer.AddSpacer(5)
     
@@ -191,7 +171,7 @@ class PumpPanel(wx.Panel):
             else:
                print("off")
                event.GetEventObject().SetLabel("Start")
-               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pump) #\'%s\'
+               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pump)
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
@@ -200,11 +180,9 @@ class OperationsPanel(wx.Panel):
     """Panel class for user set functions for electrode actuation"""
     def __init__(self, parent, udpSend):
         super(OperationsPanel, self).__init__(parent)
-        #wx.Panel.__init__(self,parent,udpSend)
         self.udpSend = udpSend
         """Create and populate main sizer."""
         fnSizer = wx.BoxSizer(wx.VERTICAL)
-        #
         fnSizer.AddSpacer(5)
         titlebox  = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, label='Electrode Functions')
@@ -213,9 +191,6 @@ class OperationsPanel(wx.Panel):
         titlebox.Add(title, flag=wx.ALIGN_LEFT, border=8)
         fnSizer.Add(titlebox, 0, wx.ALIGN_CENTER_VERTICAL)
         fnSizer.AddSpacer(10)
-        #self.vwrBtn=wx.Button( self, label='Show chip viewer', name='wxChipViewer',style=wx.BU_EXACTFIT)
-        #self.vwrBtn.Bind(wx.EVT_BUTTON, self.onVwr)
-        #fnSizer.Add(self.vwrBtn, flag=wx.RIGHT, border=8)
         #sorting
         box=wx.BoxSizer(wx.HORIZONTAL)
         onTime=wx.StaticText(self,  wx.ID_ANY, label='onTime [s]')
@@ -225,22 +200,15 @@ class OperationsPanel(wx.Panel):
         fnSizer.AddSpacer(5)
         box.Add(self.entry, proportion=0.5, border=8)
         box1=wx.BoxSizer(wx.HORIZONTAL)
-        self.SortBtn=wx.Button( self, 1, label='Sort v1', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn=wx.Button( self, 1, label='Sort v1', name='Sort()', size=(70,24))
         self.SortBtn.Bind(wx.EVT_BUTTON, self.onSort)
         box1.Add(self.SortBtn, flag=wx.RIGHT, border=8)
-        self.SortBtn2=wx.Button( self, 2, label='Sort v2', name='Sort()', size=(70,24)) #ADDED KS
+        self.SortBtn2=wx.Button( self, 2, label='Sort v2', name='Sort()', size=(70,24))
         self.SortBtn2.Bind(wx.EVT_BUTTON, self.onSort)
         box1.Add(self.SortBtn2, flag=wx.RIGHT, border=8)
-        '''
-        self.text1=wx.StaticText(self,  wx.ID_ANY, label='t [s]  ')
-        box1.Add(self.text1, flag=wx.ALIGN_CENTER_VERTICAL, border=8)
-        self.entry1=wx.TextCtrl(self, wx.ID_ANY,'0', size=(30, -1))
-        box1.Add(self.entry1, proportion=1)
-        '''
         fnSizer.Add(box1, flag=wx.ALIGN_CENTER_VERTICAL)
         fnSizer.AddSpacer(5)
         self.SetSizer(fnSizer)
-        #self.SetBackgroundColour('#32a852')
 
     def onSort(self, event):
         t = float(self.entry.GetValue())
@@ -255,14 +223,11 @@ class SortingPanel(wx.Panel):
     def __init__(self, parent, udpSend):
         super(SortingPanel, self).__init__(parent)
         self.udpSend = udpSend
-        #self.menu = menubar
-
         def spacer(sizer):
             line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
             sizer.AddSpacer(10)
             sizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
             sizer.AddSpacer(10)
-
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
         srtSizer.AddSpacer(5)
@@ -390,7 +355,6 @@ class SortingPanel(wx.Panel):
         self.checkbox2.Bind(wx.EVT_CHECKBOX, self.onCheck2)
         self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(90,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
-        #self.StartSortBtn.SetBackgroundColour((152,251,152))
         box7 = wx.BoxSizer(wx.HORIZONTAL)
         box7.Add(self.text6, flag=wx.RIGHT, border=8)
         box7.Add(self.entry5, flag=wx.RIGHT, border=8)
@@ -401,7 +365,6 @@ class SortingPanel(wx.Panel):
         box8.Add(self.StartSortBtn, flag=wx.RIGHT, border=8)
         srtSizer.Add(box8, flag=wx.ALIGN_CENTER_VERTICAL)
         self.SetSizer(srtSizer)
-        #self.SetBackgroundColour('#f2dd88')
 
     def onCheck1(self, event):
         cb = event.GetEventObject() 
@@ -434,7 +397,6 @@ class SortingPanel(wx.Panel):
         pyperclip.copy(f)
         if self.udpSend != False:
             self.udpSend.Send(f)
-
         s = 'setup.specsp.start()'
         if self.StartSortBtn.GetLabel() == 'Restart':
             s = 'setup.specsp.play()'
@@ -457,12 +419,10 @@ class SortingPanel(wx.Panel):
             if self.StartSortBtn.GetValue() == True:
                 self.onStart()
                 self.StartSortBtn.SetLabel('Stop')
-                #self.StartSortBtn.SetBackgroundColour((250,128,114))
             # Inactive State
             if self.StartSortBtn.GetValue() == False:
                 self.onStop()
                 self.StartSortBtn.SetLabel('Restart')
-                #self.StartSortBtn.SetBackgroundColour((152,251,152))
 
     def onSetGate(self, event):
         status=MenuBar.SPEC_status
@@ -526,7 +486,6 @@ class SortingPanel(wx.Panel):
                 self.udpSend.Send(s)
 
     def onReset(self,event):
-        #if:
         self.BckgrBtn.Enable()
         self.BckgrBtn.SetValue(False)
         s = 'setup.spec.reset()'
@@ -544,11 +503,6 @@ class SortingPanel(wx.Panel):
                 self.onBckgrSpec()
                 obj=event.GetEventObject()
                 obj.Disable()
-                #self.StartSortBtn.SetLabel('Background')
-                
-            # Inactive State
-            #if self.StartSortBtn.GetValue() == False:
-            #    self.StartSortBtn.SetValue(False)
 
     def onBckgrSpec(self):
         s = 'setup.spec.background()' #setup.spec.have_darkness_correction boolean changes!
@@ -598,10 +552,8 @@ class SortingPanel(wx.Panel):
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
-    #class vars
     PID_status = False
     SPEC_status = False
-    #instance vars
     def __init__(self, pumpnrs, sviewer, cviewer, udpSend, specpanel):
         wx.MenuBar.__init__(self)
         self.pumpnrs = pumpnrs
@@ -651,9 +603,8 @@ class MenuBar(wx.MenuBar):
         if self.udpSend != False:
             self.udpSend.Send(s)
 
-    def onCloseNem(self,event): ### TO EDIT ###
+    def onCloseNem(self,event):
         s= 'Pumps.bus.close()'
-        #self.setup.pumpsObjList[pumpID]
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -707,8 +658,6 @@ class MenuBar(wx.MenuBar):
 
     def onStartSpec(self, event):
         MenuBar.SPEC_status = True
-        #self.SPEC = True
-        #Enable Spec sizer
         self.specpanel.Enable()
         s = 'setup.spec.start()'
         pyperclip.copy(s)
@@ -716,8 +665,6 @@ class MenuBar(wx.MenuBar):
                 self.udpSend.Send(s)
 
     def onStopSpec(self, event):
-        #disable sizer
-        #self.SPEC = False
         MenuBar.SPEC_status = False
         self.specpanel.Disable()
         s = 'setup.spec.stop()'
@@ -732,7 +679,6 @@ class MenuBar(wx.MenuBar):
 
     def SPEC_status(self):
         """check spec status"""
-        #return self.SPEC
         return MenuBar.SPEC_status
 
 if __name__ == '__main__':

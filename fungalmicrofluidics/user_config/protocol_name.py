@@ -29,25 +29,10 @@ except ImportError:
     class dummyThread():
         def __init__(self, nameID):
             self.name = nameID
-
-#from ArduBridge_ClR import SpecSP
 from GSOF_ArduBridge import threadBasic as bt
 import time, copy
-
-#Syringe pump modules
 import sys
 import os
-'''
-qmixsdk_dir =  "C:/QmixSDK" #path to Qmix SDK
-sys.path.append(qmixsdk_dir + "/lib/python")
-os.environ['PATH'] += os.pathsep + qmixsdk_dir
-from qmixsdk import qmixbus
-from qmixsdk import qmixpump
-from qmixsdk import qmixvalve
-from qmixsdk.qmixbus import UnitPrefix, TimeUnit
-'''
-
-#####################
 
 class Protocol(bt.BasicThread):
 
@@ -67,20 +52,8 @@ class Protocol(bt.BasicThread):
         else:
             return False
 
-"""
-Start of setup class
-"""
 class Setup():
     def __init__(self, ExtGpio, gpio, chipViewer, Pumps, Spec, SpecSP):
-        '''
-        # >>>>>>> SETUP SPECIFIC PARAMETERS BLOCK <<<<<<< #
-        deviceconfig="C:/QmixSDK/config/Nemesys_5units_20190308" #--> change path to device configuration folder
-        syringe_param={'syringe_diam':[7.29,3.26,3.26,3.26,3.26],
-                        'syringe_stroke':[59,40,40,40,40]} # --> change syringe parameters, in mm
-        self.DropletVolume= 0.00025073 #-->  change to volume of 1 drop in microliter
-        #>>>>>>>>>>>>> SETUP SPECIFIC PARAMETER BLOCK END  <<<<<<<<<<<<<
-        '''
-
         self.init_pumps(Pumps=Pumps)
         self.init_spec(Spec=Spec, SpecSP=SpecSP)
         self.init_elecs(gpio=gpio,ExtGpio = ExtGpio, chipViewer = chipViewer)
@@ -93,16 +66,12 @@ class Setup():
         print('>>>  Checking spectrometer  <<<')
         if (Spec is None):
             print("Spectrometer thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol.")
-            #sys.exit(1)
-            #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.spec=Spec
             print("ok.")
 
         if (SpecSP is None):
             print("Spectrometer signal processing thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol.")
-            #sys.exit(1)
-            #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
         else:
             self.specsp=SpecSP
             print("ok.")
@@ -113,7 +82,6 @@ class Setup():
         """
         print('>>>  <<<')
         print('>>>  Checking syringe pumps  <<<')
-        #self.nem=Nem(Nemesys=Nemesys, Deviceconfig=deviceconfig, Syringe_param=syringe_param)
         if (Pumps is None):
             print("Pump bridge not found! No syringe pumps initiated. Syringe pumps are needed for this protocol.")
         else:
