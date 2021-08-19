@@ -34,9 +34,9 @@ from GSOF_ArduBridge import udpControl
 from GSOF_ArduBridge import ArduBridge
 from GSOF_ArduBridge import ElectrodeGpioStack
 from GSOF_ArduBridge import UDP_Send
-from . import build.Nemesys_Bridge as Nemesys_Bridge
-from . import build.TCP_Send as TCP_Send
-from . import build.threadSpec as threadSpec
+from build import Nemesys_Bridge as Nemesys_Bridge
+from build import  TCP_Send as TCP_Send
+from build import threadSpec as threadSpec
 
 def extEval(s):
     '''
