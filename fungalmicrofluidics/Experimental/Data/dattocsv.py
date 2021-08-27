@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 '''
 Script to be used to convert .dat files to csv files.
 The first 4 Rows are deleted.
@@ -7,42 +6,23 @@ Version = 0.1
 Py 2.7
 '''
 import pandas as pd
-
-filename = "experimental data\PeakData-20210324-T19h01m52s.dat"
+#user input
+label='_glc_mut_27C_10msec'
+filename="PeakData-20210825-T16h04m32s.dat"
 
 # reading given csv file 
 # and creating dataframe
-peakdata = pd.read_csv(filename
-                       ,header = 0,
+df = pd.read_csv(filename,
+                       header = 0,
                        skiprows=5)
-  
-# adding column headings
+df[df.columns[0].split(',')] = df.iloc[:,0].str.split(',', expand=True)
+df.drop(df.columns[0], axis=1, inplace=True)
+#adding column headings
 #peakdata.columns = ['Name', 'Type']
 print(filename[:-4])
-# store dataframe into csv file
-peakdata.to_csv(filename[:-4]+'.csv', index = None)
+#store dataframe into csv file
+df.to_csv(filename[:-4]+label+'.csv', index = None)
 print('Saved.')
-=======
-'''
-Script to be used to convert .dat files to csv files.
-The first 4 Rows are deleted.
 
-Version = 0.1
-Py 2.7
-'''
-import pandas as pd
+#display quick plot
 
-filename=r"E:\KENZA Folder\PYTHON\fungalmicrofluidics\fungalmicrofluidics\Experimental\Data\PeakData-20210617-T15h01m16s_chitin_wt_4d.dat"
-# reading given csv file 
-# and creating dataframe
-peakdata = pd.read_csv(filename
-                       ,header = 0,
-                       skiprows=5)
-  
-# adding column headings
-#peakdata.columns = ['Name', 'Type']
-print(filename[:-4])
-# store dataframe into csv file
-peakdata.to_csv(filename[:-4]+'.csv', index = None)
-print('Saved.')
->>>>>>> ccc69ef02841cb91a3f553dce55ba1ddb4c1fe38

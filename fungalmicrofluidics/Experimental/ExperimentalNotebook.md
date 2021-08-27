@@ -1,3 +1,30 @@
+# Thu, 19 08 2021
+## Experiment details
+
+### Auto-sort, using 5uM fluorescein and 0.6% dye H2O
+*droplet generation* 
+- Fluorescein 5uM: 0.0008 oil: 0.005
+- H2O: 0.002 Oil: 0.008
+- Spacer: 0.02 (but leak at fiber)
+
+*sorting*
+- Potential: 450, 10kHz
+- Time: 0.2sec
+- Gate:  , 500-550nm,
+- Int time: 100msec
+- pin ontime: 0.4s
+
+Droplets not small enough.
+Next time: make drops seperately into pcr tube, then mix population.
+
+# Fri, 25 08 2021
+## Experiment details
+gating plots of wt and mutant with FDGlcNAC, and also sorting out mutants
+
+See gating plots
+
+needed 10msec int time only. Sorted >40.000
+
 # Fri, 29 07 2021
 ## Experiment details
 FDGlu 4d CCMM
