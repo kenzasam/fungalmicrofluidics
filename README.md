@@ -86,8 +86,8 @@ Edit the Protocol file, to include your sequences and functions.
 Edit the cfg file with your electrode configuration.
 
 * **Each time you run an experiment:**   
-Edit the ArduBridge file, depending on what hardware and protocol file you intend to use, and whether you want to work in simulation mode or not.  
-Edit the Viewer .bat files, with correct arguments.
+Edit the Main file, depending on what hardware and protocol file you intend to use, and whether you want to work in simulation mode or not.  
+Edit the Viewer .bat files, with correct arguments and path.
 
 ### How to run and use the software
 
@@ -96,3 +96,13 @@ Edit the Viewer .bat files, with correct arguments.
 3. Check the ChipViewer file by running it.
 4. Run main.py. This can be best done using the Python IDLE
 5. Have fun!
+
+
+## common methods to use in IDLE
+```
+setup.sortseq('elec nr','onTime')
+setup.seq['seqname'].onTime = t
+setup.seq['seqname'].start(1)
+setup.specsp.setEvents('500')'
+setup.specsp.start()
+```

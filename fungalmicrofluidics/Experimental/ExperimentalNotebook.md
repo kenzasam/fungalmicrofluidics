@@ -2,7 +2,6 @@
 ## Experiment details
 
 ### Auto-sort, using 5uM fluorescein and 0.6% dye H2O
-
 see screenshot 
 *droplet generation* 
 - Fluorescein 5uM: 0.0005 oil: 0.0035
@@ -17,10 +16,17 @@ see screenshot
 - Int time: 100msec
 - pin ontime: 0.4s
 
-pos outlet
-10 blue out of 57 pos
-47 fluo out of 57
+pos outlet:
+10 blue (FN) out of 57 P
+47 fluo (TP) out of 57 P
 
+neg outlet:
+165 blue (TN)
+34 fluo (FP) out of 199 N
+
+sensitivity or TPR: 47/57 = 82.45%
+specificity or TNR: 165/199 = 83%
+precision or PPV = 47 / (47+34) = 58.02%
 ### Sort out mutants at 36 C
 Detect ALL peaks above noise. filter later.
 
