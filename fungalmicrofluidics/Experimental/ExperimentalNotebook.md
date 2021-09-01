@@ -1,3 +1,37 @@
+
+# Wed, 04 09 2021
+## Experiment details
+
+### FDGlu wt 
+50msec 
+0.025 oil 
+0.01 drops 
+normal setting led
+continuous gating plot
+
+### FDGlu mut
+50msec 
+0.025 oil 
+0.01 drops 
+normal setting led
+continuous gating plot and sorting (>8000). Didn't go as well. Lots of giant drops/broken, as expected
+
+### FDGlcNAc mut
+10msec 
+0.025 oil 
+0.01 drops 
+normal setting led
+continuous gating plot and sorting(>40 000, 0.1 t, 0.3 ont).
+
+
+# Fri, 25 08 2021
+## Experiment details
+gating plots of wt and mutant with FDGlcNAC, and also sorting out mutants
+
+See gating plots
+
+needed 10msec int time only. Sorted >40.000
+
 # Thu, 19 08 2021
 ## Experiment details
 
@@ -16,14 +50,6 @@
 
 Droplets not small enough.
 Next time: make drops seperately into pcr tube, then mix population.
-
-# Fri, 25 08 2021
-## Experiment details
-gating plots of wt and mutant with FDGlcNAC, and also sorting out mutants
-
-See gating plots
-
-needed 10msec int time only. Sorted >40.000
 
 # Fri, 29 07 2021
 ## Experiment details
@@ -75,6 +101,7 @@ background subs
 50msec int time
 drop travel time:
 pulse time:
+
 
 
 
