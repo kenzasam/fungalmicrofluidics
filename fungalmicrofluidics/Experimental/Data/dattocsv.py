@@ -8,8 +8,7 @@ Py 2.7
 import pandas as pd
 #user input
 label='_glc_mut_27C_10msec'
-filename="PeakData-20210825-T15h44m50s.dat"
-
+filename = "PeakData-20210622-T16h07m45s_chitin_4d_wt.dat"
 # reading given csv file 
 # and creating dataframe
 df = pd.read_csv(filename,
@@ -25,4 +24,3 @@ df.to_csv(filename[:-4]+label+'.csv', index = None)
 print('Saved.')
 
 #display quick plot
-
