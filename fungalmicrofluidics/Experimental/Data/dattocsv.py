@@ -7,8 +7,8 @@ Py 2.7
 '''
 import pandas as pd
 #user input
-label='_glc_mut_27C_10msec'
-filename = "PeakData-20210622-T16h07m45s_chitin_4d_wt.dat"
+label='_glu_wt_27C_50msec'
+filename = r"PeakData-20210901-T20h10m08s.dat"
 # reading given csv file 
 # and creating dataframe
 df = pd.read_csv(filename,
