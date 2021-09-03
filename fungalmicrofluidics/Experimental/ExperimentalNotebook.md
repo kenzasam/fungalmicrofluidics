@@ -3,25 +3,23 @@
 ## Experiment details
 
 ### FDGlu wt 
-50msec 
-0.025 oil 
-0.01 drops 
-normal setting led
-continuous gating plot
-
+- 50msec 
+- 0.025 oil 
+- 0.01 drops 
+- normal setting led
+- continuous gating plot
 ### FDGlu mut
-50msec 
-0.025 oil 
-0.01 drops 
-normal setting led
-continuous gating plot and sorting (>8000). Didn't go as well. Lots of giant drops/broken, as expected
-
+- 50msec 
+- 0.025 oil 
+- 0.01 drops 
+- normal setting led
+- continuous gating plot and sorting (>8000). Didn't go as well. Lots of giant drops/broken, as expected
 ### FDGlcNAc mut
-10msec 
-0.025 oil 
-0.01 drops 
-normal setting led
-continuous gating plot and sorting(>40 000, 0.1 t, 0.3 ont).
+- 10msec 
+- 0.025 oil 
+- 0.01 drops 
+- normal setting led
+- continuous gating plot and sorting(>40 000, 0.1 t, 0.3 ont).
 
 
 # Fri, 25 08 2021
@@ -62,9 +60,8 @@ see excel
 
 # Sat, 03 07 2021
 ## Experiment details
-
 ### Auto-sort, using 5uM fluorescein and 0.6% dye H2O
-see screenshot 
+- see screenshot 
 
 *droplet generation* 
 - Fluorescein 5uM: 0.0005 oil: 0.0035
@@ -80,16 +77,16 @@ see screenshot
 - pin ontime: 0.4s
 
 pos outlet:
-10 blue (FN) out of 57 P
-47 fluo (TP) out of 57 P
+- 10 blue (FN) out of 57 P
+- 47 fluo (TP) out of 57 P
 
 neg outlet:
-165 blue (TN)
-34 fluo (FP) out of 199 N
+- 165 blue (TN)
+- 34 fluo (FP) out of 199 N
 
-sensitivity or TPR: 47/57 = 82.45%
-specificity or TNR: 165/199 = 83%
-precision or PPV = 47 / (47+34) = 58.02%
+- sensitivity or TPR: 47/57 = 82.45%
+- specificity or TNR: 165/199 = 83%
+- precision or PPV = 47 / (47+34) = 58.02%
 ### Sort out mutants at 36 C
 Detect ALL peaks above noise. filter later.
 

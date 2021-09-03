@@ -7,13 +7,15 @@ Py 2.7
 '''
 import pandas as pd
 #user input
-label='_glu_wt_27C_50msec'
-filename = r"PeakData-20210901-T20h10m08s.dat"
+label='_glu_mut_27C_50msec'
+filename = r"PeakData-20210729-T15h40m47s.dat"
 # reading given csv file 
 # and creating dataframe
 df = pd.read_csv(filename,
                        header = 0,
                        skiprows=5)
+'''Following two lines are needed if your rows are saved as strings. Check your .dat file in a Text editor.
+'''
 df[df.columns[0].split(',')] = df.iloc[:,0].str.split(',', expand=True)
 df.drop(df.columns[0], axis=1, inplace=True)
 #adding column headings
