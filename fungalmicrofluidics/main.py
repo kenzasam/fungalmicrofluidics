@@ -123,7 +123,7 @@ if __name__ == "__main__":
     Setting up spectrometer thread and server.
     This will allow you to retrieve data from a spectrometer and plot it.
     '''
-    print('Spectrometer Thread status: %s' %(SPEC))
+    print('Spectrometer Thread status: ' +SPEC)
     if SPEC == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     '''
     Setting up Nemesys syringe pump bridge.
     '''
-    print('Pumps status: %s' %(PUMPS))
+    print('Pumps status: ' +PUMPS)
     if PUMPS == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -208,18 +208,18 @@ if __name__ == "__main__":
     '''
     print(("/\  "*10))
     print(("  \/"*10))
-    print('Now: %s'%(time.strftime("%Y-%m-%d %H:%M")))
+    print('Now: {}'.format(time.strftime("%Y-%m-%d %H:%M")))
     print('')
-    print('USER: %s'%(user))
-    print('ASSIGNED PROTOCOL: using %s'%(lib))
+    print('USER: '+user)
+    print('ASSIGNED PROTOCOL: using'+lib)
     print('')
     print('The protocol you are using, requires the NeMESYS syringe pump add-on')
     print('Change the device config file if needed')
     print('Change the NeMESYS to True or False to go online')
-    print('status: %s' %(PUMPS))
+    print('status: ' +PUMPS)
     print('Change the SPEC spectrometer to True or False to go online')
-    print('status: %s' %(SPEC))
-    print('Loading protocol: %s' %(lib))
+    print('status:' +SPEC)
+    print('Loading protocol: ' +lib)
     ###############
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/#
     ''' If adding new methods to the setup class, please ammend here for correct class instance.
