@@ -53,7 +53,7 @@ class tcpSend():
         try: # We're now creating a Server socket
             self.tcpTx = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.tcpTx.bind((self.DesIP, self.DesPort))
-            print('%s: TCP Ready to send to %s:%d\n'%(nameID, self.DesIP, self.DesPort))
+            print('{}: TCP Ready to send to {}:{}\n'.format(nameID, self.DesIP, self.DesPort))
         except socket.error as msg :
             print('Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
     '''

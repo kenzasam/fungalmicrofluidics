@@ -65,7 +65,7 @@ class tcpControl():
                 while self.tcpRx.connect_ex((self.DesIP,self.RxPort)) != 0: #raises error indicator 0 if server not available. For asynchronous connects
                     print('Server not available. Trying to bind again in 5sec.')
                     time.sleep(5)
-                print('%s: Ready on port %d\n'%(nameID, self.RxPort))
+                print('{}: Ready on port {}\n'.format(nameID, self.RxPort))
                 self.active = True
             except socket.error as msg:
                 print('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
@@ -88,7 +88,7 @@ class tcpControl():
         """ adjust to https://stackoverflow.com/questions/60417767/tcp-lost-packet-python """
         global HEADERSIZE
         global SIZE
-        print('TCP (%s) - receiving...'%(self.nameID))
+        print('TCP ({}) - receiving...'.format(self.nameID))
         while True:
             self.running = True
             print('.', end=' ')

@@ -57,7 +57,7 @@ class Spectogram(client.tcpControl):
         if RxPort > 1:
             print('Initiating client.')
             client.tcpControl.__init__(self,nameID=nameID, DesIP=DesIP,RxPort=RxPort, callFunc=callFunc)
-            print('Remote-Consol-Active on port %s\n'%(str(RxPort)))
+            print('Remote-Consol-Active on port {}\n'.format(str(RxPort)))
         """Initialize instance variables"""
         self.enable_plot = enable_plot
         self.enable_sp = enable_sp
@@ -142,7 +142,7 @@ if __name__== "__main__":
     IP = '127.0.0.1' # Client ip adress to which udpSend package is sent. See ArduBridge.
     VERSION = '1.0.0' # version
     #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
-    print('GUI: Protocol GUI Ver:%s'%(VERSION))
+    print('GUI: Protocol GUI Ver:'+VERSION)
     print('Copyright: Kenza Samlali, 2020-2021')
 
     """Command line option parser"""

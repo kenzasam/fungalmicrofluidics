@@ -177,7 +177,7 @@ class Flame(BT.BasicThread):
         t = time in msec'''
         try:
             self.spec.integration_time_micros(t)
-            print(("Integration time set to %d ms") %(t))
+            print("Integration time set to {} ms".format(t))
         except:
             print("Error. Can't set integrtion time.")
         
@@ -194,7 +194,7 @@ class Flame(BT.BasicThread):
             self.client, addr = self.viewer['TCPspec'].tcpTx.accept() #blocking call. While loop waits here until conn accepted.
             print('Connected and starting thread...')
             BT.BasicThread.start(self)
-            print(('%s: Started ON line'%(self.name))))
+            print('{}: Started ON line'.format(self.name))
         except:
             print('Something went wrong. Can not connect to client.')
 
@@ -218,7 +218,7 @@ class Flame(BT.BasicThread):
         if self.SPECstatus:
             self.enable=True
             BT.BasicThread.start(self)
-            print(('%s: Started ON line'%(self.name)))
+            print('{}: Started ON line'.format(self.name))
         else:
             print('You need to Spec.start() first!')
 
@@ -243,14 +243,14 @@ class Flame(BT.BasicThread):
                     while sleepTime < 0.05:
                         self.T_Z[0] += self.Period
                         sleepTime += self.Period
-                    s = '%s: Timing error - Skipping a cycle'%(self.name)
+                    s = '{}: Timing error - Skipping a cycle'%(self.name)
                     print(s)
                 self.lock.release()
                 time.sleep(sleepTime)
             else:
                 self.lock.release()
         self.enable = False
-        print(('%s: Terminated\n'%(self.name)))
+        print(('{}: Terminated\n'%(self.name)))
 
     @staticmethod
     def draft_data():
@@ -526,9 +526,9 @@ class Processing(BT.BasicThread):
             print(('Saving all data under ' +filepk))
         #turn bottom electrode on
         if self.electhread and self.enOut:
-            print(('%s: Started ON line'%(self.name)))
+            print('{}: Started ON line'.format(self.name))
             self.gpio.pinWrite(self.pin_ct, 1)
-            self.teleUpdate('%s, E%d: 1'%(self.name, self.pin_ct))
+            self.teleUpdate('{}, E{}: 1'.format(self.name, self.pin_ct))
         # starting thread
         BT.BasicThread.start(self)
         
@@ -556,7 +556,7 @@ class Processing(BT.BasicThread):
                     while sleepTime < 0.05:
                         self.T_Z[0] += self.Period
                         sleepTime += self.Period
-                    s = '%s: Timing error - Skipping a cycle'%(self.name)
+                    s = '{}: Timing error - Skipping a cycle'.format(self.name)
                     #self.teleUpdate(s)
                     print(s)
                 self.lock.release()
@@ -564,7 +564,7 @@ class Processing(BT.BasicThread):
             else:
                 self.lock.release()
         self.enable = False
-        print(('%s: Terminated\n'%(self.name)))
+        print('{}: Terminated\n'.format(self.name))
 
     def process(self):
         peakfound = False
@@ -577,14 +577,14 @@ class Processing(BT.BasicThread):
             zz = False
             if len(wvl_list) > 0: 
                 zz = True
-                print(('Peak at:'+str(wvl_list))) 
+                print('Peak at:'+str(wvl_list))
             if len(p_int) > 0 and ( (self.gateL == None) or zz):
                 if self.SAVE: 
                     self.savepeaks(filepk, p_wvl, p_int) #saves all peaks, including outside gate
                 if len(wvl_list)>0 and len(int_list)>0:
                     peakfound = True
                     print('+++')
-                    print((str(wvl_list)+'nm, '+str(int_list)+'A.U'))
+                    print(str(wvl_list)+'nm, '+str(int_list)+'A.U')
                     if self.countevents(self.peakcnt): 
                         if self.cntr == self.peakcnt:
                             self.lock.release()
@@ -593,20 +593,19 @@ class Processing(BT.BasicThread):
                             end_time = datetime.now()
                             self.stop()
                         self.cntr += 1
-                        print(('Peak '+str(self.cntr)))
+                        print('Peak '+str(self.cntr))
                     if self.electhread and self.enOut:
                         #wait, depending on distance between detection and electrodes
                         time.sleep(self.t_wait)
                         #turn top elec on
                         self.gpio.pinPulse(self.pin_pulse, self.onTime)
-                        self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
+                        self.teleUpdate('{}, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
         except ValueError as e:
             print(e)
         except:
             print('Error...')
             exc_type, exc_value = sys.exc_info()[:2]
-            print('%s : Handling %s exception with message "%s"' % \
-                (self.name, exc_type.__name__, exc_value))
+            print('{} : Handling {} exception with message "{}"'.format(self.name, exc_type.__name__, exc_value))
     def stop(self):
         """Function stopping the thread and turning elecs off
         """
@@ -617,7 +616,7 @@ class Processing(BT.BasicThread):
         BT.BasicThread.stop(self)
         self.gpio.pinWrite(self.pin_ct, 0)
         self.gpio.pinWrite(self.pin_pulse, 0)
-        self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
+        self.teleUpdate('{}, E{}: 0'.format(self.name, self.pin_ct))
         self.enOut = False
     
     def pause(self):
@@ -626,7 +625,7 @@ class Processing(BT.BasicThread):
         self.autosort_status = False
         self.enable = False
         self.gpio.pinWrite(self.pin_pulse, 0)
-        self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_pulse))
+        self.teleUpdate('{}, E{}: 0'.format(self.name, self.pin_pulse))
 
     def play(self):
         """Restart the Threading process
@@ -634,7 +633,7 @@ class Processing(BT.BasicThread):
         self.autosort_status = True
         self.enable=True
         BT.BasicThread.start(self)
-        print(('%s: Started ON line'%(self.name)))   
+        print(('{}: Started ON line'%(self.name)))   
 
     @staticmethod
     def savepeaks(name, xdata, ydata):
@@ -643,7 +642,7 @@ class Processing(BT.BasicThread):
         fname = name
         with open(fname, 'a') as f:
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
-        print(('Peak data added to ' + fname))
+        print('Peak data added to ' + fname)
 
     ''' Following are functions to set values from GUI
     '''
@@ -664,7 +663,7 @@ class Processing(BT.BasicThread):
          t = time in sec'''
         try:
             self.t_wait = t
-            print(("Droplet travel time set to:" + str(t) ))
+            print("Droplet travel time set to:" + str(t) )
         except:
             print("Error. Can't set Droplet travel Time.")
 
@@ -674,7 +673,7 @@ class Processing(BT.BasicThread):
         '''
         try:
             self.onTime = t
-            print(("onTime set to: %d sec "+ str(t) ))
+            print("onTime set to: {} sec ".format(str(t)))
         except:
             print("Error. Can't set onTime.")
 
@@ -686,7 +685,7 @@ class Processing(BT.BasicThread):
         try:
             self.pin_ct = pin_ct
             self.pin_pulse = pin_pulse
-            print(("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse))
+            print("Pin_cte: {} , Pin_pulse: {}.".format(pin_ct, pin_pulse))
         except:
             print("Error. Can't set pint_cte or pin_pulse.")
 
@@ -695,7 +694,7 @@ class Processing(BT.BasicThread):
         '''
         try:
             self.pkcount = nr
-            print(("Events to be recorded: "+nr))
+            print("Events to be recorded: "+nr)
         except:
             print("Error. Can't set events nr.")
 

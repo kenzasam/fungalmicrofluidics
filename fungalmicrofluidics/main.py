@@ -75,7 +75,7 @@ if __name__ == "__main__":
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
     ########################################################################################
     user= 'user name'
-    lib = 'protocol.py' #<--CHANGE PROTOCOL file name
+    lib = 'protocol_name' #<--CHANGE PROTOCOL file name
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
@@ -234,6 +234,6 @@ if __name__ == "__main__":
     print(("/\  "*10))
     print(("  \/"*10))
 
-    if input('Run GUI? [y/n]') == 'y':
+    if raw_input('Run GUI? [y/n]') == 'y':
         os.system('python GUI_fungalsorting.py')
     #########################
