@@ -84,6 +84,11 @@ class Spectogram(client.tcpControl):
         if self.enable_sp == True:
             #denoised signal
             self.line2, = self.ax2.plot([], [], 'b')
+<<<<<<< HEAD:fungalmicrofluidics/build/SpecPlot.py
+=======
+            #treshold line
+            #self.line3 = self.ax2.axhline(y=self.ydata3[0], linewidth=3, color='r')
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/SpecPlot.py
             #gating area
             rect = patches.Rectangle((self.ydata3[2], self.ydata3[0]), self.ydata3[3]-self.ydata3[2], self.ydata3[1]-self.ydata3[0], fc='y', alpha=0.5)
             self.area = self.ax2.add_patch(rect) 
@@ -98,14 +103,45 @@ class Spectogram(client.tcpControl):
         self.ax1.set_xlabel('Wavelengths [nm]')
         self.ax1.set_ylabel('Intensity [count]')
         
+<<<<<<< HEAD:fungalmicrofluidics/build/SpecPlot.py
     def animate(self,i):
         if (self.enable_plot > 0): #(self.measurement == self.scan_frames) or \
             title = '%s /n Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
+=======
+    def animate(self,i): #,frame
+        '''
+        #object=self.TCP.run()#(nameID='udpSpecPlot', DesIP=IP,RxPort=CLIENT_PORT, callFunc=decodingPayload)
+        #print 'Decoding now...'
+        #print object
+        #self.decodingPayload(object) #once full message received
+        #self.measurement=object['Msr']
+        #xdata=object['L']
+        #ydata=object['Dat']
+        
+        if i==0:
+            print 'lll'
+            self.graph.set_data(self.xdata,self.ydata)
+            #return self.init()
+        '''
+        if (self.enable_plot > 0): #(self.measurement == self.scan_frames) or \
+            title = '%s /n Live Spectral Measurements' %(time.strftime(self.timestamp, time.gmtime()))
+            #title='%s sum of %d measurements with integration time %d us' %(time.strftime(self.timestamp, time.gmtime()) , self.measurement, self.scan_time )
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/SpecPlot.py
             self.figure.suptitle(title)
             self.line1.set_data(self.xdata, self.ydata)
             if self.enable_sp == True:
                 #DENOISED SIGNAL
                 self.line2.set_data(self.xdata, self.ydata1)
+<<<<<<< HEAD:fungalmicrofluidics/build/SpecPlot.py
+=======
+                #PEAK INFO
+                '''
+                self.graph2.set_offsets(np.c_[self.xdata2, self.ydata2])
+                for i,j in zip(self.xdata2, self.ydata2):
+                    self.ax2.annotate(str(j),xy=(i,j+0.5))
+                print(peakwvl)
+                ''' 
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/SpecPlot.py
                 #GATE
                 x0 = self.ydata3[2]
                 y0 = self.ydata3[0]
@@ -115,7 +151,14 @@ class Spectogram(client.tcpControl):
             for ax in [self.ax1, self.ax2]:
                 ax.relim()
                 ax.autoscale_view(True, True, True)
+<<<<<<< HEAD:fungalmicrofluidics/build/SpecPlot.py
             return self.graph
+=======
+            #self.ax1.relim()
+            #self.ax1.autoscale_view(True, True, True)
+            return self.graph
+            #return (self.graph, self.graph2, self.line)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/SpecPlot.py
 
     def decodingPayload(self, object):
         '''Object received from Server (tcpSend, threadSpec)

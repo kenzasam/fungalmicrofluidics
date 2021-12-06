@@ -83,6 +83,10 @@ class MainFrame(wx.Frame):
         ico = wx.Icon(os.path.join(build,'shih.ico'), wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.Bind(wx.EVT_CLOSE, self.on_quit_click)
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+        #
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         '''Create and populate Panels.'''
         MAINbox = wx.BoxSizer(wx.VERTICAL)
         MAINbox2 = wx.BoxSizer(wx.VERTICAL)
@@ -90,11 +94,29 @@ class MainFrame(wx.Frame):
         MAINbox.Add(self.pumppanel, 1, wx.EXPAND|wx.ALL, 2)
         self.operationspanel = OperationsPanel(self, udpSend)
         MAINbox.Add(self.operationspanel, 1, wx.EXPAND|wx.ALL, 2)
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
         self.sortingpanel = SortingPanel(self, udpSend)
         MAINbox2.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
         self.sortingpanel.Disable()
         '''Create and populate Menubar.'''
         menubar = MenuBar(pumpnrs, self.svwr, self.cvwr, udpSend, self.sortingpanel)
+=======
+        #PID = self.PID_status(menubar)
+        '''
+        self.incpanel = IncubationPanel(self, self.imgvwr, udpSend)
+        MAINbox.Add(self.incpanel, 1, wx.EXPAND|wx.ALL, 2)
+        self.incpanel.Disable()#
+        '''
+        self.sortingpanel = SortingPanel(self, udpSend)
+        #self.Bind(wx.EVT_CHECKBOX, self.sortingpanel.onCheck)
+        MAINbox2.Add(self.sortingpanel, 1, wx.EXPAND|wx.ALL, 2)
+        self.sortingpanel.Disable()#
+        
+        '''Create and populate Menubar.'''
+
+        menubar = MenuBar(pumpnrs, self.svwr, self.cvwr, udpSend, self.sortingpanel)
+
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         self.Bind(wx.EVT_MENU, menubar.onQuit, menubar.fileItem1)
         self.Bind(wx.EVT_MENU, menubar.onCloseAll, menubar.fileItem2)
         self.Bind(wx.EVT_MENU, menubar.onRemoteOpenPort, menubar.arduItem1)
@@ -110,7 +132,13 @@ class MainFrame(wx.Frame):
         for i in Pumpnrs:
             self.Bind(wx.EVT_MENU, menubar.onStopOnePump, menubar.stopItem[i])
             self.Bind(wx.EVT_MENU, menubar.onCalibratePump, menubar.calibrateItem[i])
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
         self.SetMenuBar(menubar)
+=======
+        
+        self.SetMenuBar(menubar)
+        #
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         appbox = wx.BoxSizer(wx.HORIZONTAL)
         appbox.Add(MAINbox, 1, wx.EXPAND|wx.ALL, 2)
         appbox.Add(MAINbox2, 1, wx.EXPAND|wx.ALL, 2)
@@ -152,6 +180,10 @@ class PumpPanel(wx.Panel):
             Btn.Bind(wx.EVT_TOGGLEBUTTON, lambda event, dropid=i, entry=entryflrt: self.onStartFlow(event, dropid, entry)) 
             boxNem.Add(Btn, 0, wx.ALIGN_RIGHT)
             NemSizer.Add(boxNem, flag=wx.LEFT|wx.EXPAND, border=8)
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+        #
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         self.SetSizer(NemSizer)
         NemSizer.AddSpacer(5)
     
@@ -162,16 +194,26 @@ class PumpPanel(wx.Panel):
         else:
             state = event.GetEventObject().GetValue()
             if state == True:
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
                print("on")
+=======
+               print "on"
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
                event.GetEventObject().SetLabel("Stop")
                s = 'setup.nem.pump_generate_flow(setup.nem.pumpID(%d),%f)'%(pump,flrt)
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
             else:
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
                print("off")
                event.GetEventObject().SetLabel("Start")
                s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pump)
+=======
+               print "off"
+               event.GetEventObject().SetLabel("Start")
+               s = 'setup.nem.pump_stop(setup.nem.pumpID(%d))'%(pump) #\'%s\'
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
                pyperclip.copy(s)
                if self.udpSend != False:
                    self.udpSend.Send(s)
@@ -223,11 +265,20 @@ class SortingPanel(wx.Panel):
     def __init__(self, parent, udpSend):
         super(SortingPanel, self).__init__(parent)
         self.udpSend = udpSend
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+        #self.menu = menubar
+
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         def spacer(sizer):
             line = wx.StaticLine(self,wx.ID_ANY,style=wx.LI_HORIZONTAL)
             sizer.AddSpacer(10)
             sizer.Add( line, 0, wx.ALL|wx.EXPAND, 2 )
             sizer.AddSpacer(10)
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         """Create and populate main sizer."""
         srtSizer = wx.BoxSizer(wx.VERTICAL)
         srtSizer.AddSpacer(5)
@@ -355,6 +406,10 @@ class SortingPanel(wx.Panel):
         self.checkbox2.Bind(wx.EVT_CHECKBOX, self.onCheck2)
         self.StartSortBtn = wx.ToggleButton(self, label='Start', name='Sort()', size=(90,24))
         self.StartSortBtn.Bind(wx.EVT_TOGGLEBUTTON, self.toggledbutton)
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+        #self.StartSortBtn.SetBackgroundColour((152,251,152))
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         box7 = wx.BoxSizer(wx.HORIZONTAL)
         box7.Add(self.text6, flag=wx.RIGHT, border=8)
         box7.Add(self.entry5, flag=wx.RIGHT, border=8)
@@ -391,12 +446,43 @@ class SortingPanel(wx.Panel):
         if self.udpSend != False:
             self.udpSend.Send(s)
 
+    def onCheck1(self, event):
+        cb = event.GetEventObject() 
+        if cb.GetValue():
+            self.entry5.Disable()
+        else:
+            self.entry5.Enable()
+            #events    
+            nr=int(float(self.entry5.GetValue()))
+            f='specsp.setEvents('+str(nr)+')'
+            pyperclip.copy(f)
+            if self.udpSend != False:
+                self.udpSend.Send(f)
+        #print cb.GetLabel(),' is clicked', cb.GetValue()
+        val = not cb.GetValue()
+        s = 'setup.specsp.countevents('+str(int(val))+')'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+        
+    def onCheck2(self, event):
+        cb = event.GetEventObject() 
+        val = cb.GetValue()
+        s = 'setup.specsp.setAutoSave('+str(val)+')'
+        pyperclip.copy(s)
+        if self.udpSend != False:
+            self.udpSend.Send(s)
+
     def onStart(self):
         nr=int(float(self.entry5.GetValue()))
         f = 'setup.specsp.setEvents('+str(nr)+')'
         pyperclip.copy(f)
         if self.udpSend != False:
             self.udpSend.Send(f)
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         s = 'setup.specsp.start()'
         if self.StartSortBtn.GetLabel() == 'Restart':
             s = 'setup.specsp.play()'
@@ -423,6 +509,10 @@ class SortingPanel(wx.Panel):
             if self.StartSortBtn.GetValue() == False:
                 self.onStop()
                 self.StartSortBtn.SetLabel('Restart')
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+                #self.StartSortBtn.SetBackgroundColour((152,251,152))
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
 
     def onSetGate(self, event):
         status=MenuBar.SPEC_status
@@ -438,6 +528,8 @@ class SortingPanel(wx.Panel):
                 wx.MessageDialog(self, "Enter a number", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
             s1 = 'setup.specsp.setGate(%d, %d, %d, %d)'%(lowerI, upperI, lowerL, upperL)
             pyperclip.copy(s1)
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
             if self.udpSend != False:
                 self.udpSend.Send(s1)
                 self.udpSend.Send(s2)
@@ -450,10 +542,26 @@ class SortingPanel(wx.Panel):
             s1 = self.onSetDropTime()
             s2 = self.onSetOnTime()
             pyperclip.copy(s1)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
             if self.udpSend != False:
                 self.udpSend.Send(s1)
                 self.udpSend.Send(s2)
 
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+    def onSetConfig(self, event):
+        status=MenuBar.SPEC_status
+        if status!= True:
+            wx.MessageDialog(self, "Please first start the Spectrometer thread first. Spectrometer > Open", "Warning!", wx.OK | wx.ICON_WARNING).ShowModal()
+        else:
+            s1 = self.onSetDropTime()
+            s2 = self.onSetOnTime()
+            pyperclip.copy(s1)
+            if self.udpSend != False:
+                self.udpSend.Send(s1)
+                self.udpSend.Send(s2)
+
+=======
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
     def onSetOnTime(self):
         try:
                 t=float(self.entry6.GetValue())
@@ -552,8 +660,15 @@ class SortingPanel(wx.Panel):
 
 class MenuBar(wx.MenuBar):
     """Create the menu bar."""
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
     PID_status = False
     SPEC_status = False
+=======
+    #class vars
+    PID_status = False
+    SPEC_status = False
+    #instance vars
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
     def __init__(self, pumpnrs, sviewer, cviewer, udpSend, specpanel):
         wx.MenuBar.__init__(self)
         self.pumpnrs = pumpnrs
@@ -603,8 +718,12 @@ class MenuBar(wx.MenuBar):
         if self.udpSend != False:
             self.udpSend.Send(s)
 
-    def onCloseNem(self,event):
+    def onCloseNem(self,event): ### TO EDIT ###
         s= 'Pumps.bus.close()'
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+        #self.setup.pumpsObjList[pumpID]
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         pyperclip.copy(s)
         if self.udpSend != False:
             self.udpSend.Send(s)
@@ -658,6 +777,11 @@ class MenuBar(wx.MenuBar):
 
     def onStartSpec(self, event):
         MenuBar.SPEC_status = True
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+        #self.SPEC = True
+        #Enable Spec sizer
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         self.specpanel.Enable()
         s = 'setup.spec.start()'
         pyperclip.copy(s)
@@ -665,6 +789,11 @@ class MenuBar(wx.MenuBar):
                 self.udpSend.Send(s)
 
     def onStopSpec(self, event):
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+        #disable sizer
+        #self.SPEC = False
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         MenuBar.SPEC_status = False
         self.specpanel.Disable()
         s = 'setup.spec.stop()'
@@ -674,11 +803,19 @@ class MenuBar(wx.MenuBar):
 
     def onSpecVwr(self, event):
         cmd = str(self.svwr)
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
         print(('Opening:'+ cmd))
+=======
+        print('Opening:'+ cmd)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def SPEC_status(self):
         """check spec status"""
+<<<<<<< HEAD:fungalmicrofluidics/GUI_fungalsorting.py
+=======
+        #return self.SPEC
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/GUI_fungalmicrofluidics/GUI_fungalsorting.py
         return MenuBar.SPEC_status
 
 if __name__ == '__main__':

@@ -34,9 +34,15 @@ from GSOF_ArduBridge import udpControl
 from GSOF_ArduBridge import ArduBridge
 from GSOF_ArduBridge import ElectrodeGpioStack
 from GSOF_ArduBridge import UDP_Send
+<<<<<<< HEAD
 from build import Nemesys_Bridge as Nemesys_Bridge
 from build import  TCP_Send as TCP_Send
 from build import threadSpec as threadSpec
+=======
+import build.Nemesys_Bridge as Nemesys_Bridge
+import build.TCP_Send as TCP_Send
+import build.threadSpec as threadSpec
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
 
 def extEval(s):
     '''
@@ -52,6 +58,7 @@ def close():
     if SETUP != False:
         if PUMPS != False:
             setup.nem.bus.stop()
+<<<<<<< HEAD
             print('Nemesys Bus closed...\n')
         if SPEC != False and Spec.SPECstatus != False:
             setup.spec.stop()
@@ -62,6 +69,18 @@ def close():
         setup.stop()
     ardu.OpenClosePort(0)
     print('Bye Bye...')
+=======
+            print 'Nemesys Bus closed...\n'
+        if SPEC != False and Spec.SPECstatus != False:
+            setup.spec.stop()
+            print 'Spec thread stoped...\n'
+        if SPECSP != False:
+            setup.specsp.stop()
+            print 'Spec thread stoped...\n'
+        setup.stop()
+    ardu.OpenClosePort(0)
+    print 'Bye Bye...'
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     
 def getProgramFolder():
         moduleFile = __file__
@@ -74,8 +93,13 @@ configPath = os.path.join(getProgramFolder(), "user_config")
 if __name__ == "__main__":
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
     ########################################################################################
+<<<<<<< HEAD
     user= 'user name'
     lib = 'protocol_name' #<--CHANGE PROTOCOL file name
+=======
+    user= 'Kenza Samlali'
+    lib = 'protocol_KS_clr_sort_nem5_v2' #<--CHANGE PROTOCOL file name
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     port = 'COM20' #'/dev/cu.usbmodem14201' #'COM20' <--Change to the correct COM-Port to access the Arduino
     baudRate = 115200 *2 #<--ArduBridge_V1.0 uses 115200 other versions use 230400 = 115200*2
     ONLINE = True #<--True to enable work with real Arduino, False for simulation only.
@@ -91,6 +115,10 @@ if __name__ == "__main__":
     '''
     import user protocol
     '''
+<<<<<<< HEAD
+=======
+    #protocol = __import__(lib)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     protocol = importlib.import_module("user_config."+lib)
     SETUP=False
     '''
@@ -101,6 +129,7 @@ if __name__ == "__main__":
     udpConsol = False
     if REMOTE_CTRL_PORT > 1:
         udpConsol = udpControl.udpControl(nameID='udpIDLE', RxPort=REMOTE_CTRL_PORT, callFunc=extEval)
+<<<<<<< HEAD
         print('Remote-Consol-Active on port %s\n'%(str(REMOTE_CTRL_PORT)))
     '''
     Starting communications with electrode stack and Arduino
@@ -112,18 +141,39 @@ if __name__ == "__main__":
         print('Connecting to Arduino ON-LINE.')
     else:
         print('Arduino OFF-LINE. Simulation mode')
+=======
+        print 'Remote-Consol-Active on port %s\n'%(str(REMOTE_CTRL_PORT))
+    '''
+    Starting communications with electrode stack and Arduino
+    '''
+    print 'Using port %s at %d'%(port, baudRate)
+    ardu = ArduBridge.ArduBridge( COM=port, baud=baudRate )
+    if ONLINE:
+        ardu.OpenClosePort(1)
+        print 'Connecting to Arduino ON-LINE.'
+    else:
+        print 'Arduino OFF-LINE. Simulation mode'
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     ardu.GetID()
     ExtGpio = ElectrodeGpioStack.ExtGpioStack(i2c=ardu.i2c, devList=STACK_BUILD, v=False)#True)
     ExtGpio.init()
     ExtGpio.init()
     ardu.Reset()
+<<<<<<< HEAD
     print('Stack and Ardu ready...\n')
+=======
+    print 'Stack and Ardu ready...\n'
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     
     '''
     Setting up spectrometer thread and server.
     This will allow you to retrieve data from a spectrometer and plot it.
     '''
+<<<<<<< HEAD
     print('Spectrometer Thread status: %s' %(SPEC))
+=======
+    print 'Spectrometer Thread status: %s' %(SPEC)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     if SPEC == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -142,7 +192,11 @@ if __name__ == "__main__":
         ######################################################################################
         specViewer=tcpSendSpec
         Spec.addViewer('TCPspec',specViewer)
+<<<<<<< HEAD
         print('Type Spec.start() to start the spectrometer thread process\n')
+=======
+        print 'Type Spec.start() to start the spectrometer thread process\n'
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     else:
         Spec = None
 
@@ -151,8 +205,14 @@ if __name__ == "__main__":
     This will allow you to analyze the spectrum from SPEC.
     A sorting thread autonomously sorts droplets above a treshold.
     '''
+<<<<<<< HEAD
     print('Spectrometer Signal Processing status: %s' %(SPECSP))
     if SPEC and SPECSP == True:
+=======
+    print 'Spectrometer Signal Processing status: %s' %(SPECSP)
+    if SPEC and SPECSP == True:
+    #if SPECSP == True:
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
         SpecSP = threadSpec.Processing (gpio =  ExtGpio,
@@ -180,15 +240,24 @@ if __name__ == "__main__":
         SpecSP.enIO(True) # sets Spec.enOut to True
         Spec.SPS = SpecSP # self.SPS Instance in threadSpec.Flame class
         SpecSP.spec = Spec
+<<<<<<< HEAD
         print('Access Spec signal processing by typing "SpecSP.". Change sorting Gate and peakfinding properties accordingly before starting Auto-Sort.')
         print('Type "SpecSP.start() to start the auto-sort process."')
+=======
+        print 'Access Spec signal processing by typing "SpecSP.". Change sorting Gate and peakfinding properties accordingly before starting Auto-Sort.'
+        print 'Type "SpecSP.start() to start the auto-sort process."'
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     else:
         SpecSP = None
 
     '''
     Setting up Nemesys syringe pump bridge.
     '''
+<<<<<<< HEAD
     print('Pumps status: %s' %(PUMPS))
+=======
+    print 'Pumps status: %s' %(PUMPS)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     if PUMPS == True:
         #\/\/\/ CHANGE THESE PARAMETERS \/\/\/##################################################
         ########################################################################################
@@ -199,13 +268,19 @@ if __name__ == "__main__":
                                 )
         #/\/\/\   PARAMETERS BLOCK END  /\/\/\################################################
         ######################################################################################
+<<<<<<< HEAD
         print('Syringe pumps ready...')
+=======
+        #nem=nemesysprot.nemesys(cfg=deviceconfig)
+        print 'Syringe pumps ready...'
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     else:
         Pumps = None
 
     '''
     Start printouts
     '''
+<<<<<<< HEAD
     print(("/\  "*10))
     print(("  \/"*10))
     print('Now: %s'%(time.strftime("%Y-%m-%d %H:%M")))
@@ -220,6 +295,23 @@ if __name__ == "__main__":
     print('Change the SPEC spectrometer to True or False to go online')
     print('status: %s' %(SPEC))
     print('Loading protocol: %s' %(lib))
+=======
+    print("/\  "*10)
+    print("  \/"*10)
+    print 'Now: %s'%(time.strftime("%Y-%m-%d %H:%M"))
+    print ''
+    print 'USER: %s'%(user)
+    print 'ASSIGNED PROTOCOL: using %s'%(lib)
+    print ''
+    if (lib =='protocol_KS_clr_sort_nem5_v2') :
+      print 'The protocol you are using, requires the NeMESYS syringe pump add-on'
+      print 'Change the device config file if needed'
+      print 'Change the NeMESYS to True or False to go online'
+      print 'status: %s' %(PUMPS)
+      print 'Change the SPEC spectrometer to True or False to go online'
+      print 'status: %s' %(SPEC)
+    print 'Loading protocol: %s' %(lib)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
     ###############
     #\/\/\/ CHANGE THESE PARAMETERS \/\/\/#
     ''' If adding new methods to the setup class, please ammend here for correct class instance.
@@ -230,9 +322,15 @@ if __name__ == "__main__":
     SETUP = True
     setup.enOut(ELEC_EN)
     prot = protocol.Protocol(setup)
+<<<<<<< HEAD
     print('')
     print(("/\  "*10))
     print(("  \/"*10))
+=======
+    print ''
+    print("/\  "*10)
+    print("  \/"*10)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e
 
     if raw_input('Run GUI? [y/n]') == 'y':
         os.system('python GUI_fungalsorting.py')

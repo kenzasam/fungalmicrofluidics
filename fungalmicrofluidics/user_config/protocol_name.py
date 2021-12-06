@@ -76,6 +76,14 @@ class Setup():
             self.specsp=SpecSP
             print("ok.")
 
+        if (SpecSP is None):
+            print "Spectrometer signal processing thread not found! No spectrometer initiated. Spectomer thread is needed for this protocol."
+            #sys.exit(1)
+            #self.spec=Spec(Flame=Flame, Deviceconfig=deviceconfig)
+        else:
+            self.specsp=SpecSP
+            print "ok."
+
     def init_pumps(self, Pumps):
         """
         Initializing NeMESYS syringe pump thread.

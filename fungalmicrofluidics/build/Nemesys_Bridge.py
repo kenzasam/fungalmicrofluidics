@@ -195,7 +195,11 @@ class Nem():
         pump.calibrate()
         time.sleep(0.2)
         calibration_finished = self.wait_calibration_finished(pump, 30)
+<<<<<<< HEAD:fungalmicrofluidics/build/Nemesys_Bridge.py
         print("Pump calibrated: ", calibration_finished)
+=======
+        print "Pump calibrated: ", calibration_finished
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/Nemesys_Bridge.py
 
     def pumpstartup(self,v=100):
         '''startup function for pumps. Run to calibrate all pumps and aspirate v.

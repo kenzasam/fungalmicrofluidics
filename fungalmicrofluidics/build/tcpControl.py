@@ -65,7 +65,11 @@ class tcpControl():
                 while self.tcpRx.connect_ex((self.DesIP,self.RxPort)) != 0: #raises error indicator 0 if server not available. For asynchronous connects
                     print('Server not available. Trying to bind again in 5sec.')
                     time.sleep(5)
+<<<<<<< HEAD:fungalmicrofluidics/build/tcpControl.py
                 print('{}: Ready on port {}\n'.format(nameID, self.RxPort))
+=======
+                print '%s: Ready on port %d\n'%(nameID, self.RxPort)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/tcpControl.py
                 self.active = True
             except socket.error as msg:
                 print('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])

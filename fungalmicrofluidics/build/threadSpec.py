@@ -134,7 +134,11 @@ class Flame(BT.BasicThread):
                 for dev in list_devices():
                     print((' - #' + str(index) + ':', 'Model:', dev.model + '; serial number:', dev.serial))
                     index += 1
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             if input('Simulate spectrometer device instead?  [Y/n] ') == 'Y': #.upper()
+=======
+            if raw_input('Simulate spectrometer device instead?  [Y/n] ') == 'Y': #.upper()
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
                 self.spec = SBSimulator()
             else:
                 sys.exit(1)
@@ -177,7 +181,11 @@ class Flame(BT.BasicThread):
         t = time in msec'''
         try:
             self.spec.integration_time_micros(t)
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             print("Integration time set to {} ms".format(t))
+=======
+            print ("Integration time set to %d ms") %(t)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
         except:
             print("Error. Can't set integrtion time.")
         
@@ -363,8 +371,15 @@ class Flame(BT.BasicThread):
         file2 = loc+filename2
         with open(filename2, 'w') as f: #time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime())
             f.write(str(self.data))
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
         print(('Data saved to ' + file2 + ', YData saved to ' + file2))
         
+=======
+        print('Data saved to ' + file2 + ', YData saved to ' + file2)
+        #except:
+        #    print('Error while writing ' + time.strftime('Snapshot-%Y-%m-%dT%H:%M:%S.dat', time.gmtime()))
+
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
     def send_df(self,d,c):
         """ Function to send data to TCP client
         """
@@ -523,7 +538,11 @@ class Processing(BT.BasicThread):
                 f.write('\n# Number of frames accumulated: ' + str(self.spec.measurement))
                 f.write('\n# Scan time per exposure [us]: ' + str(self.spec.scan_time))
                 f.write('\n Wavelength [nm], Intensity [RFU]\n')
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             print(('Saving all data under ' +filepk))
+=======
+            print ('Saving all data under ' +filepk)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
         #turn bottom electrode on
         if self.electhread and self.enOut:
             print('{}: Started ON line'.format(self.name))
@@ -556,7 +575,11 @@ class Processing(BT.BasicThread):
                     while sleepTime < 0.05:
                         self.T_Z[0] += self.Period
                         sleepTime += self.Period
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
                     s = '{}: Timing error - Skipping a cycle'.format(self.name)
+=======
+                    s = '%s: Timing error - Skipping a cycle'%(self.name)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
                     #self.teleUpdate(s)
                     print(s)
                 self.lock.release()
@@ -564,11 +587,17 @@ class Processing(BT.BasicThread):
             else:
                 self.lock.release()
         self.enable = False
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
         print('{}: Terminated\n'.format(self.name))
+=======
+        print('%s: Terminated\n'%(self.name))
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
 
     def process(self):
         peakfound = False
+        #global pkcount
         try:
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             #Find all peaks above noise
             p_int, p_wvl = self.findallpeaks(self.spec.wavelengths, self.spec.data)
             #Filter out peaks outside gate
@@ -600,12 +629,58 @@ class Processing(BT.BasicThread):
                         #turn top elec on
                         self.gpio.pinPulse(self.pin_pulse, self.onTime)
                         self.teleUpdate('{}, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
+=======
+            #Find peaks within intesnity gate
+            #p_int, p_wvl = self.findpeaks(self.spec.wavelengths, self.spec.data)
+            #Find all peaks above noise
+            p_int, p_wvl = self.findallpeaks(self.spec.wavelengths, self.spec.data)
+            #print p_wvl,p_int
+            #Filter out peaks outside x range
+            z = [i for i in p_wvl if (self.gateL[0]< i <self.gateL[1])]
+            zz = False
+            if len(z) > 0: 
+                zz = True
+                print('Peak at:'+str(z)) 
+            #if len(z) > 1: 
+            #    '''Take this conditional statement and resp. exception away to sort even with 
+            #    multiple peaks.'''
+            #    raise ValueError('WARNING Multiple peaks within gate detected. Correct gate to sort.')
+            if len(p_int) > 0 and ( (self.gateL == None) or zz):
+                peakfound = True
+                print('+++')
+                if self.countevents(self.peakcnt): 
+                    if self.cntr == self.peakcnt:
+                        self.lock.release()
+                        self.enable = False
+                        print('Final event.')
+                        end_time = datetime.now()
+                        #print('Time elapsed:', end_time - start_time)
+                        self.stop()
+                    self.cntr += 1
+                    print('Peak '+str(self.cntr))
+                #print(str(p_wvl)+'nm, '+str(p_int)+'A.U')
+                if self.SAVE: 
+                    self.savepeaks(filepk, p_wvl, p_int) #saves all peaks, including outside gate
+                if self.electhread and self.enOut:
+                    #wait, depending on distance between detection and electrodes
+                    time.sleep(self.t_wait)
+                    #turn top elec on
+                    self.gpio.pinPulse(self.pin_pulse, self.onTime)
+                    self.teleUpdate('%s, E%d: %f s pulse'%(self.name, self.pin_pulse, self.onTime))
+
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
         except ValueError as e:
             print(e)
         except:
             print('Error...')
             exc_type, exc_value = sys.exc_info()[:2]
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             print('{} : Handling {} exception with message "{}"'.format(self.name, exc_type.__name__, exc_value))
+=======
+            print '%s : Handling %s exception with message "%s"' % \
+                (self.name, exc_type.__name__, exc_value)
+            #stop thread???
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
     def stop(self):
         """Function stopping the thread and turning elecs off
         """
@@ -616,7 +691,11 @@ class Processing(BT.BasicThread):
         BT.BasicThread.stop(self)
         self.gpio.pinWrite(self.pin_ct, 0)
         self.gpio.pinWrite(self.pin_pulse, 0)
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
         self.teleUpdate('{}, E{}: 0'.format(self.name, self.pin_ct))
+=======
+        self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_ct))
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
         self.enOut = False
     
     def pause(self):
@@ -624,8 +703,14 @@ class Processing(BT.BasicThread):
         """
         self.autosort_status = False
         self.enable = False
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
         self.gpio.pinWrite(self.pin_pulse, 0)
         self.teleUpdate('{}, E{}: 0'.format(self.name, self.pin_pulse))
+=======
+        #self.gpio.pinWrite(self.pin_ct, 0)
+        self.gpio.pinWrite(self.pin_pulse, 0)
+        self.teleUpdate('%s, E%d: 0'%(self.name, self.pin_pulse))
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
 
     def play(self):
         """Restart the Threading process
@@ -644,16 +729,25 @@ class Processing(BT.BasicThread):
             f.write('\n'.join(map(lambda x,y:str(x)+', '+str(y), xdata, ydata)) + '\n')
         print('Peak data added to ' + fname)
 
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
     ''' Following are functions to set values from GUI
     '''
+=======
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
     def setGate(self, lowerI, upperI, lowerL, upperL):
         '''set lower intensity, upper intensity, 
         lower wavelength, upper wavelength'''
         try:
             self.gateI = [lowerI, upperI]
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             print(("Gate set to %d - %d [RFU] ") %(lowerI, upperI))
             self.gateL = [lowerL,upperL]
             print(("Gate set to %d - %d [nm] ") %(lowerL, upperL))
+=======
+            print ("Gate set to %d - %d [RFU] ") %(lowerI, upperI)
+            self.gateL = [lowerL,upperL]
+            print ("Gate set to %d - %d [nm] ") %(lowerL, upperL)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
         except:
             print("Error. Can't set gate.")
 
@@ -673,7 +767,11 @@ class Processing(BT.BasicThread):
         '''
         try:
             self.onTime = t
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             print("onTime set to: {} sec ".format(str(t)))
+=======
+            print("onTime set to: %d sec "+ str(t) )
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
         except:
             print("Error. Can't set onTime.")
 
@@ -685,7 +783,11 @@ class Processing(BT.BasicThread):
         try:
             self.pin_ct = pin_ct
             self.pin_pulse = pin_pulse
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             print("Pin_cte: {} , Pin_pulse: {}.".format(pin_ct, pin_pulse))
+=======
+            print("Pin_cte: %d , Pin_pulse: %d.") %(pin_ct, pin_pulse)
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
         except:
             print("Error. Can't set pint_cte or pin_pulse.")
 
@@ -705,4 +807,8 @@ class Processing(BT.BasicThread):
             self.SAVE = bool
             print("Auto-save Peaks ON ")
         except:
+<<<<<<< HEAD:fungalmicrofluidics/build/threadSpec.py
             print("Error. Can't set Auto-Save.")
+=======
+            print("Error. Can't set Auto-Save.")
+>>>>>>> f69241a8f1f1f172398eece622e0d31d1521301e:fungalmicrofluidics/threadSpec.py
