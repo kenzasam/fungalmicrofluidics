@@ -1,6 +1,22 @@
+# Mo, 06 12 2021
+## Experiment details
 
+### Auto-sort, using 5uM fluorescein and 0.6% dye H2O
+*droplet generation* 
+- Fluorescein 5uM: 0.0005  oil: 0.004
+- blue: 0.002 Oil: 0.008
+- Spacer: 0.03
 
-# Tu, 02 01 2021
+*sorting*
+- Potential: 200, 10kHz
+- Time: 0.2sec
+- Gate:  , 500-550nm,
+- Int time: 50msec
+- pin ontime: 0.3s
+
+Once good drops, stop all flows except oil: 0.004 and spacer. then autosort. PERFECT!
+
+# Tu, 02 11 2021
 ## Experiment details
 
 ### Auto-sort, using 5uM fluorescein and 0.6% dye H2O
@@ -19,7 +35,7 @@
 drops great size. directly intosorter, not reinject!!
 peaks were recorded
 
-# Mo, 01 01 2021
+# Mo, 01 11 2021
 ## Experiment details
 
 ### Auto-sort, using 5uM fluorescein and 0.6% dye H2O
